@@ -14,10 +14,10 @@ const tracker = fixture.tracker
 const defaultColumnWidth = 250
 
 const builtInColumns = [
-  "Name",
+  "Torrent",
   "Size",
-  "Down",
-  "Up",
+  "↓ Download",
+  "↑ Upload",
   "Upload total",
   "Progress",
   "Label",
@@ -93,7 +93,7 @@ describe("torrent columns", function () {
 
   it("shows a sensible Progress column value", async function () {
     const progress = (await torrent.getColumn("percent")).trim()
-    assert.match(progress, /^[A-Za-z(): ]+(?: \d+(?:\.\d)?%)?$/)
+    assert.match(progress, /^\d+(?:\.\d)?%$/)
   })
 
   it("shows a sensible Peers column value", async function () {

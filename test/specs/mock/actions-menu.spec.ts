@@ -2,7 +2,7 @@ import chai from "chai"
 import { $, browser } from "@wdio/globals"
 import { eventually } from "../../e2e/eventually"
 import { waitForModalClose, waitForModalOpen } from "../../e2e/modal"
-import { configureSpec } from "../../framework/fixture"
+import { configureSpec, getTestFixture } from "../../framework/fixture"
 
 const assert: Chai.AssertStatic = chai.assert
 
@@ -142,13 +142,19 @@ describe("mock Actions menu", function () {
     await browser.keys("Enter")
     await waitForModalClose(modal)
 
+    const app = getTestFixture().app
+    await app.openSettings()
+    await app.settingsGotoTab("layout")
+    await app.setLayoutColumnEnabled("Label", true)
+    await app.settingsSave()
     const label = await $("#torrentTable tbody tr[data-id] td[data-col='label']").getText()
     assert.equal(label.trim(), "mock-label-1")
   })
 })
 
 async function openSetLabelModal() {
-  const row = $(`#torrentTable tbody tr[data-id='${"a".repeat(40)}']`)
+  await browser.keys("Escape")
+  const row = $(`#torrentTable tbody tr[data-id='${"a".repeat(40)}'] td[data-col='decodedName']`)
   await row.waitForClickable()
   const parentWindow = await browser.getWindowHandle()
   const existingWindowHandles = new Set(await browser.getWindowHandles())

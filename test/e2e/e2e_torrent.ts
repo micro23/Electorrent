@@ -43,7 +43,8 @@ export class Torrent {
     const columns = {}
     for await (const e of elem) {
       const colName = await e.getAttribute("data-col")
-      const colText = await e.getText()
+      const colText = colName === "decodedName"
+        ? await e.$(".torrent-name-content").getText() : await e.getText()
       columns[colName] = colText
     }
     return columns
@@ -51,7 +52,7 @@ export class Torrent {
 
   async getColumn(column: ColumnName) {
     const torrent = $(this.query)
-    const elem = torrent.$(`td[data-col='${column}']`)
+    const elem = torrent.$(`td[data-col='${column}']${column === "decodedName" ? " .torrent-name-content" : ""}`)
     return await elem.getText()
   }
 

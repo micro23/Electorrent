@@ -6,6 +6,7 @@ import type { AppSettings, EditCommand, PendingTorrentUploadLink, WindowCommand 
 import { getAppVersion } from './app-meta'
 import { bittorrentManager } from './bittorrent'
 import { normalizeConnectionError } from './bittorrent/connection-error'
+import logger from './logger'
 import * as certificates from './certificates'
 import * as menu from './menu'
 import * as settings from './settings'
@@ -236,7 +237,12 @@ export function registerHandlers({ isDebug, forceTitleBarMenu, getWindow, consum
             await onBittorrentConnected?.()
             return { ok: true, connection }
         } catch (error) {
-            return { ok: false, error: normalizeConnectionError(error) }
+            const connectionError = normalizeConnectionError(error)
+            logger.warn('Bittorrent connection failed', {
+                client: server.client, host: server.ip, port: server.port, path: server.path,
+                kind: connectionError.kind, code: connectionError.code,
+            })
+            return { ok: false, error: connectionError }
         }
     })
 

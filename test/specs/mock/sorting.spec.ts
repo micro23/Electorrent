@@ -79,7 +79,8 @@ describe("mock torrent table sorting", function () {
   }
 
   async function getColumnHeader(columnName: string) {
-    const header = $(`//table[@id='torrentTable']//th[contains(normalize-space(.), '${columnName}')]`)
+    const key = { Name: "decodedName", Size: "size", Progress: "percent" }[columnName]
+    const header = $(`#torrentTable th[sort-key='${key}']`)
     await header.waitForDisplayed()
     await header.waitForClickable()
     return header
@@ -104,7 +105,7 @@ describe("mock torrent table sorting", function () {
 
   async function getColumnValues(column: string) {
     await waitForMockRows(sortingScenario.length)
-    const cells = await $$(`#torrentTable tbody tr[data-id] td[data-col='${column}']`)
+    const cells = await $$(`#torrentTable tbody tr[data-id] td[data-col='${column}']${column === "decodedName" ? " .torrent-name-content" : ""}`)
     const values: string[] = []
     for (const cell of cells) {
       values.push((await cell.getText()).trim())
@@ -149,26 +150,15 @@ describe("mock torrent table sorting", function () {
     return Number(match![1]) * byteUnits[match![2]]
   }
 
-  function parseProgress(value: string) {
-    const match = value.match(/^(.+?)\s+(\d+(?:\.\d+)?)%$/)
-    if (!match) {
-      return {
-        status: value,
-        progress: 0,
-      }
-    }
-    return {
-      status: match[1],
-      progress: Number(match[2]),
-    }
-  }
-
   async function getProgressRows() {
     await waitForMockRows(sortingScenario.length)
-    const cells = await $$("#torrentTable tbody tr[data-id] td[data-col='percent']")
+    const rows = await $$("#torrentTable tbody tr[data-id]")
     const values: Array<{ progress: number, status: string }> = []
-    for (const cell of cells) {
-      values.push(parseProgress((await cell.getText()).trim()))
+    for (const row of rows) {
+      values.push({
+        progress: Number.parseFloat(await row.$("td[data-col='percent']").getText()),
+        status: await row.$("td[data-col='statusMessage']").getText(),
+      })
     }
     return values
   }

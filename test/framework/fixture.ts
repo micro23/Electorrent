@@ -45,7 +45,8 @@ export function configureSpec(options: { login?: boolean, clearTorrents?: boolea
     }, 10 * 1000)
     await browser.execute((settings) => {
       const rendererWindow = window as unknown as Window & { electorrent: ElectorrentBridge }
-      return rendererWindow.electorrent.settings.saveAll(settings)
+      return rendererWindow.electorrent.bittorrent.disconnect()
+        .then(() => rendererWindow.electorrent.settings.saveAll(settings))
     }, createDefaultSettings())
     fs.rmSync(path.join(userDataPath, "certs"), { recursive: true, force: true })
     await browser.execute(() => window.localStorage.clear())
