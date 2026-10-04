@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - master
+    tags:
+      - "v*"
   pull_request:
+  workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0' # every Sunday at midnight
+
+permissions:
+  contents: read
 
 env:
   NODE_VERSION: 22.x
@@ -61,12 +67,16 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
     - name: Install npm dependencies
       run: npm install
+    - name: Lint
+      run: npm run lint
+    - name: Test GitHub updater
+      run: node --test test/unit/github-updater.test.cjs
     - name: Build web application
       run: npm run build
     - name: Package application
       run: npm run pack
     - name: Run tests
-      run: xvfb-run -a -- npm test -- --dist --client "${{ matrix.client }}" --parallel
+      run: xvfb-run -a -- npm test -- --dist --client "${{ matrix.client }}" --headless
 
   build:
     strategy:
@@ -96,18 +106,57 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
     - name: Install npm dependencies
       run: npm install
+    - name: Verify release version
+      if: startsWith(github.ref, 'refs/tags/v')
+      shell: bash
+      run: |
+        node --input-type=module -e 'import fs from "node:fs"; const root = JSON.parse(fs.readFileSync("package.json")); const app = JSON.parse(fs.readFileSync("app/package.json")); if (process.env.GITHUB_REF_NAME !== `v${root.version}` || app.version !== root.version) throw new Error("Release tag must match both package versions")'
     - name: Build distribution
+      if: runner.os != 'macOS'
       run: npm run dist
-      if: github.ref != 'refs/heads/master'
+    - name: Build unsigned macOS distribution
+      if: runner.os == 'macOS'
+      run: npm run dist -- --config.mac.identity=null --config.extraMetadata.manualMacUpdates=true
+      env:
+        CSC_IDENTITY_AUTO_DISCOVERY: false
     - name: Upload distribution
       uses: actions/upload-artifact@v4
-      if: github.event_name == 'pull_request'
       with:
         name: electorrent-dist-${{ runner.os }}
-        path: dist/**
+        path: |
+          dist/*.exe
+          dist/*.dmg
+          dist/*.zip
+          dist/*.AppImage
+          dist/*.deb
+          dist/*.rpm
+          dist/*.snap
+          dist/*.blockmap
+          dist/latest*.yml
         if-no-files-found: error
-    - name: Release artifacts
-      if: github.ref == 'refs/heads/master'
-      run: npm run release
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Download distributions
+      uses: actions/download-artifact@v4
+      with:
+        pattern: electorrent-dist-*
+        path: release-assets
+        merge-multiple: true
+    - name: Create draft release with installers and update metadata
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: micro23/Electorrent
+        RELEASE_TAG: ${{ github.ref_name }}
+      run: |
+        if gh release view "$RELEASE_TAG" --json isDraft > release.json 2>/dev/null; then
+          node -e 'if (!require("./release.json").isDraft) throw new Error("Refusing to overwrite a published release")'
+        else
+          gh release create "$RELEASE_TAG" --verify-tag --draft --title "$RELEASE_TAG" --generate-notes
+        fi
+        gh release upload "$RELEASE_TAG" release-assets/* --clobber

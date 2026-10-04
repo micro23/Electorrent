@@ -25,12 +25,12 @@ export class ProgressDirective implements IDirective {
         let idle = true;
         const bar = element.find(".bar");
 
-        const updateProgress = (oldPercent?: number) => {
+        const updateProgress = () => {
             if (!controller.torrent) {
                 return;
             }
 
-            if (controller.torrent.percent < 1000 || (oldPercent !== undefined && oldPercent < 1000)) {
+            if (controller.torrent.percent >= 0) {
                 bar.css("width", controller.torrent.getPercentStr());
                 if (idle) {
                     this.$timeout(() => {
@@ -45,7 +45,7 @@ export class ProgressDirective implements IDirective {
             () => controller.torrent && controller.torrent.percent,
             (newPercent, oldPercent) => {
                 if (newPercent !== oldPercent) {
-                    updateProgress(oldPercent);
+                    updateProgress();
                 }
             },
         );

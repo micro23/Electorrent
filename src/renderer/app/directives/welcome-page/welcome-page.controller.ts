@@ -1,13 +1,10 @@
 export class WelcomePageController {
-    static $inject = ["$scope", "$timeout", "$bittorrent", "$btclients", "settingsService", "notificationService", "Server"];
+    static $inject = ["$scope", "$btclients", "settingsService", "Server"];
 
     constructor(
         $scope: any,
-        $timeout: angular.ITimeoutService,
-        $bittorrent: any,
         $btclients: any,
         settingsService: any,
-        $notify: any,
         Server: any,
     ) {
         $scope.connecting = false;
@@ -20,12 +17,9 @@ export class WelcomePageController {
         $scope.connect = () => {
             $scope.connecting = true;
 
-            $scope.server.connect().then(() => {
-                return settingsService.saveServer($scope.server);
-            }).then(() => {
-                $scope.$emit("connect:server", $scope.server);
+            settingsService.saveServer($scope.server).then(() => {
+                $scope.$emit("connect:server", $scope.server, true);
                 clearForm();
-                $notify.ok("Success!", "Hooray! Welcome to Electorrent");
             }).catch((err: unknown) => {
                 console.error(err);
             }).finally(() => {

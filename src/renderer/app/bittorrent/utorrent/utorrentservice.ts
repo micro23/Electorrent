@@ -131,9 +131,13 @@ export class UtorrentClient extends TorrentClient<UtorrentTorrent> {
     },
   ];
 
+  private actionHeaderWithoutLabels?: TorrentActionList<UtorrentTorrent>
+
   get actionHeader(): TorrentActionList<UtorrentTorrent> {
-    return this.features.labels
-      ? this.baseActionHeader
-      : this.baseActionHeader.filter((action) => action.type !== "labels")
+    if (this.features.labels) {
+      return this.baseActionHeader
+    }
+    this.actionHeaderWithoutLabels ??= this.baseActionHeader.filter((action) => action.type !== "labels")
+    return this.actionHeaderWithoutLabels
   }
 }

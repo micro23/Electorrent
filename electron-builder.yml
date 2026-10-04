@@ -6,7 +6,12 @@ directories:
 toolsets:
   appimage: 1.0.3
 productName: Electorrent
-appId: com.github.tympanix.electorrent
+appId: com.github.micro23.electorrent
+publish:
+  - provider: github
+    owner: micro23
+    repo: Electorrent
+    releaseType: draft
 files:
   - '!**/*.map'
 mac:
@@ -18,16 +23,12 @@ mac:
       arch:
         - universal
         - arm64
+    - target: zip
+      arch:
+        - universal
+        - arm64
 win:
-  target: squirrel
-  publish:
-    - github
-dmg:
-  publish:
-    - github
-pkg:
-  publish:
-    - github
+  target: nsis
 linux:
   icon: build/png
   category: Network;FileTransfer;P2P;
@@ -40,18 +41,6 @@ linux:
     - AppImage
     - deb
     - rpm
-snap:
-  publish:
-    - github
-appImage:
-  publish:
-    - github
-deb:
-  publish:
-    - github
-rpm:
-  publish:
-    - github
 extraFiles:
   - filter:
       - resources

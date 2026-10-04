@@ -230,9 +230,13 @@ export class RtorrentClient extends TorrentClient<RtorrentTorrent> {
       },
     ];
 
+    private actionHeaderWithoutLabels?: TorrentActionList<RtorrentTorrent>
+
     get actionHeader(): TorrentActionList<RtorrentTorrent> {
-      return this.features.labels
-        ? this.baseActionHeader
-        : this.baseActionHeader.filter((action) => action.type !== "labels")
+      if (this.features.labels) {
+        return this.baseActionHeader
+      }
+      this.actionHeaderWithoutLabels ??= this.baseActionHeader.filter((action) => action.type !== "labels")
+      return this.actionHeaderWithoutLabels
     }
 }

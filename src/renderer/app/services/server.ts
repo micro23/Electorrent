@@ -1,4 +1,3 @@
-import _ from "underscore"
 import type { IPromise } from "angular"
 import { Torrent } from "@renderer/app/bittorrent"
 import type { ColumnProps } from "@renderer/app/services/column"
@@ -345,9 +344,34 @@ export const serverService = ['$q', 'notificationService', '$bittorrent', '$btcl
         Server.prototype.parseColumns = function(data) {
             const columns = this.defaultColumns()
             if(!data || data.length === 0) return columns
-            columns.sort(zipsort(columns, data))
+
+            // Replace the untouched pre-Deck default layout once. Custom column
+            // selections continue to use their saved names and order.
+            const legacyDefaults = [
+                ["Torrent", "State", "Progress", "Size", "Ratio", "↓ Download", "↑ Upload", "ETA", "Seeds", "Peers", "Seeding time"],
+                ["Name", "Size", "Down", "Up", "Progress", "Label", "Date Added", "Date Completed"],
+                ["Name", "Size", "Down", "Up", "Progress", "Peers", "Seeds", "ETA"],
+                ["Torrent", "Size", "↓ Download", "↑ Upload", "Progress", "Label", "Date Added", "Date Completed"],
+                ["Torrent", "Size", "↓ Download", "↑ Upload", "Progress", "Peers", "Seeds", "ETA"],
+                ["Torrent", "State", "Progress", "Size", "Ratio", "↓ Download", "↑ Upload", "ETA", "Seeds", "Peers"],
+            ]
+            const isLegacyDefault = legacyDefaults.some((legacyDefault) =>
+                data.length === legacyDefault.length && legacyDefault.every((name, index) => data[index] === name),
+            )
+            if (isLegacyDefault) return columns
+
+            const aliases: Record<string, string> = {
+                "Name": "Torrent",
+                "Down": "↓ Download",
+                "Download": "↓ Download",
+                "Up": "↑ Upload",
+                "Upload": "↑ Upload",
+                "Seeding Time": "Seeding time",
+            }
+            const savedColumns = data.map((name) => aliases[name] || name)
+            columns.sort(zipsort(columns, savedColumns))
             columns.forEach((column) => {
-                column.enabled = data.some((entry) => (entry === column.name))
+                column.enabled = savedColumns.some((entry) => (entry === column.name))
             })
             return columns
         }
@@ -362,7 +386,14 @@ export const serverService = ['$q', 'notificationService', '$bittorrent', '$btcl
         Server.prototype.addCustomColumns = function (columns) {
             if (this.isClientKnown()) {
                 const client = $bittorrent.getClient(this.client)
-                columns = _.union(columns, client.extraColumns)
+                const columnNames = new Set(columns.map((column) => column.name.toLowerCase()))
+                client.extraColumns.forEach((column) => {
+                    const normalizedName = column.name.toLowerCase()
+                    if (!columnNames.has(normalizedName)) {
+                        columns.push(column)
+                        columnNames.add(normalizedName)
+                    }
+                })
             }
             return columns
         };

@@ -26,7 +26,7 @@ interface NotificationsCenterScope extends IScope {
 }
 
 export class NotificationsCenterController {
-    static $inject = ["$scope", "$rootScope", "$timeout", "settingsService", "notificationService", "$http", "certificateResponseService"];
+    static $inject = ["$scope", "$rootScope", "$timeout", "settingsService", "notificationService", "certificateResponseService"];
 
     constructor(
         $scope: NotificationsCenterScope,
@@ -34,7 +34,6 @@ export class NotificationsCenterController {
         $timeout: angular.ITimeoutService,
         settingsService: any,
         $notify: any,
-        $http: angular.IHttpService,
         certificateResponseService: CertificateResponseService,
     ) {
         const electorrent = window.electorrent
@@ -43,7 +42,7 @@ export class NotificationsCenterController {
 
         $scope.updateData = {
             releaseDate: "Just now...",
-            updateUrl: "https://github.com/tympanix/Electorrent/releases",
+            updateUrl: "https://github.com/micro23/Electorrent/releases",
         };
 
         $scope.notifications = [];
@@ -84,26 +83,13 @@ export class NotificationsCenterController {
             }, event.data || {});
             $scope.manualUpdate = !!data.manual;
 
-            $http.get(data.updateUrl, { timeout: 10000 })
-                .then((res: any) => {
-                    if (!data.releaseNotes) {
-                        data.releaseNotes = res.data.notes;
-                    }
-                    if (!data.releaseDate) {
-                        data.releaseDate = res.data.pub_date;
-                    }
-                })
-                .catch(() => {
-                    if (!data.releaseNotes) {
-                        data.releaseNotes = "Not available. Please go to the website for more info";
-                    }
-                })
-                .then(() => {
-                    $scope.updateData = data;
-                    $timeout(() => {
-                        $scope.updateModalRef?.showModal();
-                    }, $scope.manualUpdate ? 500 : 0);
-                });
+            // Both update paths supply release information with the event.
+            // GitHub release pages are HTML, rather than the old JSON feed.
+            data.releaseNotes ||= "Not available. Please go to the website for more info";
+            $scope.updateData = data;
+            $timeout(() => {
+                $scope.updateModalRef?.showModal();
+            }, $scope.manualUpdate ? 500 : 0);
         });
 
         $scope.installUpdate = () => {

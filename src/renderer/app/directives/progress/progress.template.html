@@ -1,4 +1,67 @@
-<div class="ui torrent progress" ng-class="ctl.class()">
-    <label>{{ctl.label()}}</label>
-    <div class="bar idle"></div>
+<div class="ui torrent progress deck-progress" ng-class="ctl.class()" title="{{ctl.label()}}">
+    <div
+        class="deck-progress-track"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        ng-attr-aria-valuenow="{{ctl.percentValue()}}"
+        ng-attr-aria-label="{{ctl.label()}}"
+    >
+        <div class="bar idle"></div>
+        <!-- Each SVG fragment ID must use the controller-bound torrent ID so every row resolves its own fill/pattern. -->
+        <svg class="deck-special-progress deck-progress-potion" viewBox="0 0 160 32" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+                <clipPath id="potion-inside-{{ctl.torrent.id}}">
+                    <path d="M22 11H133C137 11 138 6 145 6C152 6 156 10 156 16S152 26 145 26C138 26 137 21 133 21H22Z" />
+                </clipPath>
+                <linearGradient id="potion-glass-{{ctl.torrent.id}}" x2="0" y2="1">
+                    <stop stop-color="#e0e0e0" stop-opacity=".8" />
+                    <stop offset=".45" stop-color="#737373" stop-opacity=".7" />
+                    <stop offset="1" stop-color="#b6b6b6" stop-opacity=".8" />
+                </linearGradient>
+                <linearGradient id="potion-liquid-{{ctl.torrent.id}}" x2="0" y2="1">
+                    <stop stop-color="#ffd779" />
+                    <stop offset=".45" stop-color="#f7a52e" />
+                    <stop offset="1" stop-color="#ba4f13" />
+                </linearGradient>
+            </defs>
+            <path d="M17 8H132C137 8 137 3 145 3C154 3 159 8 159 16S154 29 145 29C137 29 137 24 132 24H17Z" fill="#252525" ng-attr-stroke="url(#potion-glass-{{ctl.torrent.id}})" stroke-width="1.5" />
+            <g ng-attr-clip-path="url(#potion-inside-{{ctl.torrent.id}})">
+                <rect x="22" y="6" ng-attr-width="{{134 * ctl.percentValue() / 100}}" height="20" ng-attr-fill="url(#potion-liquid-{{ctl.torrent.id}})" />
+                <path ng-if="ctl.percentValue() > 0" ng-attr-d="M22 12H{{22 + 134 * ctl.percentValue() / 100}}" stroke="#ffe5a1" stroke-opacity=".65" />
+            </g>
+            <path d="M23 9H132C138 9 140 5 145 5C149 5 152 7 153 9" fill="none" stroke="#f0f0f0" stroke-opacity=".55" stroke-width="1" stroke-linecap="round" />
+            <path d="M23 23H132C137 23 140 27 145 27" fill="none" stroke="#9c9c9c" stroke-opacity=".5" stroke-width="1" />
+            <rect x="3" y="10" width="12" height="12" rx="2" fill="#805029" stroke="#b88648" stroke-width="1" />
+            <path d="M6 12V20M10 12V20" stroke="#d2a365" stroke-opacity=".35" />
+            <rect x="14" y="7" width="7" height="18" rx="2" fill="#353535" ng-attr-stroke="url(#potion-glass-{{ctl.torrent.id}})" stroke-width="1.2" />
+            <path d="M16 9V22" stroke="#e6e6e6" stroke-opacity=".65" />
+        </svg>
+        <svg class="deck-special-progress deck-progress-candy-cane" viewBox="0 0 160 32" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+                <pattern id="candy-stripes-{{ctl.torrent.id}}" patternUnits="userSpaceOnUse" width="12" height="12" patternTransform="rotate(35)">
+                    <rect width="12" height="12" fill="#fff5e9" />
+                    <rect width="5" height="12" fill="#d93443" />
+                </pattern>
+            </defs>
+            <path d="M7 23H139C157 23 157 7 143 7H134" fill="none" stroke="#675553" stroke-width="10" stroke-linecap="round" />
+            <path ng-if="ctl.percentValue() > 0" d="M7 23H139C157 23 157 7 143 7H134" fill="none" ng-attr-stroke="url(#candy-stripes-{{ctl.torrent.id}})" stroke-width="10" ng-attr-stroke-linecap="{{ctl.percentValue() >= 100 ? 'round' : 'butt'}}" pathLength="100" ng-attr-stroke-dasharray="{{ctl.percentValue()}} 100" />
+            <path d="M7 20H139C152 20 152 8 143 8H135" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
+        <svg class="deck-special-progress deck-progress-flag" viewBox="0 0 190 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+                <clipPath id="flag-fill-{{ctl.torrent.id}}"><rect width="{{190 * ctl.percentValue() / 100}}" height="100" /></clipPath>
+                <path id="flag-star-{{ctl.torrent.id}}" d="M0-3L.67-.93L2.85-.93L1.09.35L1.76 2.43L0 1.15L-1.76 2.43L-1.09.35L-2.85-.93L-.67-.93Z" />
+            </defs>
+            <g ng-attr-clip-path="url(#flag-fill-{{ctl.torrent.id}})">
+                <rect width="190" height="100" fill="#fff8ed" />
+                <rect ng-repeat="stripe in [0,1,2,3,4,5,6] track by $index" y="{{$index * 200 / 13}}" width="190" height="{{100 / 13}}" fill="#bf263c" />
+                <rect width="76" height="{{700 / 13}}" fill="#183b78" />
+                <g ng-repeat="row in [0,1,2,3,4,5,6,7,8] track by $index">
+                    <use ng-repeat="star in (row % 2 ? [0,1,2,3,4] : [0,1,2,3,4,5]) track by $index" ng-attr-href="#flag-star-{{ctl.torrent.id}}" ng-attr-transform="translate({{($index + (row % 2 ? 1 : .5)) * 76 / 6}},{{(row + 1) * 70 / 13}})" fill="#fff8ed" />
+                </g>
+            </g>
+        </svg>
+    </div>
+    <span class="deck-progress-value">{{ctl.percentage()}}</span>
 </div>

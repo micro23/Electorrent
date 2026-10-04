@@ -1,6 +1,7 @@
 import { app } from 'electron'
 import { spawn } from 'child_process'
 import path from 'path'
+import fs from 'fs'
 import Q from 'q'
 import electronRegedit from 'electron-regedit'
 
@@ -85,7 +86,9 @@ export function configureSystemStartup(option: SystemStartupOption) {
 
         app.setLoginItemSettings({
             openAtLogin,
-            path: stubLauncher,
+            // Older Squirrel installs have a stub one directory above the app.
+            // NSIS installs launch the actual executable in the install directory.
+            path: fs.existsSync(path.join(appFolder, '..', 'Update.exe')) ? stubLauncher : process.execPath,
             args: openAtLogin ? [STARTED_AT_LOGIN_ARG] : [],
         })
         return

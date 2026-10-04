@@ -13,6 +13,7 @@ export class DelugeTorrent extends Torrent {
     public storageMode: string
     public totalRemaining: number
     public trackerHost: string
+    public seedingTime: number
 
     constructor(hash: string, data: Record<string, any>) {
         const dateCompleted = DelugeTorrent.normalizeDateCompleted(hash, data)
@@ -56,6 +57,7 @@ export class DelugeTorrent extends Torrent {
         this.storageMode = data.storage_mode
         this.totalRemaining = data.total_remaining
         this.trackerHost = data.tracker_host
+        this.seedingTime = data.seeding_time
     }
 
     private static normalizeDateCompleted(hash: string, data: Record<string, any>) {

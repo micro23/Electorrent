@@ -33,6 +33,11 @@ if (!startup) {
 }
 
 async function bootstrap() {
+    // Keep automated sessions separate from the user's settings and app lock.
+    const testUserData = app.commandLine.getSwitchValue('test-user-data-dir')
+    if (app.commandLine.hasSwitch('test') && testUserData) {
+        app.setPath('userData', testUserData)
+    }
     const parser = yargs(process.argv.slice(1))
     parser.version(app.getVersion())
     parser.help('h').alias('h', 'help')

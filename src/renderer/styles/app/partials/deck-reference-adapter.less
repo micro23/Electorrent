@@ -1,0 +1,252 @@
+/* Native Angular/Electron geometry. Artwork/materials come from Deck's source. */
+html[data-theme]:not([data-theme="terminal"]) {
+    --deck-radius:var(--theme-radius,12px);
+    --deck-control-radius:var(--theme-control-radius,8px);
+    --torrent-sidebar-width:250px;
+    --torrent-sidebar-collapsed-width:120px;
+    --deck-stat-height:clamp(124px,16vh,140px);
+}
+html[data-theme]:not([data-theme="terminal"]) body .main-panel { background:transparent !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-overview {
+    position:relative; padding:52px 12px 9px; background:transparent !important;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-overview-heading,
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-library-heading { display:none; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stats-grid {
+    display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; margin:0;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stats-grid .deck-stat-card {
+    display:flex !important; flex-direction:column !important; align-items:center !important;
+    justify-content:flex-start !important; min-height:0 !important; height:var(--deck-stat-height) !important;
+    padding:7px 10px 6px !important; gap:6px 0 !important; text-align:center;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stat-icon {
+    display:grid; place-items:center; width:36px; height:32px; flex:0 0 32px; margin:0;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stat-copy { display:flex; flex-direction:column; align-items:center; gap:0; width:calc(100% - 70px); }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stat-copy > span { position:static !important; font-size:11px !important; line-height:1.3; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stat-copy > strong { font-size:21px !important; line-height:1.06; margin:1px 0 0; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stat-copy > small { font-size:11px !important; line-height:1.2; margin:1px 0 0; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stat-chart {
+    display:block !important; position:relative !important; inset:auto !important; width:min(72%,190px) !important;
+    height:17px !important; margin:0 !important; padding:0 !important;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stat-accent { display:none; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-control-strip {
+    position:absolute !important; inset:7px 12px auto !important; display:flex; align-items:center;
+    height:35px !important; min-height:35px !important; margin:0 !important; padding:0 !important;
+    border:0 !important; background:transparent !important; box-shadow:none !important; backdrop-filter:none;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-control-strip .actions.right { justify-content:flex-end; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-control-strip .ui.button {
+    min-height:29px !important; height:29px; padding:6px 8px !important; font-size:11px;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-control-strip .ui.input > input {
+    min-height:31px !important; height:31px !important; font-size:13px;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .main-content {
+    margin:0 12px 12px !important; padding:0 !important; border:1px solid var(--line-strong);
+    border-radius:var(--theme-radius,9px); background:var(--surface); min-height:100px;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable { margin:0 !important; background:transparent !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable thead th {
+    height:32px; padding:0 14px !important; font-size:13px !important; font-weight:750 !important;
+    text-align:center !important; background:var(--core-head,var(--surface-3)) !important;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable tbody td {
+    height:40px; padding:0 8px !important; background:transparent !important;
+    text-align:center !important; font-size:13px !important; font-weight:650 !important;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable tbody td[data-col="decodedName"] { text-align:left !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable .torrent-name-content { font-size:13px !important; font-weight:650 !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable tbody tr:nth-child(even) { background:color-mix(in srgb,var(--text) 3%,transparent); }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable tbody tr:hover,
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable tbody tr.active { background:var(--cyan-soft) !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable .rz-handle { width:16px; right:0; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable .rz-handle::after { background:var(--line-strong) !important; height:8px; width:1.5px; border-radius:2px; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable .rz-handle:hover::after { background:var(--cyan) !important; box-shadow:0 0 5px var(--cyan); }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar .sidebar-scroll { padding:12px; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar .deck-sidebar-add {
+    width:150px !important; height:39px; min-height:39px; margin:0 auto 16px !important; padding:0 10px !important;
+    display:flex; align-items:center; justify-content:center; font-size:14px;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar .nav > li {
+    display:grid; grid-template-columns:20px minmax(0,1fr) 20px; align-items:center; gap:8px;
+    height:39px; min-height:39px; margin:2px 0; padding:0 10px; font-size:13px;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent-sidebar-item-label { text-align:center; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sort.label { background:none !important; border:0 !important; margin:0; padding:0; min-width:0; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .nav { display:flex; flex-direction:column; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .nav > li[data-state="all"] { order:0; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .nav > li[data-state="active"] { order:1; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .nav > li[data-state="downloading"] { order:2; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .nav > li[data-state="seeding"] { order:3; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .nav > li[data-state="paused"] { order:4; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .nav > li[data-state="error"] { order:5; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .status-bar { margin:0 12px 12px; border:1px solid var(--line-strong); border-radius:var(--theme-radius,9px); min-height:38px; background:var(--surface); }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-progress { display:grid !important; grid-template-rows:auto auto; gap:2px; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-progress-value { position:static !important; grid-row:2; font-size:11px; text-align:center; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .theme-detail { position:absolute !important; width:46px; height:46px; right:12px; top:34px; opacity:.22; pointer-events:none; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .theme-detail-left { left:12px; right:auto; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .sports-masthead { display:flex; margin:0 0 9px; min-height:55px; }
+html[data-theme="matrix"][data-theme] body #page-torrents #torrentTable th { background:linear-gradient(180deg,#102519,#0b1a10) !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .matrix-mark i { font-style:normal; }
+html[data-theme="matrix"][data-theme] body #page-torrents i.icon { font-family:icons !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .main-content > div { position:relative; z-index:1; }
+/* Darkhand's clean inset shell, compact content-sized table and empty details. */
+html[data-theme="darkhand"][data-theme] body .main.wrapper { background:#0d1014 !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents { padding:16px 16px 0; }
+html[data-theme="darkhand"][data-theme] body torrent-sidebar { left:16px; top:16px; bottom:12px; width:248px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .torrent.sidebar { border:1px solid var(--line) !important; border-radius:18px !important; width:100% !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .torrent.sidebar .sidebar-scroll { padding:0 0 12px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-brand { padding:0 30px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-sidebar-add { margin:16px auto !important; }
+html[data-theme="darkhand"][data-theme] body .main-panel { width:calc(100% - 264px); }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-overview { padding:52px 0 16px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .main-content { flex:0 1 auto; min-height:0 !important; max-height:calc(100vh - 300px); margin:0 0 16px !important; border-radius:18px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents #torrentTable th { background:var(--surface) !important; text-transform:uppercase; letter-spacing:.06em; }
+html[data-theme="darkhand"][data-theme] body #page-torrents #torrentTable tbody td { height:34px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .status-bar { margin:auto 0 12px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-progress-track { height:14px !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .is-sidebar-collapsed torrent-sidebar { width:120px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .is-sidebar-collapsed .main-panel { width:calc(100% - 136px); }
+html[data-theme="darkhand"][data-theme] body #page-torrents .is-sidebar-collapsed .dh-brand { justify-content:center; padding:0; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .is-sidebar-collapsed .dh-brand span { display:none; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .torrent-sidebar-toggle { display:block !important; }
+.deck-theme-category { grid-column:1/-1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.deck-theme-category h3 { grid-column:1/-1; margin:5px 0; font-size:12px; color:var(--muted); }
+.deck-matrix-preview { height:65px; overflow:hidden; padding:8px; background:#030906; color:#68ff86; font:11px/1.3 monospace; }
+@media(max-width:1100px) {
+    html[data-theme]:not([data-theme="terminal"]) { --torrent-sidebar-width:200px; }
+    html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stat-copy { width:100%; }
+    html[data-theme="darkhand"][data-theme] body .main-panel { width:calc(100% - 264px); }
+}
+@media(prefers-reduced-motion:reduce) {
+    html[data-theme] *,html[data-theme] *::before,html[data-theme] *::after { animation:none !important; transition:none !important; }
+}
+
+html[data-theme]:not([data-theme="terminal"]) body .app-content,
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents { background:transparent !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-overview {
+    min-height:0 !important; height:auto !important; display:block !important;
+    flex:0 0 auto !important; padding:52px 12px 9px !important;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents { --torrent-sidebar-width:250px; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents.is-sidebar-collapsed { --torrent-sidebar-width:120px; }
+html[data-theme]:not([data-theme="terminal"]) body .main.wrapper { min-height:0 !important; height:100vh; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .main-content { flex:1 1 auto; max-height:none !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-overview { padding:52px 0 16px !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .main-content { flex:0 1 auto; max-height:calc(100vh - 300px) !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar {
+    width:100% !important; min-width:0 !important; height:100%; position:relative !important; inset:auto !important;
+}
+html[data-theme] body #page-torrents i.icon { font-family:icons !important; font-style:normal !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent-sidebar-item-label { text-overflow:clip; min-width:0; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar .nav > li { width:auto !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .main-content > div { position:relative; z-index:1; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-stats-grid { display:none !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-overview { padding:52px 0 10px !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-switches {
+    margin:0; padding:0 10px; min-height:30px; justify-content:flex-start;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-overview { margin:0 0 16px; flex:0 0 auto; order:2; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .main-panel { position:relative; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .main-content { order:1; }
+html[data-theme="darkhand"][data-theme] body #page-torrents.dh-stats-above .dh-overview { order:0; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-overview { order:-1; }
+html[data-theme="darkhand"][data-theme] body #page-torrents torrent-details-panel { order:3; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .status-bar { order:4; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-stat > i { font-size:20px; margin:0; line-height:44px; display:grid; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-plot svg { height:125px; width:100%; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-overview .dh-stat strong { font-size:18px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-switches button { cursor:pointer; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .torrent-details-panel { border:1px solid var(--line); border-radius:18px; margin-bottom:16px; background:var(--surface); }
+@media(min-width:1101px) {
+    html[data-theme="darkhand"][data-theme] body #page-torrents.dh-details-right:has(.torrent-details-panel) .main-content,
+    html[data-theme="darkhand"][data-theme] body #page-torrents.dh-details-right:has(.torrent-details-panel) .dh-overview { margin-right:calc(var(--deck-details-width,400px) + 16px) !important; }
+    html[data-theme="darkhand"][data-theme] body #page-torrents.dh-details-right .torrent-details-panel {
+        position:absolute; right:0; top:95px; bottom:54px; width:400px; height:auto !important;
+    }
+    html[data-theme="darkhand"][data-theme] body #page-torrents.dh-details-right .torrent-details-panel-resizer { cursor:ew-resize; top:0; bottom:0; left:-4px; width:8px; height:100%; }
+}
+html[data-theme="mets"][data-theme] body #page-torrents .mets-masthead { flex:0 0 auto; min-height:60px; margin:0 0 9px; }
+html[data-theme="mets"][data-theme] body #page-torrents .sports-motif { max-width:120px; max-height:120px; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .terminal-session-actions {
+    display:flex !important; order:3; align-items:center; gap:3px; margin-left:7px;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .terminal-session-actions button {
+    cursor:pointer; height:29px; padding:0 8px; border:1px solid var(--line-strong);
+    border-radius:var(--theme-control-radius,6px); color:var(--text);
+    background:linear-gradient(180deg,var(--surface-3),var(--surface)); font-size:10px; white-space:nowrap;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .terminal-preferences {
+    display:block; cursor:pointer; border:0; background:none; color:var(--muted); font-size:12px;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent-sidebar-footer { justify-content:flex-start; gap:8px; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-control-strip .actions.left { flex:0 1 auto; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-control-strip .actions.right { flex:1 1 auto; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent-sidebar-footer .torrent-sidebar-toggle { margin:0; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .main-panel { container-type:inline-size; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable .terminal-name-cell { display:flex; min-width:0; align-items:center; gap:6px; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable .torrent-name-content { max-width:max(140px,calc(100cqw - 950px)); width:auto; min-width:0; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .terminal-row-check {
+    display:block; position:relative; flex:0 0 15px; width:15px; height:15px; cursor:pointer;
+    border:1px solid var(--line-strong); border-radius:4px; background:transparent; color:var(--cyan); font-size:0; padding:0;
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .terminal-row-check[aria-pressed="true"]::after { content:"✓"; display:block; font:12px/13px sans-serif; }
+.deck-row-state { display:none; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-row-state {
+    display:grid; place-items:center; flex:0 0 28px; width:28px; height:28px; border-radius:var(--theme-control-radius,6px);
+    color:var(--cyan); background:var(--cyan-soft);
+}
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-row-state i { margin:0; font-size:13px; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .terminal-session-actions button { font-family:inherit; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-sidebar-caption { text-align:center; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable tbody td { border-radius:0 !important; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar .nav > li > .icon { margin:0; }
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar .torrent.sort.label { color:var(--muted) !important; font-size:11px; }
+html[data-theme="matrix"][data-theme] body #page-torrents #torrentTable th .rz-handle::after { box-shadow:none; background:#89c996 !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-empty-details { order:3; flex:0 0 auto; margin-bottom:16px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-empty-details button { display:block; width:100%; background:none; border:0; padding:7px; font-size:11px; color:var(--muted); cursor:pointer; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-empty-details-space { height:115px; }
+/* Deck 1.0.78 Matrix uses a cinematic masthead and horizontal telemetry. */
+html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar { padding:0 !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .torrent.sidebar .sidebar-scroll { padding:26px 16px 20px; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-overview { padding:64px 20px 16px !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stats-grid { gap:12px; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stats-grid .deck-stat-card {
+    display:block !important; height:96px !important; padding:17px 18px !important; text-align:left !important;
+}
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stat-copy { display:block !important; width:100%; text-align:left; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stat-copy > span,
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stat-copy > strong,
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stat-copy > small { display:block !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stat-copy > span { font:9px/1.3 var(--matrix-mono) !important; letter-spacing:.2em; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stat-copy > strong { font:500 24px/1.3 var(--matrix-ui) !important; margin:5px 0 4px; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stat-copy > small { font:9px/1.3 var(--matrix-mono) !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-stat-chart { position:absolute !important; inset:auto 16px 16px auto !important; width:34% !important; height:25px !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents #torrentTable thead th { height:42px; background:#0e1511 !important; text-transform:none; letter-spacing:0; }
+html[data-theme="matrix"][data-theme] body #page-torrents #torrentTable tbody td { height:56px; font-family:var(--matrix-mono) !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents #torrentTable .torrent-name-content { font-family:var(--matrix-ui) !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-sidebar-add { width:100% !important; height:42px; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-progress-track { height:6px !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .main-content { background:#0c1110 !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .main-content::before,
+html[data-theme="matrix"][data-theme] body #page-torrents .main-content::after { content:none !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .matrix-identity { border:0; background:none; box-shadow:none; }
+.deck-matrix-preview { background:linear-gradient(90deg,#080d0bbd,transparent),url('../../assets/deck/matrix-atmosphere.webp') center/cover; color:#63f99a; }
+@media(max-height:740px) { html[data-theme="matrix"][data-theme] body #page-torrents .matrix-masthead { height:148px; } }
+
+/* Smaller visible grips; retain the full resize hit target. */
+html[data-theme] body #page-torrents #torrentTable.ui.table th .rz-handle::after {
+  top:50% !important;
+  bottom:auto !important;
+  height:8px !important;
+  width:1.5px !important;
+  opacity:.8 !important;
+  transform:translateY(-50%) !important;
+}
+html[data-theme="terminal"] body #page-torrents #torrentTable.ui.table th .rz-handle::after {
+  width:1px !important;
+}

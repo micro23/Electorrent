@@ -85,6 +85,10 @@ const commonPlugins = [
         noErrorOnMissing: true,
       },
       {
+        from: path.resolve(__dirname, 'src/renderer/assets/deck'),
+        to: path.resolve(outDir, 'deck-assets'),
+      },
+      {
         from: geoIpCountryDir,
         to: path.resolve(outDir, 'node_modules/geoip-country'),
       },

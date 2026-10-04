@@ -283,9 +283,13 @@ export class TransmissionClient extends TorrentClient<TransmissionTorrent> {
       },
     ];
 
+    private actionHeaderWithoutLabels?: TorrentActionList<TransmissionTorrent>
+
     get actionHeader(): TorrentActionList<TransmissionTorrent> {
-      return this.features.labels
-        ? this.baseActionHeader
-        : this.baseActionHeader.filter((action) => action.type !== "labels")
+      if (this.features.labels) {
+        return this.baseActionHeader
+      }
+      this.actionHeaderWithoutLabels ??= this.baseActionHeader.filter((action) => action.type !== "labels")
+      return this.actionHeaderWithoutLabels
     }
 }

@@ -33,6 +33,39 @@
                 <dropdown-item ng-repeat="theme in ctl.themes" title="theme.theme" value="theme.basename"></dropdown-item>
             </dropdown>
         </div>
+        <div class="content deck-theme-gallery" aria-label="Deck themes">
+            <section class="deck-theme-category" ng-repeat="category in ctl.themeCategories track by category.id">
+            <h3>{{category.label}}</h3>
+            <button
+                type="button"
+                class="deck-theme-preview"
+                ng-repeat="theme in ctl.categoryThemes(category) track by theme.basename"
+                ng-class="{'is-selected': ctl.settings.ui.theme === theme.basename}"
+                ng-click="ctl.chooseTheme(theme)"
+                aria-label="Choose {{theme.theme}} theme"
+                title="{{theme.theme}}">
+                <img ng-if="theme.basename !== 'matrix'" ng-src="deck-assets/theme-previews/{{ctl.themePreview(theme)}}" alt="" loading="lazy">
+                <div ng-if="theme.basename === 'matrix'" class="deck-matrix-preview" aria-hidden="true"><strong>THE MATRIX</strong><br><small>CONNECTED TO THE SOURCE</small></div>
+                <span>{{theme.theme}}</span>
+            </button>
+            </section>
+        </div>
+    </div>
+    <div class="ui card deck-shortcuts-help">
+        <div class="content">
+            <div class="header"><i class="keyboard icon"></i> Deck Keyboard Shortcuts</div>
+            <div class="description">Quick controls are available throughout the app.</div>
+        </div>
+        <div class="content deck-shortcut-list">
+            <span><kbd>A</kbd> Add torrent</span>
+            <span><kbd>/</kbd> Focus search</span>
+            <span><kbd>D</kbd> Darkhand</span>
+            <span><kbd>T</kbd> Next theme</span>
+            <span><kbd>Shift</kbd> + <kbd>T</kbd> Previous theme</span>
+            <span><kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>K</kbd> Command palette</span>
+            <span><kbd>Esc</kbd> Close the top panel</span>
+            <span><kbd>↑</kbd>/<kbd>↓</kbd> Move torrent selection</span>
+        </div>
     </div>
     <div class="ui card" ng-if="!ctl.platform.linux()">
         <div class="content">

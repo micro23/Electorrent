@@ -31,6 +31,7 @@ const DELUGE_TORRENT_FIELDS = [
     "ratio",
     "save_path",
     "seeds_peers_ratio",
+    "seeding_time",
     "storage_mode",
     "stop_at_ratio",
     "stop_ratio",

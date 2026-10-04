@@ -12,6 +12,7 @@ export class DelugeClient extends TorrentClient<DelugeTorrent> {
         const data: Record<string, any> = await getSnapshot()
 
         return applyFreeDiskSpace({
+            sessionStats: data.stats || {},
             labels: Array.isArray(data.labels) ? data.labels : [],
             all: Object.keys(data.torrents || {}).map((hash) => new DelugeTorrent(hash, data.torrents[hash])),
             changed: [],
@@ -205,9 +206,13 @@ export class DelugeClient extends TorrentClient<DelugeTorrent> {
         },
     ]
 
+    private actionHeaderWithoutLabels?: TorrentActionList<DelugeTorrent>
+
     get actionHeader(): TorrentActionList<DelugeTorrent> {
-        return this.features.labels
-            ? this.baseActionHeader
-            : this.baseActionHeader.filter((action) => action.type !== "labels")
+        if (this.features.labels) {
+            return this.baseActionHeader
+        }
+        this.actionHeaderWithoutLabels ??= this.baseActionHeader.filter((action) => action.type !== "labels")
+        return this.actionHeaderWithoutLabels
     }
 }

@@ -225,10 +225,18 @@ export abstract class Torrent implements TorrentProps {
     }
 
     static COL_NAME = new Column({
-      name: 'Name',
+      name: 'Torrent',
       enabled: true,
-      template: '{{settings.ui.cleanNames ? torrent.decodedName : torrent.name}}',
+      template: '<span class="terminal-name-cell"><button type="button" class="terminal-row-check" ng-click="toggleTerminalSelection($event, torrent)" ng-attr-aria-pressed="{{torrent.selected}}" aria-label="Select torrent">{{torrent.selected ? "[✓]" : "[ ]"}}</button><span class="deck-row-state" ng-attr-title="{{torrent.manualStatusText()}}"><i class="icon" ng-class="{\'arrow down\': torrent.isStatusDownloading(), \'arrow up\': torrent.isStatusSeeding(), \'pause\': torrent.isStatusPaused() || torrent.isStatusStopped(), \'clock\': torrent.isStatusQueued(), \'exclamation triangle\': torrent.isStatusError()}"></i></span><span class="torrent-name-content">{{settings.ui.cleanNames ? torrent.decodedName : torrent.name}}</span></span>',
       attribute: 'decodedName',
+      sort: Column.ALPHABETICAL
+    })
+
+    static COL_STATE = new Column({
+      name: 'State',
+      enabled: true,
+      template: '{{torrent.manualStatusText()}}',
+      attribute: 'statusMessage',
       sort: Column.ALPHABETICAL
     })
 
@@ -240,14 +248,14 @@ export abstract class Torrent implements TorrentProps {
     })
 
     static COL_DOWNSPEED = new Column({
-      name: 'Down',
+      name: '↓ Download',
       enabled: true,
       template: '{{torrent.downloadSpeed | speed}}',
       attribute: 'downloadSpeed'
     })
 
     static COL_UPSPEED = new Column({
-      name: 'Up',
+      name: '↑ Upload',
       enabled: true,
       template: '{{torrent.uploadSpeed | speed}}',
       attribute: 'uploadSpeed'
@@ -283,7 +291,7 @@ export abstract class Torrent implements TorrentProps {
 
     static COL_LABEL = new Column({
       name: 'Label',
-      enabled: true,
+      enabled: false,
       template: '<span class="torrent-table-label-chip" ng-if="torrent.label" label-chip="torrent.label"><span class="label-chip-text">{{torrent.label}}</span></span>',
       attribute: 'label',
       sort: Column.ALPHABETICAL
@@ -291,28 +299,28 @@ export abstract class Torrent implements TorrentProps {
 
     static COL_DATEADDED = new Column({
       name: 'Date Added',
-      enabled: true,
+      enabled: false,
       template: '<span time="torrent.dateAdded"></span>',
       attribute: 'dateAdded'
     })
 
     static COL_DATECOMPLETED = new Column({
       name: 'Date Completed',
-      enabled: true,
+      enabled: false,
       template: '<span time="torrent.dateCompleted"></span>',
       attribute: 'dateCompleted'
     })
 
     static COL_PEERS = new Column({
       name: 'Peers',
-      enabled: false,
+      enabled: true,
       template: '{{torrent.peersText()}}',
       attribute: 'peersConnected'
     })
 
     static COL_SEEDS = new Column({
       name: 'Seeds',
-      enabled: false,
+      enabled: true,
       template: '{{torrent.seedsText()}}',
       attribute: 'seedsConnected'
     })
@@ -327,7 +335,7 @@ export abstract class Torrent implements TorrentProps {
 
     static COL_ETA = new Column({
       name: 'ETA',
-      enabled: false,
+      enabled: true,
       template: '{{torrent.eta | eta}}',
       attribute: 'eta',
       sort: Column.NATURAL_NUMBER_ASC
@@ -335,9 +343,17 @@ export abstract class Torrent implements TorrentProps {
 
     static COL_RATIO = new Column({
       name: 'Ratio',
-      enabled: false,
+      enabled: true,
       template: '{{torrent.ratio | torrentRatio}}',
       attribute: 'ratio'
+    })
+
+    static COL_SEEDING_TIME = new Column({
+      name: 'Seeding time',
+      enabled: true,
+      template: '{{torrent.seedingTime | eta}}',
+      attribute: 'seedingTime',
+      sort: Column.NATURAL_NUMBER_ASC
     })
 
     static COL_RATIO_LIMIT = new Column({
@@ -349,19 +365,21 @@ export abstract class Torrent implements TorrentProps {
 
     static COLUMNS = [
         Torrent.COL_NAME,
+        Torrent.COL_STATE,
         Torrent.COL_SIZE,
+        Torrent.COL_PROGRESS,
         Torrent.COL_DOWNSPEED,
         Torrent.COL_UPSPEED,
+        Torrent.COL_ETA,
+        Torrent.COL_RATIO,
+        Torrent.COL_SEEDS,
+        Torrent.COL_PEERS,
+        Torrent.COL_SEEDING_TIME,
         Torrent.COL_UPLOAD_TOTAL,
-        Torrent.COL_PROGRESS,
         Torrent.COL_LABEL,
         Torrent.COL_DATEADDED,
         Torrent.COL_DATECOMPLETED,
-        Torrent.COL_PEERS,
-        Torrent.COL_SEEDS,
         Torrent.COL_QUEUE,
-        Torrent.COL_ETA,
-        Torrent.COL_RATIO,
         Torrent.COL_RATIO_LIMIT
     ]
 

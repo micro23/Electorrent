@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS: AppSettings = {
         displayCompact: false,
         cleanNames: true,
         fixedHeader: false,
-        theme: 'system',
+        theme: 'darkhand',
         sidebarCollapsed: false,
         speedUnit: 'bytes',
     },

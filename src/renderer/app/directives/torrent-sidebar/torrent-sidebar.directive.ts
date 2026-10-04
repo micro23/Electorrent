@@ -42,6 +42,7 @@ export class TorrentSidebarController {
     onStatus?: (locals: { status: string }) => void;
     onLabel?: (locals: { label?: string }) => void;
     onTracker?: (locals: { tracker?: string }) => void;
+    onAdd?: () => void;
 
     static $inject = ["settingsService", "notificationService"];
 
@@ -81,6 +82,8 @@ export class TorrentSidebarController {
         this.onTracker?.({ tracker });
     }
 
+    addTorrent() { this.onAdd?.(); }
+
     numInStatus(status: string) {
         return Object.values(this.torrents || {}).filter(this.torrentFilter(status)).length;
     }
@@ -106,8 +109,9 @@ export class TorrentSidebarController {
     private statusFilter(torrent: TorrentLike, status: string) {
         switch (status) {
             case "all": return true;
+            case "active": return torrent.isStatusDownloading() || torrent.isStatusSeeding() || torrent.isStatusQueued();
             case "finished": return torrent.isStatusCompleted();
-            case "downloading": return torrent.isStatusDownloading() || torrent.isStatusPaused();
+            case "downloading": return torrent.isStatusDownloading();
             case "paused": return torrent.isStatusPaused();
             case "queued": return torrent.isStatusQueued();
             case "seeding": return torrent.isStatusSeeding();
@@ -136,6 +140,7 @@ export class TorrentSidebarDirective implements IDirective {
         onStatus: "&",
         onLabel: "&",
         onTracker: "&",
+        onAdd: "&",
     };
     bindToController = true;
     controller = TorrentSidebarController;

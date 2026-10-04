@@ -1,4 +1,5 @@
 <div class="main wrapper">
+    <div class="terminal-window-drag" aria-hidden="true"></div>
     <header class="title-bar" aria-label="Window title bar">
         <title-bar-menu
             ng-if="showTitleBarMenu()"
@@ -25,6 +26,19 @@
         </div>
 
         <notifications-center></notifications-center>
+
+        <div class="deck-command-backdrop" ng-if="commandPaletteOpen" ng-click="commandPaletteOpen = false">
+            <section class="deck-command-palette" role="dialog" aria-modal="true" aria-label="Command palette" ng-click="$event.stopPropagation()">
+                <div class="deck-command-search"><i class="search icon"></i><input id="command-palette-search" type="text" placeholder="Type a command…" ng-model="commandSearch" aria-label="Command search"></div>
+                <div class="deck-command-list">
+                    <button type="button" ng-if="!commandSearch || 'add torrent'.includes(commandSearch.toLowerCase())" ng-click="runCommand('add')"><i class="plus icon"></i><span>Add torrent</span><kbd>A</kbd></button>
+                    <button type="button" ng-if="!commandSearch || 'open preferences'.includes(commandSearch.toLowerCase())" ng-click="runCommand('preferences')"><i class="cog icon"></i><span>Open Preferences</span></button>
+                    <button type="button" ng-if="!commandSearch || 'refresh torrents'.includes(commandSearch.toLowerCase())" ng-click="runCommand('refresh')"><i class="refresh icon"></i><span>Refresh torrents</span></button>
+                    <button type="button" ng-if="!commandSearch || 'focus search'.includes(commandSearch.toLowerCase())" ng-click="runCommand('search')"><i class="search icon"></i><span>Focus search</span><kbd>/</kbd></button>
+                </div>
+                <div class="deck-command-hint"><kbd>Esc</kbd> close <span>·</span> <kbd>⌘ K</kbd> open</div>
+            </section>
+        </div>
 
         <div ng-show="showSettings()" class="overlay animated">
             <settings-page></settings-page>

@@ -63,6 +63,74 @@ export class TorrentsPageController {
         $scope.totalUploadSpeed = 0;
         $scope.totalDownloaded = 0;
         $scope.totalUploaded = 0;
+        $scope.connectedPeers = 0;
+        $scope.sessionStats = {};
+        $scope.activeTorrentCount = 0;
+        const layoutKey = "electorrent-deck-layout";
+        const readStored = (key: string, fallback: any) => {
+            try { return JSON.parse(localStorage.getItem(key) || "null") || fallback; } catch { return fallback; }
+        };
+        const savedLayout = readStored(layoutKey, {});
+        $rootScope.deckLayout = {
+            stats: savedLayout.stats === "above" ? "above" : "below",
+            details: savedLayout.details === "right" ? "right" : "bottom",
+        };
+        $scope.setDeckPlacement = (key: "stats" | "details", value: string) => {
+            $rootScope.deckLayout[key] = value;
+            try { localStorage.setItem(layoutKey, JSON.stringify($rootScope.deckLayout)); } catch { /* Storage may be unavailable. */ }
+        };
+        $scope.deckChartMinutes = Math.max(1, Math.min(129600, Number(readStored("electorrent-deck-chart-minutes", 5)) || 5));
+        $scope.updateDeckChart = () => {
+            $scope.deckChartMinutes = Math.max(1, Math.min(129600, Number($scope.deckChartMinutes) || 5));
+            try { localStorage.setItem("electorrent-deck-chart-minutes", JSON.stringify($scope.deckChartMinutes)); } catch { /* Storage may be unavailable. */ }
+            renderDeckHistory();
+        };
+        const historyKey = `electorrent-deck-history:${$rootScope.$server?.id || "default"}`;
+        let speedHistory: number[][] = readStored(historyKey, []);
+        if (!Array.isArray(speedHistory)) speedHistory = [];
+        speedHistory = speedHistory.filter(row => Array.isArray(row) && row.length === 3 && row.every(Number.isFinite));
+        let lastHistorySave = 0;
+        function renderDeckHistory() {
+            const now = Date.now();
+            const start = now - $scope.deckChartMinutes * 60000;
+            const rows = speedHistory.filter(row => row[0] >= start && row[0] <= now);
+            const step = Math.max(1, Math.ceil(rows.length / 600));
+            const visible = rows.filter((_row, index) => index % step === 0 || index === rows.length - 1);
+            const max = Math.max(1, ...visible.flatMap(row => [row[1], row[2]])) * 1.2;
+            $scope.deckChartMax = max;
+            $scope.deckHistoryPaths = [1, 2].map(column => {
+                let previous = 0;
+                return visible.map(row => {
+                    const command = !previous || row[0] - previous > Math.max(90000, step * 90000) ? "M" : "L";
+                    previous = row[0];
+                    return `${command}${((row[0] - start) / ($scope.deckChartMinutes * 60000) * 700).toFixed(2)},${(110 - row[column] / max * 100).toFixed(2)}`;
+                }).join(" ");
+            });
+            $scope.deckChartStart = start;
+            $scope.deckChartNow = now;
+        }
+        function recordDeckHistory() {
+            const now = Date.now();
+            const last = speedHistory[speedHistory.length - 1];
+            if (!last || now - last[0] >= 15000) speedHistory.push([now, $scope.totalDownloadSpeed, $scope.totalUploadSpeed]);
+            // Fine samples for one hour; minute samples for up to 90 days.
+            speedHistory = speedHistory.filter((row, index, rows) => row[0] >= now - 90 * 86400000 &&
+                (row[0] >= now - 3600000 || index === 0 || Math.floor(row[0] / 60000) !== Math.floor(rows[index - 1][0] / 60000)));
+            if (now - lastHistorySave >= 60000) {
+                try { localStorage.setItem(historyKey, JSON.stringify(speedHistory)); } catch { /* Chart still works in memory. */ }
+                lastHistorySave = now;
+            }
+            renderDeckHistory();
+        }
+        $scope.downloadChart = "0,22 12,16 24,19 36,10 48,14 60,5 72,12 84,8 96,14 108,5 120,9";
+        $scope.uploadChart = "0,17 12,20 24,14 36,18 48,9 60,13 72,6 84,15 96,8 108,12 120,4";
+        const downloadHistory: number[] = [];
+        const uploadHistory: number[] = [];
+        const chartPoints = (samples: number[]) => {
+            const values = samples.length ? samples : [0];
+            const max = Math.max(1, ...values);
+            return values.map((value, index) => `${Math.round(index * 120 / Math.max(values.length - 1, 1))},${Math.round(25 - value / max * 21)}`).join(" ");
+        };
         $scope.freeDiskSpace = null;
         $scope.alternativeSpeedLimitsEnabled = false;
         $scope.contextMenu = null;
@@ -133,7 +201,7 @@ export class TorrentsPageController {
         $scope.renderDone = () => {
             $scope.guiBusy = false;
             $timeout(() => {
-                $scope.$emit("hide:loading");
+                $rootScope.$broadcast("hide:loading");
             }, 100);
         };
 
@@ -208,6 +276,7 @@ export class TorrentsPageController {
         });
 
         $scope.$on("wipe:torrents", () => {
+            initialSnapshotRendered = false;
             $scope.connectionLost = false;
             setSyncConnectionState("normal");
             deselectAll();
@@ -248,6 +317,26 @@ export class TorrentsPageController {
                 console.error(err);
             }
         };
+
+        $scope.openTorrentFiles = () => {
+            window.electorrent.torrents.openFiles(false).then((files) => {
+                files.forEach((file) => {
+                    $scope.$broadcast("torrents:add", {
+                        ...file,
+                        data: new Uint8Array(file.data),
+                    }, false);
+                });
+                $scope.$applyAsync();
+            }).catch((err: unknown) => {
+                console.error("Could not open torrent files", err);
+                $notify.alert("Could not open torrent files", "Select a valid .torrent file and try again");
+            });
+        };
+
+        $scope.$on("shortcut:add-torrent", () => $scope.openTorrentFiles());
+        $scope.$on("shortcut:refresh-torrents", () => {
+            if (isServerReady()) void $scope.update(true).catch(() => undefined);
+        });
 
         $scope.$on("stop:torrents", () => {
             stopTimer();
@@ -683,6 +772,12 @@ export class TorrentsPageController {
             (event.currentTarget as HTMLElement).closest("table")?.focus({ preventScroll: true });
         };
 
+        $scope.toggleTerminalSelection = (event: MouseEvent, torrent: any) => {
+            event.stopPropagation();
+            toggleSelect(torrent);
+            (event.currentTarget as HTMLElement).closest("table")?.focus({ preventScroll: true });
+        };
+
         $scope.navigateSelection = (event: KeyboardEvent) => {
             if ((event.key !== "ArrowUp" && event.key !== "ArrowDown") || $scope.arrayTorrents.length === 0) {
                 return;
@@ -727,6 +822,18 @@ export class TorrentsPageController {
                 .catch((err: unknown) => {
                     console.error("Action error", err);
                     $notify.alert("Invalid action", "The action could not be performed because the server responded with a faulty reply");
+                });
+        };
+
+        $scope.doAllAction = (role: string) => {
+            const client = $rootScope.$btclient;
+            const item = client.actionHeader.find((action: any) => action.role === role);
+            if (!item || item.type !== "button" || !$scope.arrayTorrents.length) return;
+            return item.click.call(client, $scope.arrayTorrents.slice())
+                .then(() => syncAfterTorrentMutation())
+                .catch((err: unknown) => {
+                    console.error("Session action error", err);
+                    $notify.alert("Invalid action", "The session action could not be performed");
                 });
         };
 
@@ -834,8 +941,9 @@ export class TorrentsPageController {
         function statusFilter(torrent: any, status: string) {
             switch (status) {
                 case "all": return true;
+                case "active": return torrent.isStatusDownloading() || torrent.isStatusSeeding() || torrent.isStatusQueued();
                 case "finished": return torrent.isStatusCompleted();
-                case "downloading": return torrent.isStatusDownloading() || torrent.isStatusPaused();
+                case "downloading": return torrent.isStatusDownloading();
                 case "paused": return torrent.isStatusPaused();
                 case "queued": return torrent.isStatusQueued();
                 case "seeding": return torrent.isStatusSeeding();
@@ -892,16 +1000,26 @@ export class TorrentsPageController {
         }
 
         function refreshTorrents() {
-            let torrents = fetchTorrents();
+            const allTorrents = fetchTorrents();
+            let torrents = allTorrents;
             torrents = torrents.filter(torrentFilter());
             torrents = fuzzySearch(torrents);
             torrents = torrents.sort(torrentSorter());
             $scope.isSearching = false;
             $scope.arrayTorrents = torrents;
-            $scope.totalDownloadSpeed = torrents.reduce((acc: number, { downloadSpeed }: { downloadSpeed: number }) => acc + downloadSpeed, 0);
-            $scope.totalUploadSpeed = torrents.reduce((acc: number, { uploadSpeed }: { uploadSpeed: number }) => acc + uploadSpeed, 0);
-            $scope.totalDownloaded = torrents.reduce((acc: number, { downloaded }: { downloaded: number }) => acc + downloaded, 0);
-            $scope.totalUploaded = torrents.reduce((acc: number, { uploaded }: { uploaded: number }) => acc + uploaded, 0);
+            $scope.totalDownloadSpeed = allTorrents.reduce((acc: number, { downloadSpeed }: { downloadSpeed: number }) => acc + downloadSpeed, 0);
+            $scope.totalUploadSpeed = allTorrents.reduce((acc: number, { uploadSpeed }: { uploadSpeed: number }) => acc + uploadSpeed, 0);
+            $scope.totalDownloaded = allTorrents.reduce((acc: number, { downloaded }: { downloaded: number }) => acc + downloaded, 0);
+            $scope.totalUploaded = allTorrents.reduce((acc: number, { uploaded }: { uploaded: number }) => acc + uploaded, 0);
+            $scope.connectedPeers = allTorrents.reduce((acc: number, torrent: any) => acc + (torrent.peersConnected || 0), 0);
+            $scope.activeTorrentCount = allTorrents.filter((torrent: any) => (torrent.isStatusDownloading() || torrent.isStatusSeeding())).length;
+            recordDeckHistory();
+            downloadHistory.push($scope.totalDownloadSpeed);
+            uploadHistory.push($scope.totalUploadSpeed);
+            if (downloadHistory.length > 12) downloadHistory.shift();
+            if (uploadHistory.length > 12) uploadHistory.shift();
+            $scope.downloadChart = chartPoints(downloadHistory);
+            $scope.uploadChart = chartPoints(uploadHistory);
         }
 
         function reassignSelected() {
@@ -946,6 +1064,8 @@ export class TorrentsPageController {
             }
         }
 
+        let initialSnapshotRendered = false;
+
         $scope.update = (fullupdate?: boolean) => {
             const serverId = $rootScope.$server?.id;
             const request = $rootScope.$btclient?.torrents(!!fullupdate);
@@ -964,6 +1084,7 @@ export class TorrentsPageController {
                 if (serverId !== $rootScope.$server?.id) {
                     return;
                 }
+                if (torrents.sessionStats) $scope.sessionStats = torrents.sessionStats;
                 newTorrents(torrents);
                 deleteTorrents(torrents);
                 changeTorrents(torrents);
@@ -977,7 +1098,11 @@ export class TorrentsPageController {
                 }
             }).then(() => {
                 syncDetailsPanel();
-                if (!$scope.arrayTorrents || $scope.arrayTorrents.length === 0) {
+                // Do not rely solely on ngRepeat's repeat-done callback to
+                // remove the app-shell loading overlay. Some client responses
+                // update the torrent list without causing that callback to run.
+                if (!initialSnapshotRendered) {
+                    initialSnapshotRendered = true;
                     $scope.renderDone();
                 }
             }).catch((err: unknown) => {

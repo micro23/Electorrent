@@ -1,4 +1,4 @@
-import { IDirective, IDirectiveFactory } from "angular";
+import { IDirective, IDirectiveFactory, IAugmentedJQuery } from "angular";
 import { parseServerAddressInput, sanitizeServerAddress } from "@shared/server-address";
 import html from "./connection-form.template.html";
 
@@ -37,7 +37,13 @@ export class ConnectionFormDirective implements IDirective {
         return () => new ConnectionFormDirective();
     }
 
-    link(scope: ConnectionFormScope) {
+    link(scope: ConnectionFormScope, element: IAugmentedJQuery) {
+        const focusTimer = window.setTimeout(() => {
+            if (!scope.server?.ip || !scope.server?.client) return;
+            const password = element[0].querySelector<HTMLInputElement>('input[type="password"]');
+            if (password?.offsetParent && (!document.activeElement || document.activeElement === document.body)) password.focus();
+        }, 150);
+        scope.$on("$destroy", () => window.clearTimeout(focusTimer));
         scope.showSubmit = scope.showSubmit === true;
         scope.showLabels = scope.showLabels !== false;
         scope.large = scope.large === true;

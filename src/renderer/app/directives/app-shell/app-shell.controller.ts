@@ -20,6 +20,8 @@ interface AppShellScope extends IScope {
     currentPage: () => string | null;
     showTitleBarMenu: () => boolean;
     hasBrowserTitleBarMenu: boolean;
+    commandPaletteOpen: boolean;
+    commandSearch: string;
     [key: string]: any;
 }
 
@@ -66,6 +68,53 @@ export class AppShellController {
         $scope.hasBrowserTitleBarMenu = false;
         $scope.currentPage = () => page;
         $scope.showTitleBarMenu = () => $scope.hasBrowserTitleBarMenu;
+        $scope.commandPaletteOpen = false;
+        $scope.commandSearch = "";
+
+        const shortcutKeyDown = (event: KeyboardEvent) => {
+            const target = event.target instanceof Element ? event.target : null;
+            const typingSelector = 'input,textarea,select,[contenteditable="true"],[role="textbox"]';
+            const typing = !!target?.closest(typingSelector) || !!document.activeElement?.matches(typingSelector);
+            if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+                event.preventDefault();
+                $scope.commandPaletteOpen = true;
+                $scope.commandSearch = "";
+                $scope.$applyAsync();
+                $timeout(() => document.querySelector<HTMLInputElement>("#command-palette-search")?.focus());
+                return;
+            }
+            if (event.key === "Escape" && $scope.commandPaletteOpen) {
+                event.preventDefault();
+                $scope.commandPaletteOpen = false;
+                $scope.$applyAsync();
+                return;
+            }
+            if (event.key === "Escape") {
+                $rootScope.$broadcast("shortcut:escape");
+                return;
+            }
+            if (typing || event.metaKey || event.ctrlKey || event.altKey || event.repeat) return;
+            if (event.key === "/") {
+                const search = document.querySelector<HTMLInputElement>("input[search]");
+                if (search) {
+                    event.preventDefault();
+                    search.focus();
+                }
+            } else if (event.key.toLowerCase() === "a") {
+                event.preventDefault();
+                $rootScope.$broadcast("shortcut:add-torrent");
+            }
+        };
+        window.addEventListener("keydown", shortcutKeyDown);
+        $scope.$on("$destroy", () => window.removeEventListener("keydown", shortcutKeyDown));
+
+        $scope.runCommand = (command: string) => {
+            $scope.commandPaletteOpen = false;
+            if (command === "add") $rootScope.$broadcast("shortcut:add-torrent");
+            if (command === "preferences") $scope.$emit("show:settings");
+            if (command === "refresh") $rootScope.$broadcast("shortcut:refresh-torrents");
+            if (command === "search") $timeout(() => document.querySelector<HTMLInputElement>("input[search]")?.focus());
+        };
 
         $rootScope.$on("ready", () => {
             Promise.all([settingsService.whenReady(), electorrent.app.getMeta()]).then(([_, meta]: [unknown, AppMeta]) => {
@@ -191,8 +240,25 @@ export class AppShellController {
             page = PAGE_TORRENTS;
         };
 
+        const cancelLoadingTimeout = () => {
+            if (loadingTimer) {
+                $timeout.cancel(loadingTimer);
+                loadingTimer = undefined;
+            }
+        };
+
+        const startLoadingTimeout = () => {
+            cancelLoadingTimeout();
+            loadingTimer = $timeout(() => {
+                loadingTimer = undefined;
+                $scope.showLoading = false;
+                $notify.alert("Loading took too long", "There seems to be something wrong with loading");
+            }, MAX_LOADING_TIME);
+        };
+
         const pageLoading = () => {
             $scope.showLoading = true;
+            startLoadingTimeout();
         };
 
         const pageSettings = (settingsPage?: string, serverId?: string) => {
@@ -215,7 +281,7 @@ export class AppShellController {
             page = PAGE_WELCOME;
         };
 
-        const connectToServer = (server: any) => {
+        const connectToServer = (server: any, notifyOnConnect = false) => {
             const connectionId = ++activeConnectionId;
             const isCurrentConnection = () => connectionId === activeConnectionId;
 
@@ -237,6 +303,9 @@ export class AppShellController {
 
                 $scope.statusText = "Loading Torrents";
                 settingsService.updateServer(server);
+                if (notifyOnConnect) {
+                    $notify.ok("Success!", "Hooray! Welcome to Electorrent");
+                }
                 pageTorrents(true);
                 if (initialLaunchPayloadDelivered) {
                     return;
@@ -270,8 +339,8 @@ export class AppShellController {
             $scope.$apply();
         });
 
-        $scope.$on("connect:server", (event: unknown, server: any) => {
-            connectToServer(server);
+        $scope.$on("connect:server", (event: unknown, server: any, notifyOnConnect?: boolean) => {
+            connectToServer(server, notifyOnConnect);
         });
 
         $scope.$on("show:settings", () => {
@@ -287,10 +356,8 @@ export class AppShellController {
             pageServers();
         });
 
-        $scope.$on("hide:loading", () => {
-            if (loadingTimer) {
-                $timeout.cancel(loadingTimer);
-            }
+        $rootScope.$on("hide:loading", () => {
+            cancelLoadingTimeout();
             $scope.showLoading = false;
         });
 
@@ -310,11 +377,7 @@ export class AppShellController {
         $scope.$on("loading", (event: unknown, message: string) => {
             $scope.statusText = message;
             $scope.showLoading = true;
-
-            loadingTimer = $timeout(() => {
-                $scope.showLoading = false;
-                $notify.alert("Loading took too long", "There seems to be something wrong with loading");
-            }, MAX_LOADING_TIME);
+            startLoadingTimeout();
         });
 
         $scope.showSettings = () => page === PAGE_SETTINGS;

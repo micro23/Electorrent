@@ -16,6 +16,10 @@ export class TorrentDetailsPanelController {
   private readonly defaultPanelHeight = 320;
   private readonly minPanelHeight = 220;
   private panelHeight = this.defaultPanelHeight;
+  private panelWidth = 400;
+  private isSidePanel() {
+    return this.rootScope.deckTheme === "darkhand" && this.rootScope.deckLayout?.details === "right" && this.$window.innerWidth > 1100;
+  }
   private stopResizeListeners?: () => void;
 
   constructor(
@@ -24,6 +28,11 @@ export class TorrentDetailsPanelController {
     private $window: IWindowService,
     private $document: IDocumentService,
   ) {
+    try {
+      const saved = JSON.parse(this.$window.localStorage.getItem("electorrent-deck-details-size") || "{}");
+      this.panelHeight = Math.max(this.minPanelHeight, Math.min(600, Number(saved.height) || this.defaultPanelHeight));
+      this.panelWidth = Math.max(320, Math.min(720, Number(saved.width) || 400));
+    } catch { /* Use the default panel size. */ }
     this.scope.isOpen = false;
     this.scope.torrent = null;
     this.scope.refresh = 0;
@@ -34,7 +43,8 @@ export class TorrentDetailsPanelController {
     });
     const syncListener = this.rootScope.$on("torrentDetails:sync", (_event, torrent) => {
       if (!this.scope.isOpen) {
-        return;
+        if (this.rootScope.deckTheme === "darkhand" && torrent) this.open(torrent);
+        else return;
       }
 
       if (!torrent) {
@@ -48,11 +58,15 @@ export class TorrentDetailsPanelController {
     const resetListener = this.rootScope.$on("wipe:torrents", () => {
       this.close();
     });
+    const escapeListener = this.rootScope.$on("shortcut:escape", () => {
+      if (this.scope.isOpen) this.close();
+    });
 
     this.scope.$on("$destroy", () => {
       openListener();
       syncListener();
       resetListener();
+      escapeListener();
       this.stopResizeListeners?.();
     });
   }
@@ -63,9 +77,9 @@ export class TorrentDetailsPanelController {
     }
 
     this.scope.isOpen = true;
-    this.panelHeight = this.defaultPanelHeight;
     this.scope.activeTab = this.defaultTab();
     this.scope.torrent = torrent;
+    document.querySelector<HTMLElement>("#page-torrents")?.style.setProperty("--deck-details-width", `${this.panelWidth}px`);
     this.scope.refresh += 1;
   }
 
@@ -85,9 +99,7 @@ export class TorrentDetailsPanelController {
   }
 
   panelStyle() {
-    return {
-      height: `${this.panelHeight}px`,
-    };
+    return this.isSidePanel() ? { width: `${this.panelWidth}px`, height: "auto" } : { height: `${this.panelHeight}px`, width: "100%" };
   }
 
   canShowPeers() {
@@ -114,23 +126,28 @@ export class TorrentDetailsPanelController {
     event.preventDefault();
     event.stopPropagation();
 
-    const startY = event.clientY;
-    const startHeight = this.panelHeight;
+    const side = this.isSidePanel();
+    const startY = side ? event.clientX : event.clientY;
+    const startHeight = side ? this.panelWidth : this.panelHeight;
     const documentRef = this.$document[0];
 
     this.stopResizeListeners?.();
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const delta = startY - moveEvent.clientY;
-      const maxHeight = Math.max(this.minPanelHeight, (this.$window.innerHeight || startHeight) - 140);
-      const nextHeight = Math.max(this.minPanelHeight, Math.min(maxHeight, startHeight + delta));
+      const delta = startY - (side ? moveEvent.clientX : moveEvent.clientY);
+      const maxHeight = side ? Math.min(720, this.$window.innerWidth * .45) : Math.max(this.minPanelHeight, (this.$window.innerHeight || startHeight) - 140);
+      const nextHeight = Math.max(side ? 320 : this.minPanelHeight, Math.min(maxHeight, startHeight + delta));
 
       this.scope.$evalAsync(() => {
-        this.panelHeight = nextHeight;
+        if (side) {
+          this.panelWidth = nextHeight;
+          document.querySelector<HTMLElement>("#page-torrents")?.style.setProperty("--deck-details-width", `${nextHeight}px`);
+        } else this.panelHeight = nextHeight;
       });
     };
 
     const onMouseUp = () => {
+      try { this.$window.localStorage.setItem("electorrent-deck-details-size", JSON.stringify({ height: this.panelHeight, width: this.panelWidth })); } catch { /* Resizing still works without storage. */ }
       documentRef.removeEventListener("mousemove", onMouseMove);
       documentRef.removeEventListener("mouseup", onMouseUp);
       this.stopResizeListeners = undefined;

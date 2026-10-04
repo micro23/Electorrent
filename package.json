@@ -1,14 +1,14 @@
 {
   "name": "electorrent",
-  "version": "2.17.1",
+  "version": "2.18.0",
   "description": "A thin client for your torrenting needs",
   "type": "module",
   "main": "app/main.js",
   "license": "GPL-3.0",
   "scripts": {
-    "app": "electron app/main.js",
+    "app": "electron .",
     "app:debug": "NODE_ENV=test npm run app -- --force-title-bar-menu",
-    "app:mcp": "electron --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 app/main.js",
+    "app:mcp": "electron --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 .",
     "build": "npm run build:webpack -- --mode production --config-node-env production",
     "build:webpack": "webpack --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --mode development --config-node-env development --watch",
@@ -19,20 +19,22 @@
     "prerelease": "npm run build",
     "release": "electron-builder",
     "version": "node ./scripts/sync-app-version.js && git add app/package.json",
-    "test": "wdio run ./wdio.conf.ts",
-    "smoketest": "npm test -- --client qbittorrent:latest --mochaOpts.grep \"torrent is stopped and resumed\" --headless",
-    "lint": "eslint ./src ./test ./wdio.conf.ts && tsc --build"
+    "test": "node scripts/run-tests.mjs",
+    "smoketest": "npm test -- --client mock --spec test/specs/mock/headless-window.spec.ts --spec test/specs/mock/bulk-torrent-actions.spec.ts --headless",
+    "lint": "eslint ./src ./test ./wdio.conf.ts && tsc --build",
+    "smoketest:integration": "npm test -- --client qbittorrent:latest --mochaOpts.grep \"torrent is stopped and resumed\" --headless"
   },
   "keywords": [
     "utorrent"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tympanix/Electorrent.git"
+    "url": "https://github.com/micro23/Electorrent.git"
   },
   "author": "tympanix",
   "dependencies": {
     "electron-regedit": "^2.0.0",
+    "electron-updater": "^6.8.9",
     "geoip-country": "^5.0.202607180103",
     "less": "^4.4.1",
     "q": "^1.5.1",

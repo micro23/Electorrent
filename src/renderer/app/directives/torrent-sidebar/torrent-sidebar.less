@@ -23,16 +23,19 @@ torrent-sidebar {
 
     .sidebar-scroll {
         flex: 1 1 auto;
-        height: 100%;
+        height: auto;
         min-height: 0;
         overflow-x: visible;
         overflow-y: auto;
     }
 
-    .torrent-sidebar-header {
+    .torrent-sidebar-footer {
+        flex: 0 0 auto;
         display: flex;
-        justify-content: flex-end;
-        padding: 12px 14px 0;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 44px;
+        padding: 0 12px 10px;
     }
 
     .torrent-sidebar-toggle {
@@ -163,7 +166,6 @@ torrent-sidebar {
 }
 
 #page-torrents.is-sidebar-collapsed torrent-sidebar {
-    .torrent-sidebar-header { justify-content: center; padding-right: 0; padding-left: 0; }
     .nav { padding-right: 8px; padding-left: 8px; }
     .nav li { flex-direction: column; justify-content: center; gap: .2em; margin: .2em; padding: 4px; }
     .torrent-sidebar-item-label { flex: 0 0 0; width: 0; opacity: 0; }

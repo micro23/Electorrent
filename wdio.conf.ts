@@ -1,5 +1,9 @@
 import { browser } from '@wdio/globals'
 import { fileURLToPath } from 'node:url'
+import { mkdtempSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
+import electronBinary from 'electron'
 import { TEST_CLIENTS } from './test/clients'
 import ElectorrentTestService from './test/framework/service'
 import ElectorrentSpecReporter from './test/framework/spec-reporter'
@@ -37,21 +41,25 @@ const workerClientLabels = new Map<string, string>()
 const specReporterPath = fileURLToPath(new URL('./test/framework/spec-reporter.ts', import.meta.url))
 
 function electronCapability(client: (typeof selectedClients)[number]): WebdriverIO.Capabilities {
+    const testUserData = mkdtempSync(path.join(tmpdir(), 'electorrent-test-'))
     return {
         browserName: 'electron',
         'wdio:maxInstances': client.fixture ? concurrency : 1,
         'wdio:specs': client.specs ?? standardSpecs,
         'electorrent:client': client,
         'wdio:electronServiceOptions': {
-            ...useDistribution ? {} : { appEntryPoint: 'app/main.js' },
+            ...useDistribution ? {} : { appBinaryPath: electronBinary as unknown as string },
             appArgs: [
+                ...(useDistribution ? [] : [`--app=${path.resolve('.')}`]),
                 '--test',
+                `--test-user-data-dir=${testUserData}`,
                 ...(client.appArgs ?? []),
                 ...(useHeadless ? ['--headless'] : []),
             ],
         },
         'goog:chromeOptions': {
             args: [
+                `--user-data-dir=${testUserData}`,
                 '--no-sandbox',
                 '--disable-dev-shm-usage',
             ],
@@ -67,12 +75,10 @@ function clientLabel(capabilities: WebdriverIO.Capabilities) {
 }
 
 async function quitElectronApp() {
+    if (!browser.electron) return
     await browser.electron.execute((electron) => {
-        electron.app.quit()
-
-        setTimeout(() => {
-            electron.app.exit(0)
-        }, 1000).unref?.()
+        // Return from the inspector call before exiting the disposable test app.
+        setTimeout(() => electron.app.exit(0), 100).unref?.()
     }).catch(() => undefined)
 }
 

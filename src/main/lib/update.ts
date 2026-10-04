@@ -1,6 +1,6 @@
-import { app, autoUpdater, dialog, shell, type BrowserWindow } from 'electron'
+import { app, dialog, shell, type BrowserWindow } from 'electron'
+import { autoUpdater, type UpdateInfo } from 'electron-updater'
 import fs from 'fs'
-import is from 'electron-is'
 import path from 'path'
 import request from 'request'
 import semver from 'semver'
@@ -8,39 +8,71 @@ import semver from 'semver'
 import { IPC_CHANNELS } from '@shared/ipc'
 import * as electorrent from './electorrent'
 import logger from './logger'
-import { buildUpdateUrl } from './update-url'
 
-const ENDPOINT = 'https://electorrent.vercel.app/'
+const RELEASES_URL = 'https://github.com/micro23/Electorrent/releases'
 const UPDATE_CONNECTION_ERROR = 'Could not check version automatically. Please visit the website instead'
 const version = app.getVersion()
 
-let updateUrl = buildUpdateUrl(ENDPOINT, process.platform, version, process.arch)
+// Only explicit --update-url overrides use the legacy JSON downloader (local tests).
+let updateUrl: string | undefined
 let mainWindow: BrowserWindow | null = null
 let update: any = null
 let downloadedUpdate: string | null = null
 let verbose = false
+let manualMacUpdates = false
 
 export function checkForUpdates(notifyVerbose: boolean) {
     verbose = notifyVerbose === true
 
-    if (is.windows()) {
-        autoUpdater.checkForUpdates()
-    } else {
+    if (updateUrl) {
         manualUpdater()
+        return
     }
+    if (!app.isPackaged) {
+        if (verbose) {
+            sendUpdateStatus({ type: 'error', message: 'Automatic updates are available in installed releases.' })
+        }
+        return
+    }
+    if (manualMacUpdates) {
+        manualMacUpdater()
+        return
+    }
+    // Snap installations are updated by snapd, rather than an in-app installer.
+    if (process.env.SNAP) {
+        if (verbose) {
+            sendUpdateStatus({ type: 'error', message: 'This Snap installation is updated by the Snap package manager.' })
+        }
+        return
+    }
+    void autoUpdater.checkForUpdates().catch((error: Error) => {
+        // electron-updater also emits the error event, which updates the UI.
+        logger.error('GitHub update check failed', error)
+    })
 }
 
 export function initialise(initWindow: BrowserWindow, customUpdateUrl?: string) {
     mainWindow = initWindow
-    updateUrl = customUpdateUrl || updateUrl
-    squirrelUpdater()
-    manualDownloader()
+    updateUrl = customUpdateUrl
+    if (app.isPackaged && process.platform === 'darwin') {
+        const metadata = JSON.parse(fs.readFileSync(path.join(app.getAppPath(), 'package.json'), 'utf8'))
+        manualMacUpdates = metadata.manualMacUpdates === true
+    }
+    if (updateUrl || manualMacUpdates) {
+        manualDownloader()
+    } else {
+        githubUpdater()
+    }
 }
 
 export function manualQuitAndUpdate() {
     if (!downloadedUpdate) return
     const updatePath = downloadedUpdate
 
+    if (path.extname(updatePath).toLowerCase() === '.dmg') {
+        void shell.openPath(updatePath)
+        return
+    }
     const isExecutable = fs.constants.F_OK | fs.constants.X_OK
     fs.access(updatePath, isExecutable, (err: Error | null) => {
         if (err) {
@@ -150,6 +182,45 @@ function manualUpdater() {
     })
 }
 
+function manualMacUpdater() {
+    notifyCheckingUpdate()
+    request({
+        url: 'https://api.github.com/repos/micro23/Electorrent/releases/latest',
+        headers: { 'User-Agent': 'Electorrent', Accept: 'application/vnd.github+json' },
+        timeout: 15000,
+    }, (error: Error | null, response: { statusCode: number }, body: string) => {
+        if (error || !response || (response.statusCode !== 200 && response.statusCode !== 404)) {
+            notifyConnectionError()
+            return
+        }
+        if (response.statusCode === 404) {
+            notifyUpToDate()
+            return
+        }
+        try {
+            const release = JSON.parse(body)
+            const newVersion = semver.clean(release.tag_name)
+            if (!newVersion || !semver.valid(newVersion)) throw new Error('Invalid release version')
+            if (!semver.gt(newVersion, version)) {
+                notifyUpToDate()
+                return
+            }
+            const suffix = process.arch === 'arm64' ? '-arm64.dmg' : '-universal.dmg'
+            const asset = release.assets.find((item: { name: string }) => item.name.endsWith(suffix))
+                || release.assets.find((item: { name: string }) => item.name.endsWith('-universal.dmg'))
+            if (!asset || !asset.browser_download_url.startsWith('https://github.com/micro23/Electorrent/releases/download/')) {
+                throw new Error('Release has no compatible macOS installer')
+            }
+            update = { name: newVersion, notes: release.body, pub_date: release.published_at, url: release.html_url }
+            downloadUpdate(asset.browser_download_url)
+            notifyUpdateAvailable()
+        } catch (error) {
+            logger.error('macOS manual update check failed', error)
+            notifyConnectionError()
+        }
+    })
+}
+
 function notify({ title = '', message = '', type = 'info' }) {
     const win = electorrent.getWindow()
     if (!win) return
@@ -199,7 +270,7 @@ function notifyUpdateAvailable() {
             releaseName: update && update.name,
             releaseDate: update && update.pub_date,
             updateUrl: update && update.url,
-            manual: !is.windows(),
+            manual: !!updateUrl || manualMacUpdates,
         },
     })
     notify({
@@ -234,42 +305,46 @@ function notifyConnectionError() {
     })
 }
 
-function squirrelUpdater() {
-    if (!updateUrl || !is.windows()) return
+function releaseData(info: UpdateInfo) {
+    return {
+        releaseNotes: Array.isArray(info.releaseNotes)
+            ? info.releaseNotes.map(note => note.note).filter(Boolean).join('\n\n')
+            : info.releaseNotes,
+        releaseName: info.releaseName || info.version,
+        releaseDate: info.releaseDate,
+        updateUrl: RELEASES_URL,
+        manual: false,
+    }
+}
 
-    autoUpdater.setFeedURL({ url: updateUrl })
+function githubUpdater() {
+    // The packaged app-update.yml is generated from electron-builder.yml.
+    autoUpdater.autoDownload = true
+    autoUpdater.autoInstallOnAppQuit = true
+    autoUpdater.allowPrerelease = false
+    autoUpdater.allowDowngrade = false
 
-    autoUpdater.on('error', function(err: Error) {
-        logger.error('Auto updater error', err)
+    autoUpdater.on('error', (error: Error) => {
+        logger.error('GitHub updater error', error)
+        mainWindow?.setProgressBar(-1)
         notifyConnectionError()
     })
-
-    autoUpdater.on('checking-for-update', function() {
-        logger.debug('Checking for update')
-        notifyCheckingUpdate()
-    })
-
-    autoUpdater.on('update-not-available', function() {
-        logger.verbose('No update available')
-        notifyUpToDate()
-    })
-
-    autoUpdater.on('update-available', function() {
-        logger.info('Update available')
+    autoUpdater.on('checking-for-update', notifyCheckingUpdate)
+    autoUpdater.on('update-not-available', notifyUpToDate)
+    autoUpdater.on('update-available', (info: UpdateInfo) => {
+        update = {
+            notes: releaseData(info).releaseNotes,
+            name: info.releaseName || info.version,
+            pub_date: info.releaseDate,
+            url: RELEASES_URL,
+        }
         notifyUpdateAvailable()
     })
-
-    autoUpdater.on('update-downloaded', function(...args: any[]) {
-        logger.info('Auto update downloaded', args)
-        sendUpdateStatus({
-            type: 'downloaded',
-            data: {
-                releaseNotes: args[1],
-                releaseName: args[2],
-                releaseDate: args[3],
-                updateUrl,
-                manual: false,
-            },
-        })
+    autoUpdater.on('download-progress', (progress) => {
+        mainWindow?.setProgressBar(progress.percent / 100)
+    })
+    autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
+        mainWindow?.setProgressBar(-1)
+        sendUpdateStatus({ type: 'downloaded', data: releaseData(info) })
     })
 }

@@ -29,7 +29,8 @@ export interface ContextMenuPlacement {
 }
 
 export type ColorTheme = "light" | "dark"
-export type ThemePreference = ColorTheme | "system"
+export type DeckThemeId = "matrix" | "dark" | "darkhand" | "light" | "ocean" | "forest" | "sunset" | "christmas" | "halloween" | "valentine" | "st-patricks" | "independence" | "new-year" | "terminal" | "yankees" | "giants" | "knicks" | "dodgers" | "red-sox" | "blue-jays" | "cubs" | "lakers" | "warriors" | "bulls" | "cavaliers" | "heat" | "cowboys" | "eagles" | "patriots" | "chiefs" | "steelers" | "rangers" | "blackhawks" | "penguins" | "bruins" | "maple-leafs" | "canadiens" | "mets"
+export type ThemePreference = ColorTheme | "system" | DeckThemeId
 export type SystemStartupOption = "disabled" | "open" | "background"
 export type SpeedUnit = "bytes" | "bits"
 
