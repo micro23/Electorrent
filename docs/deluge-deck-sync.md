@@ -2,7 +2,7 @@
 
 Compared October 4, 2026. Electorrent fork created October 4 at 02:12:11 UTC.
 Reference baseline: `619328af5f8549d6b7068fd228c61329f928b765` (1.0.73).
-Latest source used: `0cb9c35fc53a4343a4a7140ca7f5118882d6bca4` (1.0.79).
+Latest source used: `43b32f004a0973ecd352a993f9b5a28d8d090bc2` (1.0.80).
 
 The original `deluge-deck-reference` checkout is read-only and remains unchanged.
 A separate, ignored checkout under `.dream-loop/deck-latest` supplied the current
@@ -18,6 +18,7 @@ source, artwork, typography and visual reference screenshots.
 | `ba26ca3` | Matrix and tighter spacing | Complete Matrix colors, typography, code rain SVG, identity, card finishes, table/sidebar materials and reduced-motion support; compact table spacing. |
 | `25d40e3` | 1.0.78 cinematic Matrix rebuild | Actual atmosphere artwork, Matrix glyph identity, cinematic masthead, horizontal telemetry cards, clean data table and updated typefaces. |
 | `267ff36` | 1.0.79 USA heritage theme | Replace Independence fireworks and flag progress art with a compact USA masthead, monument engraving, ivory paper, navy ink and muted red controls. |
+| `43b32f0` | 1.0.80 USA flag progress and footer artwork | Refine the compact flag mark, restore a clipped flag fill for transfer progress, and add the eagle illustration at the status rail. |
 | `f801582` | 1.0.77 release | Matrix appears in theme selection and T/Shift+T cycling; Regular, Holiday and Sports categories. |
 
 Latest default columns: Torrent, State, Size, Progress, Download, Upload, ETA,

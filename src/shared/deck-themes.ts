@@ -1,4 +1,4 @@
-// Synced from micro23/deluge-deck 1.0.79 (0cb9c35).
+// Synced from micro23/deluge-deck 1.0.80 (43b32f0).
 import type { DeckThemeId } from './ipc-contract';
 export const DECK_THEME_ORDER: DeckThemeId[] = [
     "darkhand",

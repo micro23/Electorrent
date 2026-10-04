@@ -263,6 +263,7 @@
         </section>
         <torrent-details-panel></torrent-details-panel>
         <div class="action footer status-bar">
+            <img ng-if="$root.deckTheme === 'independence'" class="usa-footer-eagle" ng-src="deck-assets/independence-eagle-aaa-optimized.webp" alt="" aria-hidden="true" />
             <span class="terminal-sync-status">{{connectionLost ? 'OFFLINE' : 'LIVE SYNC'}} [{{connectionLost ? ' ' : '✓'}}] / IP: {{$server.ip}} ]</span>
             <div class="client-version" ng-if="$btclient.version">
                 {{$btclient.name}} {{$btclient.version}}
