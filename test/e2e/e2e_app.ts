@@ -8,7 +8,7 @@ import type { ClientId } from "../../src/shared/client-metadata"
 import { parseServerAddressInput } from "../../src/shared/server-address"
 import { eventually } from "./eventually"
 import { waitForModalClose, waitForModalOpen } from "./modal"
-import type { ChainablePromiseElement } from "webdriverio"
+import { Key, type ChainablePromiseElement } from "webdriverio"
 
 /**
  * Options to use during the login screen of the app to connect to your torrent client
@@ -74,7 +74,12 @@ export class App {
     const portForm = $("#connection-port")
     await portForm.waitForDisplayed()
     if (!parsedHost.hasExplicitPort) {
-      await portForm.setValue(options.port);
+      // Number inputs with a client-specific default can retain it during WebDriver clear.
+      await portForm.click()
+      await browser.keys([Key.Ctrl, 'a'])
+      await browser.keys('Backspace')
+      await portForm.addValue(String(options.port))
+      await eventually(() => portForm.getValue()).equals(String(options.port))
     }
 
     const submit = $("#connection-submit")
