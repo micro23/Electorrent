@@ -1,4 +1,4 @@
-// Synced from micro23/deluge-deck 1.0.78 (25d40e3).
+// Synced from micro23/deluge-deck 1.0.79 (0cb9c35).
 import type { DeckThemeId } from './ipc-contract';
 export const DECK_THEME_ORDER: DeckThemeId[] = [
     "darkhand",
@@ -161,7 +161,7 @@ export const DECK_THEME_TITLES: Record<DeckThemeId, string> = {
     "halloween": "Halloween",
     "valentine": "Valentine’s",
     "st-patricks": "St. Patrick’s",
-    "independence": "Independence",
+    "independence": "USA",
     "new-year": "New Year",
     "yankees": "NY Yankees",
     "giants": "NY Giants",

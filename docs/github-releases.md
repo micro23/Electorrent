@@ -7,7 +7,7 @@ Windows now uses NSIS, macOS includes DMG and ZIP builds, and Linux includes App
 ## Publish a release
 
 1. Increase the version in both `package.json` and `app/package.json` (the existing `npm version` script synchronizes the app version).
-2. Commit the finished code and push a matching tag, for example `v2.18.1` for version `2.18.1`.
+2. Commit the finished code and push a matching tag, for example `v2.18.2` for version `2.18.2`.
 3. GitHub Actions runs the client tests and builds Windows, macOS, and Linux installers. All jobs must succeed before it creates or updates a **draft** GitHub release.
 4. Review the draft, test the installers, then publish it. Keep the generated `latest*.yml`, ZIPs, installers, and blockmaps attached; the updater needs them. An empty release or source-only tag cannot update installed apps.
 
@@ -24,3 +24,5 @@ Before shipping, verify a real older-to-newer signed release update on Windows, 
 Release 2.18.1 validation: lint/typechecking, production build, all six updater unit checks, and the packaged download/dialog test (seven checks) passed. Test browser profiles are isolated from the user’s running app. CI gives each spec a fresh profile and allows two isolated backend fixtures per client. Native older-to-newer installer upgrades still require verification on each operating system.
 
 Release 2.18.1 is published as a preview because the complete integration matrix is not yet green. All twelve local interface test files and seven unit checks passed; cross-platform installer builds passed. Stable update feeds exclude this preview. Install it manually to test the fork, and publish a higher stable version after the remaining integration failures are resolved.
+
+Release 2.18.2 updates Electorrent's bundled theme reference to Deluge Deck 1.0.79. The saved `independence` theme key remains compatible and is displayed as **USA**; the new monument masthead replaces its fireworks and flag progress bar. The Deluge Deck repository is used as a read-only design reference and is not modified by the Electorrent sync script.

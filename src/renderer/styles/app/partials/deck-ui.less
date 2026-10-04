@@ -273,21 +273,6 @@ html[data-theme="christmas"] .deck-progress-candy-cane {
     filter: drop-shadow(0 1px 1px #0008);
     pointer-events: none;
 }
-html[data-theme="independence"] .deck-progress-track {
-    height: 12px;
-    overflow: hidden;
-    border-radius: 2px;
-    background: #fff8ed !important;
-}
-html[data-theme="independence"] .deck-progress-track > .bar { display: none; }
-html[data-theme="independence"] .deck-progress-flag {
-    position: absolute;
-    inset: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
 html[data-theme="terminal"] .deck-progress-track {
     height: 14px;
     border: 0;
@@ -768,8 +753,6 @@ html[data-theme="valentine"] { --deck-art: url("../../assets/deck/valentine-art-
 html[data-theme="valentine"] .deck-stat-card { background: linear-gradient(180deg, #391829dc, #411b2de8), url("../../assets/deck/valentine-art-deco-salon-optimized.webp") center / cover; }
 html[data-theme="new-year"] { --deck-art: url("../../assets/deck/new-year-rooftop-observatory-optimized.webp"); }
 html[data-theme="new-year"] .deck-stat-card { background: linear-gradient(180deg, #07101cdb, #0b1928e8), url("../../assets/deck/new-year-rooftop-observatory-optimized.webp") center / cover; }
-html[data-theme="independence"] { --deck-art: url("../../assets/deck/independence-coastal-observatory-optimized.webp"); }
-html[data-theme="independence"] .deck-stat-card { background: linear-gradient(180deg, #07142adc, #091a2fe8), url("../../assets/deck/independence-coastal-observatory-optimized.webp") center / cover; }
 html[data-theme="st-patricks"] { --deck-art: url("../../assets/deck/st-patricks-botanical-conservatory-optimized.webp"); }
 html[data-theme="st-patricks"] .deck-stat-card { background: linear-gradient(180deg, #0b1a10db, #0d2114e8), url("../../assets/deck/st-patricks-botanical-conservatory-optimized.webp") center / cover; }
 html[data-theme="light"] { --deck-art: url("../../assets/deck/paper-observatory-atrium-optimized.webp"); }
@@ -812,8 +795,6 @@ html[data-theme="halloween"] .deck-library-heading::after { content: ""; width: 
 html[data-theme="valentine"] .deck-stat-card::before { content: ""; position: absolute; z-index: 2; inset: 4px; border: 1px solid #d7abb050; border-radius: 8px; background: url("../../assets/deck/valentine-card-corners-optimized.webp") center/100% 100% no-repeat; pointer-events: none; }
 html[data-theme="valentine"] .deck-library-heading::after { content: ""; width: 46px; height: 26px; background: url("../../assets/deck/valentine-seeding-heart.svg") center/contain no-repeat; }
 html[data-theme="new-year"] .deck-stat-card::before { content: ""; position: absolute; z-index: 2; inset: 4px; border: 1px solid #d9bd7840; border-radius: 7px; background: url("../../assets/deck/new-year-card-corners.svg") center/100% 100% no-repeat; pointer-events: none; }
-html[data-theme="independence"] .deck-library-heading::after { content: ""; width: 38px; height: 30px; background: url("../../assets/deck/independence-eagle.svg") center/contain no-repeat; }
-html[data-theme="independence"] .deck-stat-card::before { content: ""; position: absolute; z-index: 2; inset: 4px; border: 1px solid #cdb47745; border-radius: 7px; background: url("../../assets/deck/independence-celebration.svg") center/cover no-repeat; opacity: .16; pointer-events: none; }
 html[data-theme="terminal"] { font-family: "Deck CRT Mono", ui-monospace, monospace; }
 @font-face { font-family: "Deck CRT Mono"; src: url("../../assets/deck/fonts/DeckCRTMono-Regular.ttf") format("truetype"); font-display: swap; }
 @font-face { font-family: "Share Tech Mono"; src: url("../../assets/deck/fonts/ShareTechMono-Regular.ttf") format("truetype"); font-display: swap; }
@@ -916,7 +897,6 @@ html[data-theme="light"] { --deck-art: url("../../assets/deck/paper-observatory-
 html[data-theme="christmas"] { --deck-art: url("../../assets/deck/christmas-night-observatory-optimized.webp"); --deck-mark: url("../../assets/deck/christmas-card-corners.svg"); }
 html[data-theme="halloween"] { --deck-art: url("../../assets/deck/halloween-graveyard-midnight-optimized.webp"); --deck-mark: url("../../assets/deck/halloween-pumpkins-candles.svg"); }
 html[data-theme="valentine"] { --deck-art: url("../../assets/deck/valentine-damask-brocade-optimized.webp"); --deck-mark: url("../../assets/deck/valentine-heart-chain.svg"); }
-html[data-theme="independence"] { --deck-art: url("../../assets/deck/independence-coastal-observatory-optimized.webp"); --deck-mark: url("../../assets/deck/independence-eagle.svg"); }
 html[data-theme="new-year"] { --deck-art: url("../../assets/deck/new-year-rooftop-observatory-optimized.webp"); --deck-mark: url("../../assets/deck/new-year-fireworks.svg"); }
 html[data-theme="st-patricks"] { --deck-art: url("../../assets/deck/st-patricks-botanical-conservatory-optimized.webp"); }
 html[data-theme="terminal"] { --deck-mark: url("../../assets/deck/core-midnight-radar.svg"); }
@@ -1158,7 +1138,6 @@ html[data-theme="christmas"] .torrent.sidebar::before {
 html[data-theme="valentine"] .torrent.sidebar::before {
     background: linear-gradient(180deg, #f8e9dfc4, #f8e9dff0 48%, var(--surface) 100%), var(--deck-art) center / cover no-repeat;
 }
-html[data-theme="independence"] .torrent.sidebar::before,
 html[data-theme="new-year"] .torrent.sidebar::before {
     background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 80%, transparent), var(--surface) 100%), var(--deck-art) center / cover no-repeat;
 }
