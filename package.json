@@ -1,6 +1,6 @@
 {
   "name": "electorrent",
-  "version": "2.18.3",
+  "version": "2.18.4",
   "description": "A thin client for your torrenting needs",
   "type": "module",
   "main": "app/main.js",
@@ -95,10 +95,8 @@
     "form-data": "^4.0.4",
     "fuse.js": "^3.0.5",
     "globals": "^17.8.0",
-    "hoek": "^5.0.4",
     "html-loader": "^3.0.1",
     "html-webpack-plugin": "^5.6.7",
-    "import-glob-loader": "^1.1.0",
     "jquery": "^3.0.0",
     "jquery-ui-dist": "1.12.1",
     "less-loader": "^12.3.0",
@@ -133,6 +131,7 @@
     "@types/tapable": "1.0.0"
   },
   "overrides": {
-    "form-data": "$form-data"
+    "form-data": "$form-data",
+    "ip-address": "10.7.3"
   }
 }

@@ -45,15 +45,16 @@ A mock client is also included for development and testing; it is not a producti
 ## Features
 
 - Manage several remote client/server profiles and switch between them.
-- Add torrents by opening `.torrent` files, dragging and dropping them, pasting magnet links, or using the browser magnet protocol handler.
+- Add torrents by opening `.torrent` files, dragging and dropping them, pasting magnet links, or using the browser magnet protocol handler. The macOS app reclaims `.torrent` file association when it launches.
 - Search and filter torrents, including fuzzy matching.
-- View torrent state, progress, transfer rates, peers, trackers, and file information.
-- Start, pause, and remove torrents, with bulk actions for selected items.
-- Choose whether removal also deletes downloaded data when supported by the client.
-- Configure table columns and resize them to fit their contents.
+- View current torrent states, including checking/verifying, queued, paused, downloading, seeding, and errors, alongside progress, transfer rates, peers, trackers, and file information.
+- Keep torrent details separate from selection: clicking a row opens its information, while checkboxes select torrents for actions.
+- Use the themed bottom action menu on every theme to start, pause, or remove selected torrents, individually or in bulk.
+- Choose between removing a torrent only or removing it with downloaded files when the client supports file deletion.
+- Configure table columns, resize them, and double-click a column divider to fit its contents.
 - Use native desktop notifications and configure certificate trust for self-signed HTTPS endpoints.
-- Choose from a collection of bundled themes, including Darkhand, Terminal, Matrix, seasonal, and sports styles. Theme assets are bundled locally.
-- Use the Darkhand dashboard’s transfer statistics and arrange statistics and torrent details to suit the window.
+- Choose from 38 bundled themes, including Darkhand, Terminal, Matrix, five redesigned core themes, and seasonal and sports styles. Theme assets and refreshed gallery previews are bundled locally.
+- Use the Darkhand dashboard’s live transfer statistics and history, and arrange statistics and torrent details to suit the window.
 - Receive release checks from this project’s GitHub Releases. macOS installs updates manually from a downloaded DMG; platform-specific update behavior is described in the [release guide](docs/github-releases.md).
 
 Feature availability can vary by client. Removing a torrent’s downloaded data is destructive, so check the confirmation and selected removal option before proceeding.

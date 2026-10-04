@@ -92,9 +92,11 @@ html[data-theme] .action.header.deck-control-strip {
     white-space: normal;
 }
 
-html[data-theme] .deck-control-strip .actions.left { flex: 1 1 auto; }
-html[data-theme] .deck-control-strip .actions.right { flex: 1 1 auto; gap: 9px; }
-html[data-theme] .deck-control-strip .actions.right .ui.fluid.search { flex: 1 1 280px; min-width: 170px; max-width: 380px; }
+html[data-theme] .deck-control-strip .deck-toolbar-left { display:flex; flex:1 1 auto; min-width:0; align-items:center; gap:9px; }
+html[data-theme] .deck-control-strip .deck-toolbar-left .actions.left { flex:0 1 auto; min-width:0; }
+html[data-theme] .deck-control-strip .deck-toolbar-search { flex:1 1 280px; min-width:170px; max-width:380px; }
+html[data-theme] .deck-control-strip .deck-toolbar-right { display:flex; flex:1 1 auto; min-width:0; align-items:center; justify-content:flex-end; gap:9px; }
+html[data-theme] .deck-control-strip .actions.right { display:flex; flex:0 0 auto; gap:9px; }
 html[data-theme] .deck-control-strip .ui.button {
     min-height: 37px;
     padding-top: 10px;
@@ -271,6 +273,21 @@ html[data-theme="christmas"] .deck-progress-candy-cane {
     height: 100%;
     overflow: visible;
     filter: drop-shadow(0 1px 1px #0008);
+    pointer-events: none;
+}
+html[data-theme="independence"] .deck-progress-track {
+    height: 12px;
+    overflow: hidden;
+    border-radius: 2px;
+    background: #fff8ed !important;
+}
+html[data-theme="independence"] .deck-progress-track > .bar { display: none; }
+html[data-theme="independence"] .deck-progress-flag {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
 }
 html[data-theme="terminal"] .deck-progress-track {
@@ -662,7 +679,9 @@ html[data-theme] .deck-overview { background: color-mix(in srgb, var(--bg) 76%, 
 html[data-theme] .action.header { backdrop-filter: blur(16px); }
 html[data-theme] .status-bar { backdrop-filter: blur(14px); }
 html[data-theme] #torrentTable thead { position: sticky; top: 0; z-index: 3; }
-html[data-theme] #torrentTable tbody tr td { backdrop-filter: blur(9px); }
+// Per-cell backdrop filters multiply compositor surfaces as the library grows.
+// Keep the themed cell backgrounds without allocating a blur surface per cell.
+html[data-theme] #torrentTable tbody tr td { backdrop-filter: none; }
 html[data-theme] #torrentTable.ui.table th .rz-handle {
     z-index: 5;
     top: 2px;
@@ -753,6 +772,8 @@ html[data-theme="valentine"] { --deck-art: url("../../assets/deck/valentine-art-
 html[data-theme="valentine"] .deck-stat-card { background: linear-gradient(180deg, #391829dc, #411b2de8), url("../../assets/deck/valentine-art-deco-salon-optimized.webp") center / cover; }
 html[data-theme="new-year"] { --deck-art: url("../../assets/deck/new-year-rooftop-observatory-optimized.webp"); }
 html[data-theme="new-year"] .deck-stat-card { background: linear-gradient(180deg, #07101cdb, #0b1928e8), url("../../assets/deck/new-year-rooftop-observatory-optimized.webp") center / cover; }
+html[data-theme="independence"] { --deck-art: url("../../assets/deck/independence-coastal-observatory-optimized.webp"); }
+html[data-theme="independence"] .deck-stat-card { background: linear-gradient(180deg, #07142adc, #091a2fe8), url("../../assets/deck/independence-coastal-observatory-optimized.webp") center / cover; }
 html[data-theme="st-patricks"] { --deck-art: url("../../assets/deck/st-patricks-botanical-conservatory-optimized.webp"); }
 html[data-theme="st-patricks"] .deck-stat-card { background: linear-gradient(180deg, #0b1a10db, #0d2114e8), url("../../assets/deck/st-patricks-botanical-conservatory-optimized.webp") center / cover; }
 html[data-theme="light"] { --deck-art: url("../../assets/deck/paper-observatory-atrium-optimized.webp"); }
@@ -795,6 +816,8 @@ html[data-theme="halloween"] .deck-library-heading::after { content: ""; width: 
 html[data-theme="valentine"] .deck-stat-card::before { content: ""; position: absolute; z-index: 2; inset: 4px; border: 1px solid #d7abb050; border-radius: 8px; background: url("../../assets/deck/valentine-card-corners-optimized.webp") center/100% 100% no-repeat; pointer-events: none; }
 html[data-theme="valentine"] .deck-library-heading::after { content: ""; width: 46px; height: 26px; background: url("../../assets/deck/valentine-seeding-heart.svg") center/contain no-repeat; }
 html[data-theme="new-year"] .deck-stat-card::before { content: ""; position: absolute; z-index: 2; inset: 4px; border: 1px solid #d9bd7840; border-radius: 7px; background: url("../../assets/deck/new-year-card-corners.svg") center/100% 100% no-repeat; pointer-events: none; }
+html[data-theme="independence"] .deck-library-heading::after { content: ""; width: 38px; height: 30px; background: url("../../assets/deck/independence-eagle.svg") center/contain no-repeat; }
+html[data-theme="independence"] .deck-stat-card::before { content: ""; position: absolute; z-index: 2; inset: 4px; border: 1px solid #cdb47745; border-radius: 7px; background: url("../../assets/deck/independence-celebration.svg") center/cover no-repeat; opacity: .16; pointer-events: none; }
 html[data-theme="terminal"] { font-family: "Deck CRT Mono", ui-monospace, monospace; }
 @font-face { font-family: "Deck CRT Mono"; src: url("../../assets/deck/fonts/DeckCRTMono-Regular.ttf") format("truetype"); font-display: swap; }
 @font-face { font-family: "Share Tech Mono"; src: url("../../assets/deck/fonts/ShareTechMono-Regular.ttf") format("truetype"); font-display: swap; }
@@ -897,6 +920,7 @@ html[data-theme="light"] { --deck-art: url("../../assets/deck/paper-observatory-
 html[data-theme="christmas"] { --deck-art: url("../../assets/deck/christmas-night-observatory-optimized.webp"); --deck-mark: url("../../assets/deck/christmas-card-corners.svg"); }
 html[data-theme="halloween"] { --deck-art: url("../../assets/deck/halloween-graveyard-midnight-optimized.webp"); --deck-mark: url("../../assets/deck/halloween-pumpkins-candles.svg"); }
 html[data-theme="valentine"] { --deck-art: url("../../assets/deck/valentine-damask-brocade-optimized.webp"); --deck-mark: url("../../assets/deck/valentine-heart-chain.svg"); }
+html[data-theme="independence"] { --deck-art: url("../../assets/deck/independence-coastal-observatory-optimized.webp"); --deck-mark: url("../../assets/deck/independence-eagle.svg"); }
 html[data-theme="new-year"] { --deck-art: url("../../assets/deck/new-year-rooftop-observatory-optimized.webp"); --deck-mark: url("../../assets/deck/new-year-fireworks.svg"); }
 html[data-theme="st-patricks"] { --deck-art: url("../../assets/deck/st-patricks-botanical-conservatory-optimized.webp"); }
 html[data-theme="terminal"] { --deck-mark: url("../../assets/deck/core-midnight-radar.svg"); }
@@ -1138,6 +1162,7 @@ html[data-theme="christmas"] .torrent.sidebar::before {
 html[data-theme="valentine"] .torrent.sidebar::before {
     background: linear-gradient(180deg, #f8e9dfc4, #f8e9dff0 48%, var(--surface) 100%), var(--deck-art) center / cover no-repeat;
 }
+html[data-theme="independence"] .torrent.sidebar::before,
 html[data-theme="new-year"] .torrent.sidebar::before {
     background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 80%, transparent), var(--surface) 100%), var(--deck-art) center / cover no-repeat;
 }
@@ -1145,43 +1170,21 @@ html[data-theme] #page-torrents.is-sidebar-collapsed .torrent.sidebar .deck-side
 html[data-theme] #page-torrents.is-sidebar-collapsed .torrent.sidebar .deck-sidebar-add { font-size: 0 !important; }
 html[data-theme] #page-torrents.is-sidebar-collapsed .torrent.sidebar .deck-sidebar-add .icon { font-size: 14px !important; }
 
-/* Playback actions use each palette's own success and danger colors. These
-   role selectors cover every torrent client even if its legacy color class
-   changes, and keep Start and Pause visually distinct at a glance. */
-html[data-theme] .deck-control-strip [data-role="resume"],
-html[data-theme] .deck-control-strip [data-role="start"] {
-    color: #071116 !important;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--green) 82%, white), var(--green) 88%) !important;
-    border: 1px solid color-mix(in srgb, var(--green) 78%, var(--line)) !important;
-    box-shadow: inset 0 1px #ffffff55, 0 3px 10px color-mix(in srgb, var(--green) 18%, transparent) !important;
-}
-html[data-theme] .deck-control-strip [data-role="resume"] .icon,
-html[data-theme] .deck-control-strip [data-role="start"] .icon { color: #071116 !important; }
-html[data-theme] .deck-control-strip [data-role="stop"],
-html[data-theme] .deck-control-strip [data-role="pause"] {
-    color: var(--danger) !important;
-    background: linear-gradient(180deg,
-        color-mix(in srgb, var(--danger) 21%, var(--surface-2)),
-        color-mix(in srgb, var(--danger) 12%, var(--surface))) !important;
-    border: 1px solid color-mix(in srgb, var(--danger) 58%, var(--line)) !important;
-    box-shadow: inset 0 1px color-mix(in srgb, var(--danger) 12%, transparent),
-        0 3px 10px color-mix(in srgb, var(--danger) 10%, transparent) !important;
-}
-html[data-theme] .deck-control-strip [data-role="stop"] .icon,
-html[data-theme] .deck-control-strip [data-role="pause"] .icon { color: var(--danger) !important; }
-html[data-theme] .deck-control-strip [data-role="resume"]:hover,
-html[data-theme] .deck-control-strip [data-role="start"]:hover {
-    color: #071116 !important;
-    border-color: var(--green) !important;
-    box-shadow: inset 0 1px #ffffff70, 0 5px 16px color-mix(in srgb, var(--green) 30%, transparent) !important;
-}
-html[data-theme] .deck-control-strip [data-role="stop"]:hover,
-html[data-theme] .deck-control-strip [data-role="pause"]:hover {
+/* Transport actions use the active theme's regular control palette. */
+html[data-theme] body #page-torrents .deck-control-strip #torrent-action-header :is([data-role="start"], [data-role="resume"], [data-role="stop"], [data-role="pause"]) {
     color: var(--text) !important;
-    background: color-mix(in srgb, var(--danger) 30%, var(--surface-2)) !important;
-    border-color: var(--danger) !important;
-    box-shadow: inset 0 1px color-mix(in srgb, var(--danger) 20%, transparent),
-        0 5px 16px color-mix(in srgb, var(--danger) 20%, transparent) !important;
+    background: linear-gradient(180deg, var(--surface-3), var(--surface-2)) !important;
+    border: 1px solid var(--line-strong) !important;
+    box-shadow: inset 0 1px color-mix(in srgb, var(--text) 7%, transparent), 0 2px 5px color-mix(in srgb, var(--bg) 25%, transparent) !important;
+}
+html[data-theme] body #page-torrents .deck-control-strip #torrent-action-header :is([data-role="start"], [data-role="resume"], [data-role="stop"], [data-role="pause"]) .icon {
+    color: inherit !important;
+}
+html[data-theme] body #page-torrents .deck-control-strip #torrent-action-header :is([data-role="start"], [data-role="resume"], [data-role="stop"], [data-role="pause"]):hover {
+    color: var(--text) !important;
+    background: color-mix(in srgb, var(--cyan) 14%, var(--surface-2)) !important;
+    border-color: var(--cyan) !important;
+    box-shadow: inset 0 1px color-mix(in srgb, var(--text) 7%, transparent), 0 3px 10px color-mix(in srgb, var(--cyan) 15%, transparent) !important;
 }
 html[data-theme] .deck-control-strip [data-role="resume"]:focus-visible,
 html[data-theme] .deck-control-strip [data-role="start"]:focus-visible,
@@ -1518,7 +1521,7 @@ html[data-theme="terminal"] .torrent.sidebar .nav { padding:0 !important; }
 html[data-theme="terminal"] .torrent.sidebar .nav > li { min-height:24px; height:24px; padding:0 2px; font-size:17px; }
 html[data-theme="terminal"] .torrent-sidebar-item-label { text-align:center; font-size:17px; }
 html[data-theme="terminal"] .torrent.sidebar .torrent.sort.label { font-size:16px; }
-html[data-theme="terminal"] .torrent-sidebar-footer .torrent-sidebar-toggle::before { content:"[ (M)enu ]"; font-size:17px; }
+html[data-theme="terminal"] .torrent-sidebar-footer .torrent-sidebar-toggle::before { content:"[ Menu ]"; font-size:17px; }
 html[data-theme="terminal"] .torrent-sidebar-footer .torrent-sidebar-toggle .icon { display:none; }
 html[data-theme="terminal"] .deck-overview { position:relative; padding:59px 13px 0 18px; }
 html[data-theme="terminal"] .deck-overview::before { content:"[ CLI TORRENT CLIENT v1.0 ]"; position:absolute; top:20px; left:22px; color:var(--text); font-size:19px; }
@@ -1648,3 +1651,160 @@ html[data-theme="terminal"] body .terminal-window-drag {
 html[data-theme="terminal"] body .deck-overview::before { -webkit-app-region:drag; app-region:drag; }
 html[data-theme="terminal"] body .deck-control-strip,
 html[data-theme="terminal"] body .deck-control-strip * { -webkit-app-region:no-drag; app-region:no-drag; }
+
+/* Selection actions follow the current selection and sit above the status line. */
+html[data-theme] body #page-torrents .torrent-selection-menu {
+    position:relative;
+    z-index:30;
+    flex:0 0 auto;
+    align-self:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    max-width:calc(100% - 24px);
+    margin:10px auto 12px;
+    padding:10px 14px;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    color:var(--text);
+    border-radius:10px;
+    font-family:inherit;
+}
+html[data-theme] body #page-torrents .torrent-selection-menu > [action-header] {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+}
+html[data-theme] body #page-torrents .torrent-selection-count { color:var(--muted); white-space:nowrap; }
+html[data-theme] body #page-torrents .torrent-selection-menu .ui.button {
+    margin:0;
+    padding:6px 8px !important;
+    min-height:30px;
+    border:1px solid var(--line) !important;
+    border-radius:6px !important;
+    background:var(--surface) !important;
+    color:var(--text) !important;
+    box-shadow:none !important;
+    font:inherit;
+    white-space:nowrap;
+}
+html[data-theme] body #page-torrents .torrent-selection-menu .ui.dropdown.button {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+}
+html[data-theme] body #page-torrents .torrent-selection-menu .ui.dropdown.button > .icon {
+    position:static !important;
+    width:1em !important;
+    height:auto !important;
+    margin:0 !important;
+    background:transparent !important;
+    line-height:1 !important;
+}
+html[data-theme="terminal"] body #page-torrents .torrent-selection-menu .ui.button::before { content:'[ '; }
+html[data-theme="terminal"] body #page-torrents .torrent-selection-menu .ui.button::after { content:' ]'; }
+html[data-theme="terminal"] body #page-torrents .torrent-selection-menu .ui.button > .icon { display:none !important; }
+html[data-theme] body #page-torrents .torrent-selection-menu .ui.button:hover,
+html[data-theme] body #page-torrents .torrent-selection-menu .ui.button:focus-visible {
+    border-color:var(--text) !important;
+    background:var(--surface-3) !important;
+}
+html[data-theme] body #page-torrents .torrent-selection-menu .ui.dropdown > .menu {
+    top:auto !important;
+    bottom:100% !important;
+    margin:0 0 8px !important;
+    max-height:min(50vh,320px);
+    overflow:auto;
+    border:1px solid var(--line-strong) !important;
+    border-radius:6px !important;
+    background:var(--surface) !important;
+    box-shadow:none !important;
+}
+html[data-theme] body #page-torrents .torrent-selection-menu .ui.dropdown > .menu::after { content:none !important; }
+html[data-theme] body #page-torrents .torrent-selection-menu .ui.dropdown > .menu > .item {
+    color:var(--text) !important;
+    font-family:inherit;
+}
+html[data-theme] body #page-torrents .torrent-selection-menu .ui.dropdown > .menu > .item:hover { background:var(--surface-3) !important; }
+
+html[data-theme="terminal"] body #page-torrents .torrent-selection-menu,
+html[data-theme="terminal"] body #page-torrents .torrent-selection-menu .ui.button,
+html[data-theme="terminal"] body #page-torrents .torrent-selection-menu .ui.dropdown > .menu { border-radius:0 !important; }
+html[data-theme="terminal"] body #page-torrents .torrent-selection-count::before { content:"[ "; }
+html[data-theme="terminal"] body #page-torrents .torrent-selection-count::after { content:" ]"; }
+
+/* Compact Terminal shelf: keep controls within the 52px collapsed rail. */
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .torrent.sidebar .sidebar-scroll { padding:8px 4px; }
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .deck-sidebar-caption { display:none; }
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .torrent.sidebar .deck-sidebar-add {
+    font-size:0 !important;
+    margin:0 0 12px !important;
+}
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .deck-sidebar-add::before { content:'[ + ]'; font-size:14px; margin:0; }
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .deck-sidebar-add::after { content:none; }
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .torrent.sidebar .nav > li {
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    height:36px;
+    min-height:36px;
+    margin:0;
+    padding:0 !important;
+}
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .torrent-sidebar-item-label { display:none; }
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .torrent.sidebar .nav > li > .icon {
+    flex:0 0 14px;
+    width:14px;
+    min-width:14px;
+    height:18px;
+    margin:0;
+    line-height:18px;
+}
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .torrent.sidebar .torrent.sort.label {
+    flex:0 1 auto;
+    min-width:0;
+    margin:0;
+    padding:0;
+    font-size:12px;
+    line-height:18px;
+}
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .torrent.sidebar .torrent-sidebar-footer {
+    padding:10px 4px 12px;
+    gap:8px;
+}
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .terminal-preferences { font-size:0; width:100%; }
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .terminal-preferences > span { display:none; }
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .terminal-preferences::after { content:'[ P ]'; font-size:14px; }
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .torrent.sidebar .torrent-sidebar-footer .torrent-sidebar-toggle {
+    width:100%;
+    height:28px;
+    min-height:28px;
+}
+html[data-theme="terminal"] body #page-torrents.is-sidebar-collapsed .torrent-sidebar-toggle::before { content:'[ > ]'; font-size:14px; }
+
+/* Action icons occupy their own space instead of Semantic UI's absolute slot. */
+html[data-theme] body #page-torrents [action-header] .ui.button.torrent-action-button {
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:6px 10px !important;
+    white-space:nowrap;
+}
+html[data-theme] body #page-torrents [action-header] .torrent-action-button > .icon {
+    position:static !important;
+    flex:0 0 1em;
+    width:1em !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:transparent !important;
+    line-height:1 !important;
+}
+html[data-theme] body #page-torrents [action-header] .torrent-action-label { position:static; flex:0 0 auto; }

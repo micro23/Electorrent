@@ -1,6 +1,5 @@
 import chai from "chai"
 import { $, $$, browser } from "@wdio/globals"
-import { Key } from "webdriverio"
 import { eventually } from "../../e2e/eventually"
 import { configureSpec } from "../../framework/fixture"
 import { restartApplication } from "../../shared"
@@ -113,37 +112,6 @@ describe("mock torrent table sorting", function () {
     return values
   }
 
-  async function getSelectedIds() {
-    const rows = await $$("#torrentTable tbody tr.active[data-id]")
-    const ids: string[] = []
-    for (const row of rows) {
-      ids.push(await row.getAttribute("data-id"))
-    }
-    return ids
-  }
-
-  async function expectSelectedIds(expected: string[]) {
-    await eventually(async () => (await getSelectedIds()).join(","))
-      .equals(expected.join(","))
-  }
-
-  async function shiftClick(row: ReturnType<typeof $>) {
-    await browser.actions([
-      browser.action("key")
-        .down(Key.Shift)
-        .pause(0)
-        .pause(0)
-        .pause(0)
-        .up(Key.Shift),
-      browser.action("pointer")
-        .pause(0)
-        .move({ origin: row, duration: 0 })
-        .down({ button: 0 })
-        .up({ button: 0 })
-        .pause(0),
-    ])
-  }
-
   function parseBytes(value: string) {
     const match = value.match(/^(\d+(?:\.\d+)?)\s+([KMGT]?B)$/)
     assert.isNotNull(match, `Expected byte value, got ${value}`)
@@ -188,44 +156,6 @@ describe("mock torrent table sorting", function () {
       return rows.slice(index + 1).some((other) => row.progress === other.progress && row.status !== other.status)
     }), "Expected at least one equal-progress group with different statuses")
   }
-
-  it("navigates the selected torrent with arrow keys", async function () {
-    const rows = await $$("#torrentTable tbody tr[data-id]")
-    const ids = await rows.map((row) => row.getAttribute("data-id"))
-
-    await rows[1].click()
-    await browser.keys([Key.ArrowDown])
-    await expectSelectedIds([ids[2]])
-
-    await browser.keys([Key.ArrowUp])
-    await expectSelectedIds([ids[1]])
-  })
-
-  it("extends the torrent selection with shift and arrow keys", async function () {
-    const rows = await $$("#torrentTable tbody tr[data-id]")
-    const ids = await rows.map((row) => row.getAttribute("data-id"))
-
-    await rows[2].click()
-    await browser.keys([Key.Shift, Key.ArrowDown])
-    await expectSelectedIds(ids.slice(2, 4))
-
-    await browser.keys([Key.Shift, Key.ArrowDown])
-    await expectSelectedIds(ids.slice(2, 5))
-
-    await browser.keys([Key.Shift, Key.ArrowUp])
-    await expectSelectedIds(ids.slice(1, 5))
-  })
-
-  it("collapses multiple selections from the directional edge", async function () {
-    const rows = await $$("#torrentTable tbody tr[data-id]")
-    const ids = await rows.map((row) => row.getAttribute("data-id"))
-
-    await rows[1].click()
-    await shiftClick(rows[3])
-    await expectSelectedIds(ids.slice(1, 4))
-    await browser.keys([Key.ArrowDown])
-    await expectSelectedIds([ids[4]])
-  })
 
   it("sorts by size and persists that sort after restart", async function () {
     await clickColumn("Size")

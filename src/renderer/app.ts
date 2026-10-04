@@ -178,6 +178,8 @@ torrentApp.directive("sortHeader", SortHeaderDirective.getInstance())
 import { TorrentBodyDirective, TorrentRowDirective } from "@renderer/app/directives/torrent-table/torrent-table.directive"
 torrentApp.directive("torrentBody", TorrentBodyDirective.getInstance())
 torrentApp.directive("torrentRow", TorrentRowDirective.getInstance())
+import { TableAutoFitDirective } from "@renderer/app/directives/torrent-table/table-auto-fit.directive"
+torrentApp.directive("rzTable", TableAutoFitDirective.getInstance())
 import { SearchDirective } from "@renderer/app/directives/search/search.directive"
 torrentApp.directive("search", SearchDirective.getInstance())
 import { TimeDirective } from "@renderer/app/directives/time/time.directive"

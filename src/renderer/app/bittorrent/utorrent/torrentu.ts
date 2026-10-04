@@ -209,7 +209,7 @@ export class UtorrentTorrent extends Torrent {
     };
 
     isStatusQueued() {
-        return this.getStatusFlag(64) && !this.isStatusDownloading();
+        return this.getStatusFlag(64) && !this.isStatusStarted();
     };
 
     isStatusLoaded() {
@@ -221,7 +221,7 @@ export class UtorrentTorrent extends Torrent {
     };
 
     isStatusDownloading() {
-        return this.getStatusFlag(64) && this.percent !== 1000;
+        return this.isStatusStarted() && !this.isStatusChecking() && !this.isStatusPaused() && this.percent !== 1000;
     };
 
     isStatusSeeding() {
@@ -231,5 +231,17 @@ export class UtorrentTorrent extends Torrent {
     isStatusStopped() {
         return(!this.getStatusFlag(64)) && (!this.isStatusCompleted());
     };
+
+    manualStatusText() {
+        if (this.isStatusChecking()) return "Checking";
+        if (this.isStatusError()) return "Error";
+        if (this.isStatusPaused()) return "Paused";
+        if (this.isStatusQueued()) return this.isStatusStartAfterCheck() ? "Queued to Start" : "Queued";
+        if (this.isStatusSeeding()) return "Seeding";
+        if (this.isStatusDownloading()) return "Downloading";
+        if (this.isStatusCompleted()) return "Completed";
+        if (this.isStatusLoaded()) return "Stopped";
+        return super.manualStatusText();
+    }
 
 }

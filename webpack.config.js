@@ -104,6 +104,14 @@ const rendererConfig = {
   name: 'renderer',
   cache: sharedCache,
   optimization: sharedOptimization,
+  // Webpack's default 244 KiB browser budget flags the desktop app's bundled
+  // theme CSS and copied media/database files. Keep a 2.5 MiB guard on the
+  // generated renderer code and styles, while excluding copied data assets.
+  performance: {
+    maxAssetSize: 2.5 * 1024 * 1024,
+    maxEntrypointSize: 2.5 * 1024 * 1024,
+    assetFilter: (filename) => /\.(?:js|css)$/.test(filename),
+  },
   devtool: 'source-map',
   entry: {
     app: [
@@ -153,7 +161,7 @@ const rendererConfig = {
               },
             },
           },
-          'import-glob-loader',
+          path.resolve(__dirname, 'scripts/less-import-glob-loader.cjs'),
         ],
       },
       {

@@ -103,6 +103,10 @@ export class TransmissionTorrent extends Torrent {
         return this.status === TransmissionTorrent.STATUS_CHECK;
     };
 
+    isStatusChecking(): boolean {
+        return this.isStatusVerifying() || this.isStatusQueuedToVerify();
+    }
+
     isStatusQueuedToVerify(): boolean {
         return this.status === TransmissionTorrent.STATUS_CHECK_WAIT;
     };
@@ -135,7 +139,7 @@ export class TransmissionTorrent extends Torrent {
     };
 
     isStatusPaused(): boolean {
-        return ;
+        return this.status === TransmissionTorrent.STATUS_STOPPED && !this.isStatusCompleted();
     };
 
 
@@ -144,6 +148,10 @@ export class TransmissionTorrent extends Torrent {
             return 'Verifying';
         } else if (this.isStatusQueuedToVerify()) {
             return 'Queued to Verify';
+        } else if (this.status === TransmissionTorrent.STATUS_DOWNLOAD_WAIT) {
+            return 'Queued to Download';
+        } else if (this.status === TransmissionTorrent.STATUS_SEED_WAIT) {
+            return 'Queued to Seed';
         } else if (this.isStatusQueued()) {
             return 'Queued';
         } else if (this.isStatusSeeding()){
@@ -162,6 +170,10 @@ export class TransmissionTorrent extends Torrent {
             return 'Unknown';
         }
 
+    }
+
+    manualStatusText(): string {
+        return this.statusText();
     }
 
     static COL_AVAILABILITY = new Column({

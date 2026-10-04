@@ -123,7 +123,7 @@ export class TransmissionRuntime implements BittorrentRuntime {
         { role: "set-ratio", label: "Set Ratio", icon: "percent" },
         { label: "Remove", menu: [
             { role: "remove", label: "Torrent", action: "remove", icon: "remove" },
-            { label: "Torrent and Local Data", action: "removeAndLocal", icon: "remove", role: "delete" },
+            { label: "Torrent and Local Data", action: "removeAndLocal", icon: "remove", role: "delete", deletesLocalData: true },
         ] },
     ]
     private server!: BittorrentServerConfig

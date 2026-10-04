@@ -1,14 +1,14 @@
 # Releases and automatic updates
 
-Installed builds check public GitHub Releases on `micro23/Electorrent` using electron-updater. Windows and supported Linux updates download automatically and install on normal quit or through the existing update dialog. Unsigned macOS builds check GitHub and download a compatible DMG for manual installation. Development builds skip production checks. The `--update-url` override retains the legacy JSON downloader for local tests.
+Installed builds check public GitHub Releases on `micro23/Electorrent` using electron-updater. The current release pipeline publishes macOS packages only. These unsigned macOS builds can check GitHub and download a compatible DMG for manual installation. Windows and Linux packaging and automatic installation are deferred while macOS support is stabilized. Development builds skip production checks. The `--update-url` override retains the legacy JSON downloader for local tests.
 
-Windows now uses NSIS, macOS includes DMG and ZIP builds, and Linux includes AppImage, DEB, RPM, and Snap. Snap installations are managed by snapd. Users of old Squirrel Windows builds must install the first NSIS release manually. Users of upstream builds must install our fork once to switch update sources.
+The electron-builder configuration retains Windows NSIS and Linux AppImage, DEB, RPM, and Snap targets for future releases; only macOS DMG and ZIP installers are built currently. Snap installations are managed by snapd. Users of upstream builds must install our fork once to switch update sources.
 
 ## Publish a release
 
 1. Increase the version in both `package.json` and `app/package.json` (the existing `npm version` script synchronizes the app version).
-2. Commit the finished code and push a matching tag, for example `v2.18.3` for version `2.18.3`.
-3. GitHub Actions runs the client tests and builds macOS installers only. Cross-platform code and client compatibility tests remain in scope, but Windows and Linux packaging are deferred until macOS is honed in. All jobs must succeed before it creates or updates a **draft** GitHub release.
+2. Commit the finished code and push a matching tag, for example `v2.18.4` for version `2.18.4`.
+3. GitHub Actions runs the client tests from source and builds macOS installers only during the current refinement period. Windows and Linux configurations remain available for later releases. All jobs must succeed before it creates or updates a **draft** GitHub release.
 4. Review the draft, test the installers, then publish it. Keep the generated `latest*.yml`, ZIPs, installers, and blockmaps attached; the updater needs them. An empty release or source-only tag cannot update installed apps.
 
 The current workflow publishes unsigned macOS builds with `manualMacUpdates: true` in packaged metadata. macOS may require the user to allow the unsigned app in System Settings. To enable native macOS automatic installation later, configure Developer ID signing and notarization in CI, remove `--config.mac.identity=null`, and omit the manual-update metadata flag for signed builds. Windows signing can be configured separately. Pull requests and manual workflow runs build artifacts without publishing releases.
@@ -17,14 +17,6 @@ The release repository must be publicly readable. No GitHub access token is embe
 
 ## Validation
 
-Run `npm run lint`, `npm run build`, `node --test test/unit/github-updater.test.cjs`, and `npm test -- --dist --client mock --spec test/specs/mock/software-update.spec.ts --headless`.
+Run `npm run lint`, `npm run build`, `node --test test/unit/*.test.cjs`, and `npm test -- --client mock --headless --parallel`.
 
-Before shipping, verify a real older-to-newer signed release update on Windows, macOS, and Linux. Local mocked tests cannot verify OS installer behavior or Apple signing.
-
-Release 2.18.1 validation: lint/typechecking, production build, all six updater unit checks, and the packaged download/dialog test (seven checks) passed. Test browser profiles are isolated from the user’s running app. CI gives each spec a fresh profile and allows two isolated backend fixtures per client. Native older-to-newer installer upgrades still require verification on each operating system.
-
-Release 2.18.1 is published as a preview because the complete integration matrix is not yet green. All twelve local interface test files and seven unit checks passed; cross-platform installer builds passed. Stable update feeds exclude this preview. Install it manually to test the fork, and publish a higher stable version after the remaining integration failures are resolved.
-
-Release 2.18.2 updates Electorrent's bundled theme reference to Deluge Deck 1.0.79. The saved `independence` theme key remains compatible and is displayed as **USA**; the new monument masthead replaces its fireworks and flag progress bar. The Deluge Deck repository is used as a read-only design reference and is not modified by the Electorrent sync script.
-
-Release 2.18.3 updates the same read-only theme reference to Deluge Deck 1.0.80, including its USA flag progress fill and eagle status-rail artwork. The preview contains macOS installers only; Windows and Linux builds remain available in v2.18.2.
+The CI matrix exercises the supported clients, and the macOS build job produces the unsigned installers. Local mocked tests cannot verify macOS Gatekeeper behavior or an older-to-newer manual DMG installation. Windows and Linux installer upgrades should be tested when release builds for those systems resume.

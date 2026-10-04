@@ -17,6 +17,7 @@ export interface TorrentActionItem {
     action?: string
     requiresTorrentSelection?: boolean
     checkProperty?: string
+    deletesLocalData?: boolean
     accelerator?: string
     menu?: TorrentActionItem[]
 }

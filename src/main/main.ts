@@ -12,10 +12,12 @@ import {
     type WebContents,
 } from 'electron'
 import is from 'electron-is'
+import fs from 'fs'
 import path from 'path'
 import yargs from 'yargs'
 
 import startup, { configureSystemStartup, shouldStartInBackground } from '@main/lib/startup'
+import { reclaimTorrentFileAssociation } from '@main/lib/torrent-file-association'
 import type { PendingTorrentUploadLink } from '@shared/ipc-contract'
 
 declare const __non_webpack_require__: NodeRequire | undefined
@@ -28,6 +30,20 @@ function isTorrentFilePath(arg: string) {
     return !isMagnetLink(arg) && arg.toLowerCase().endsWith('.torrent')
 }
 
+const pendingOpenFilePaths: string[] = []
+let handleOpenTorrentFile: ((filePath: string) => void) | null = null
+
+// macOS may deliver this event while bootstrap is still importing the app modules.
+// Register immediately and hold the path until the launch queue is available.
+app.on('open-file', (event: ElectronEvent, filePath: string) => {
+    event.preventDefault()
+    if (handleOpenTorrentFile) {
+        handleOpenTorrentFile(filePath)
+    } else {
+        pendingOpenFilePaths.push(filePath)
+    }
+})
+
 if (!startup) {
     void bootstrap()
 }
@@ -37,6 +53,38 @@ async function bootstrap() {
     const testUserData = app.commandLine.getSwitchValue('test-user-data-dir')
     if (app.commandLine.hasSwitch('test') && testUserData) {
         app.setPath('userData', testUserData)
+    } else if (app.isPackaged) {
+        // The upstream app shares Electorrent's default userData folder. Electron
+        // also uses that folder for its single-instance lock, so opening a torrent
+        // could otherwise forward the file to the old app instead of this fork.
+        const previousUserData = app.getPath('userData')
+        const forkUserData = path.join(app.getPath('appData'), 'Electorrent-micro23')
+        fs.mkdirSync(forkUserData, { recursive: true })
+        app.setPath('userData', forkUserData)
+
+        const previousConfig = path.join(previousUserData, 'config.json')
+        const forkConfig = path.join(forkUserData, 'config.json')
+        if (!fs.existsSync(forkConfig) && fs.existsSync(previousConfig)) {
+            fs.copyFileSync(previousConfig, forkConfig)
+        }
+
+        const previousCertificates = path.join(previousUserData, 'certs')
+        const forkCertificates = path.join(forkUserData, 'certs')
+        if (!fs.existsSync(forkCertificates) && fs.existsSync(previousCertificates)) {
+            fs.mkdirSync(forkCertificates, { recursive: true })
+            for (const entry of fs.readdirSync(previousCertificates, { withFileTypes: true })) {
+                const source = path.join(previousCertificates, entry.name)
+                const target = path.join(forkCertificates, entry.name)
+                if (entry.isDirectory()) {
+                    fs.mkdirSync(target, { recursive: true })
+                    for (const certificate of fs.readdirSync(source)) {
+                        fs.copyFileSync(path.join(source, certificate), path.join(target, certificate))
+                    }
+                } else if (entry.isFile()) {
+                    fs.copyFileSync(source, target)
+                }
+            }
+        }
     }
     const parser = yargs(process.argv.slice(1))
     parser.version(app.getVersion())
@@ -415,6 +463,13 @@ async function bootstrap() {
         void flushPendingLaunchPayload()
     }
 
+    handleOpenTorrentFile = (filePath: string) => {
+        queueAndFlushPendingLaunchArgs([filePath])
+        if (app.isReady()) {
+            showOrCreateTorrentWindow()
+        }
+    }
+
     ipcHandlers.registerHandlers({
         isDebug: !!program.debug,
         forceTitleBarMenu: !!program.forceTitleBarMenu,
@@ -459,16 +514,12 @@ async function bootstrap() {
         showOrCreateTorrentWindow()
     })
 
-    app.on('open-file', function(_event: ElectronEvent, filePath: string) {
-        queueAndFlushPendingLaunchArgs([filePath])
-        if (!app.isReady()) {
-            return
-        }
-        showOrCreateTorrentWindow()
-    })
-
-    app.on('ready', function() {
+    void app.whenReady().then(function() {
+        void reclaimTorrentFileAssociation().catch((error: unknown) => {
+            console.error('Could not reclaim .torrent file association', error)
+        })
         queuePendingLaunchArgs(process.argv)
+        queuePendingLaunchArgs(pendingOpenFilePaths.splice(0))
         configureSystemStartup(settings.getAllSettings().systemStartup)
         startedInBackground = shouldStartInBackground(settings.getAllSettings().systemStartup)
         if (startedInBackground && is.macOS()) {

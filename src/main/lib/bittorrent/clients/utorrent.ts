@@ -29,7 +29,7 @@ export class UtorrentRuntime implements BittorrentRuntime {
         { label: "Remove And", menu: [
             { label: "Delete Torrent", action: "removetorrent" },
             { label: "Delete Data", action: "removedata" },
-            { label: "Delete All", action: "removedatatorrent", role: "delete" },
+            { label: "Delete All", action: "removedatatorrent", role: "delete", deletesLocalData: true },
         ] },
     ]
     private server!: BittorrentServerConfig

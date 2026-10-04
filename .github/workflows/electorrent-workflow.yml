@@ -73,20 +73,8 @@ jobs:
       run: node --test test/unit/*.test.cjs
     - name: Build web application
       run: npm run build
-    - name: Package application
-      run: npm run pack
     - name: Run tests
-      run: xvfb-run -a -- npm test -- --dist --client "${{ matrix.client }}" --headless --parallel --specFileRetries 0
-
-    - name: Upload test diagnostics
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-diagnostics-${{ strategy.job-index }}
-        path: |
-          /tmp/electorrent-test-*/logfile.log
-          ~/.config/Electorrent/logfile.log
-        if-no-files-found: ignore
+      run: xvfb-run -a -- npm test -- --client "${{ matrix.client }}" --parallel --headless
 
   build:
     strategy:
@@ -169,10 +157,4 @@ jobs:
         else
           gh release create "$RELEASE_TAG" --verify-tag --draft --title "$RELEASE_TAG" --generate-notes
         fi
-        python3 - <<'PYTHON'
-        from pathlib import Path
-        for asset in Path("release-assets").iterdir():
-            if " " in asset.name:
-                asset.rename(asset.with_name(asset.name.replace(" ", "-")))
-        PYTHON
         gh release upload "$RELEASE_TAG" release-assets/* --clobber

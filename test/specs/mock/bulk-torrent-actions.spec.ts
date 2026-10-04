@@ -1,14 +1,16 @@
 import chai from "chai"
-import { Key } from "webdriverio"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import { $, $$, browser } from "@wdio/globals"
 import { Torrent } from "../../e2e/e2e_torrent"
 import { eventually } from "../../e2e/eventually"
 import { configureSpec, getTestFixture } from "../../framework/fixture"
+import { DECK_THEME_ORDER, DECK_SPORTS_CLUBS, DECK_CORE_THEMES } from "../../../src/shared/deck-themes"
 
 const assert: Chai.AssertStatic = chai.assert
 
 const torrents = [
-  { hash: "11".padStart(40, "0"), name: "Selected torrent one", state: "downloading" },
+  { hash: "11".padStart(40, "0"), name: "Selected torrent one", state: "downloading", progress: 0.42 },
   { hash: "22".padStart(40, "0"), name: "Selected torrent two", state: "downloading" },
   { hash: "33".padStart(40, "0"), name: "Unselected torrent", state: "downloading" },
 ]
@@ -25,28 +27,41 @@ describe("mock bulk torrent actions", function () {
       .equals(torrents.length)
   })
 
-  it("keeps rows accessible for range selection with bottom details open", async function () {
-    const first = $(`#torrentTable tbody tr[data-id='${torrents[0].hash}'] td[data-col='decodedName']`)
-    const second = $(`#torrentTable tbody tr[data-id='${torrents[1].hash}'] td[data-col='decodedName']`)
-    await first.waitForClickable()
-    await first.click()
-    await browser.action("key").down(Key.Shift).perform(true)
-    try {
-      await second.waitForClickable()
-      await second.click()
-    } finally {
-      await browser.action("key").up(Key.Shift).perform()
+  it("fits a column to its content when its divider is double clicked", async function () {
+    const headers = await $$("#torrentTable thead th")
+    let nameHeader: WebdriverIO.Element | undefined
+    for (const header of headers) {
+      if (["name", "torrent"].includes((await header.getText()).trim().toLowerCase())) nameHeader = header
     }
-    await eventually(getSelectedIds).satisfies("select both rows", (ids) => ids.length === 2
-      && ids.includes(torrents[0].hash) && ids.includes(torrents[1].hash))
+    assert.isOk(nameHeader, "the name column exists")
+    const divider = nameHeader!.$(".rz-handle")
+    await divider.waitForClickable()
+    await divider.dragAndDrop({ x: 200, y: 0 })
+    const originalWidth = (await nameHeader!.getSize()).width
+    await divider.doubleClick()
+    await eventually(async () => (await nameHeader!.getSize()).width)
+      .satisfies("fit the short torrent names", width => width < originalWidth - 10 && width > 100)
+    const fittedWidth = (await nameHeader!.getSize()).width
+    await divider.doubleClick()
+    assert.closeTo((await nameHeader!.getSize()).width, fittedWidth, 2, "repeated fitting is stable")
   })
 
-  it("applies a stop and resume action to every selected torrent", async function () {
-    const firstName = $(`#torrentTable tbody tr[data-id='${torrents[0].hash}'] td[data-col='decodedName']`)
-    await firstName.click()
+  it("applies a pause and resume action to every selected torrent", async function () {
+    await this.app.openSettings()
+    await this.app.settingsGotoTab("general")
+    const terminalTheme = $("button[aria-label='Choose Terminal theme']")
+    await terminalTheme.waitForClickable()
+    await terminalTheme.click()
+    await this.app.settingsSave()
+    await this.app.torrentsPageIsVisible()
+    const selectionMenu = $("[data-role='torrent-selection-menu']")
+    assert.isFalse(await selectionMenu.isExisting())
+    const firstSelected = await $(`#torrentTable tbody tr[data-id='${torrents[0].hash}']`)
     const secondSelected = await $(`#torrentTable tbody tr[data-id='${torrents[1].hash}']`)
+    const firstCheckbox = firstSelected.$(".terminal-row-check")
     const secondCheckbox = secondSelected.$(".terminal-row-check")
-    // First row is selected by its name; add the second through its checkbox.
+    await firstCheckbox.waitForClickable()
+    await firstCheckbox.click()
     await secondCheckbox.waitForClickable()
     await secondCheckbox.click()
 
@@ -57,21 +72,165 @@ describe("mock bulk torrent actions", function () {
         && ids.includes(torrents[1].hash),
     )
 
-    const stopButton = $("#torrent-action-header a[data-role='stop']")
+    await selectionMenu.waitForDisplayed()
+    assert.include(await selectionMenu.getText(), "2 selected")
+    const stopButton = $(".torrent-selection-menu a[data-role='stop']")
     await stopButton.waitForClickable()
     await stopButton.click()
 
-    await expectTorrentState(torrents[0].hash, "Stopped")
-    await expectTorrentState(torrents[1].hash, "Stopped")
+    await expectTorrentState(torrents[0].hash, "Paused")
+    await expectTorrentState(torrents[1].hash, "Paused")
     assert.include(await getTorrentState(torrents[2].hash), "Downloading")
 
-    const resumeButton = $("#torrent-action-header a[data-role='resume']")
+    const resumeButton = $(".torrent-selection-menu a[data-role='resume']")
     await resumeButton.waitForClickable()
     await resumeButton.click()
 
     await expectTorrentState(torrents[0].hash, "Downloading")
     await expectTorrentState(torrents[1].hash, "Downloading")
     assert.include(await getTorrentState(torrents[2].hash), "Downloading")
+    await firstCheckbox.click()
+    await secondCheckbox.click()
+    await selectionMenu.waitForExist({ reverse: true })
+  })
+
+  it("shows the bottom selection menu with clear transport labels in every theme", async function () {
+    this.timeout(180000)
+    await $(`#torrentTable tbody tr[data-id='${torrents[0].hash}'] .terminal-row-check`).click()
+    const startIndex = DECK_THEME_ORDER.indexOf("terminal")
+    for (let offset = 0; offset < DECK_THEME_ORDER.length; offset++) {
+      const theme = DECK_THEME_ORDER[(startIndex + offset) % DECK_THEME_ORDER.length]
+      await eventually(async () => $("html").getAttribute("data-theme")).equals(theme)
+      const core = DECK_CORE_THEMES[theme as keyof typeof DECK_CORE_THEMES]
+      if (core) {
+        await eventually(async () => $(".core-masthead h1").getText()).equals(core)
+        assert.equal(await $$(".deck-stat-icon .core-stat-icon").length, 4)
+        const meter = $(`#torrentTable tr[data-id='${torrents[0].hash}'] .core-progress`)
+        await meter.waitForDisplayed()
+        assert.equal(await meter.$("clipPath rect").getAttribute("width"), "42%")
+      }
+      const club = DECK_SPORTS_CLUBS[theme as keyof typeof DECK_SPORTS_CLUBS]
+      if (club) {
+        const heritage = $(".sports-facts-masthead")
+        await heritage.waitForDisplayed()
+        await eventually(async () => (await heritage.getText()).includes(club.venue)).equals(true)
+        const copy = await heritage.getText()
+        assert.include(copy, club.venue)
+        assert.include(copy, String(club.established))
+        assert.include(copy, String(club.opened))
+        assert.equal(await $$(".deck-stat-icon .sports-stat-icon").length, 4)
+      }
+      if (theme === "independence") {
+        await $(".usa-masthead").waitForDisplayed()
+        assert.equal(await $$(".usa-flag-mark path").length, 50)
+        await $(".usa-footer-eagle").waitForDisplayed()
+      }
+      if (theme === "matrix") {
+        assert.equal(await $$(".matrix-rain > span").length, 22)
+        assert.notInclude(await $(".matrix-masthead").getText(), "SOURCE")
+        const progress = $(`#torrentTable tr[data-id='${torrents[0].hash}'] .matrix-code-progress`)
+        await progress.waitForDisplayed()
+        assert.equal(await progress.$("clipPath rect").getAttribute("width"), "42%")
+      }
+      const menu = $(".torrent-selection-menu")
+      await menu.waitForDisplayed()
+      assert.include(await menu.getText(), "1 selected")
+      await menu.$("[data-role='selection-remove']").waitForClickable()
+      await eventually(async () => {
+        const menuPosition = await menu.getLocation()
+        const menuSize = await menu.getSize()
+        const footerPosition = await $("#page-torrents .status-bar").getLocation()
+        return menuPosition.y + menuSize.height <= footerPosition.y + 1
+      }).equals(true)
+      const more = menu.$(".ui.labeled.icon.dropdown.button")
+      await more.waitForClickable()
+      if (theme !== "terminal") {
+        const moreIcon = more.$(".icon")
+        const iconPosition = await moreIcon.getLocation()
+        const iconSize = await moreIcon.getSize()
+        const textPosition = await more.$(".text").getLocation()
+        assert.isAtMost(iconPosition.x + iconSize.width, textPosition.x + 1,
+          `${theme}: dropdown icon does not overlap its label`)
+      }
+      await more.click()
+      const dropdown = more.$(".menu")
+      await dropdown.waitForDisplayed()
+      const dropdownPosition = await dropdown.getLocation()
+      const dropdownSize = await dropdown.getSize()
+      const buttonPosition = await more.getLocation()
+      assert.isAtMost(dropdownPosition.y + dropdownSize.height, buttonPosition.y + 1,
+        `${theme}: extra actions open above the bottom menu`)
+      await more.click()
+      await dropdown.waitForDisplayed({ reverse: true })
+      for (const selector of theme === "terminal"
+        ? [".torrent-selection-menu"] : [".torrent-selection-menu", "#torrent-action-header"]) {
+        for (const role of ["resume", "stop"]) {
+          const button = $(`${selector} a[data-role='${role}']`)
+          await button.waitForDisplayed()
+          const label = button.$(".torrent-action-label")
+          const icon = button.$(".icon")
+          assert.isTrue(await label.isDisplayed(), `${theme}: ${role} label is visible`)
+          if (theme === "terminal") {
+            assert.isFalse(await icon.isDisplayed(), "Terminal uses text actions")
+          } else {
+            assert.isTrue(await icon.isDisplayed(), `${theme}: ${role} icon is visible`)
+            const iconPosition = await icon.getLocation()
+            const iconSize = await icon.getSize()
+            const labelPosition = await label.getLocation()
+            assert.isAtMost(iconPosition.x + iconSize.width, labelPosition.x + 1,
+              `${theme}: ${role} icon does not overlap its label`)
+          }
+        }
+      }
+      // Both bulk actions must operate on the selection in every theme.
+      if (["matrix", "independence", "yankees", "dark", "light", "ocean", "forest", "sunset"].includes(theme)) {
+        await browser.saveScreenshot(join(tmpdir(), `electorrent-${theme}-today.png`))
+      }
+      await menu.$("a[data-role='stop']").click()
+      await expectTorrentState(torrents[0].hash, "Paused")
+      if (theme === "matrix") {
+        assert.include(await $(`#torrentTable tr[data-id='${torrents[0].hash}'] .matrix-code-progress`).getAttribute("class"), "paused")
+      }
+      await menu.$("a[data-role='resume']").click()
+      await expectTorrentState(torrents[0].hash, "Downloading")
+      await browser.keys("t")
+    }
+    await eventually(async () => $("html").getAttribute("data-theme")).equals("terminal")
+  })
+
+  it("shows Matrix code progress in the details panel with independent SVG fills", async function () {
+    await browser.keys("t")
+    await eventually(async () => $("html").getAttribute("data-theme")).equals("matrix")
+    await $(`#torrentTable tr[data-id='${torrents[0].hash}'] .torrent-name-content`).doubleClick()
+    const drawer = $(".torrent-details-panel .matrix-code-progress")
+    await drawer.waitForDisplayed()
+    const row = $(`#torrentTable tr[data-id='${torrents[0].hash}'] .matrix-code-progress`)
+    assert.equal(await drawer.$("clipPath rect").getAttribute("width"), "42%")
+    assert.notEqual(await drawer.$("pattern").getAttribute("id"), await row.$("pattern").getAttribute("id"))
+    await $("[data-role='torrent-details-close']").click()
+    await browser.keys("d")
+    await browser.keys("t")
+    await eventually(async () => $("html").getAttribute("data-theme")).equals("terminal")
+  })
+
+  it("removes the selected torrent from the Terminal menu after confirmation", async function () {
+    const remove = $("[data-role='selection-remove']")
+    await remove.waitForClickable()
+    await remove.click()
+    const modal = $("#deleteTorrentModal")
+    await modal.waitForDisplayed()
+    assert.include(await modal.getText(), "Selected torrent one")
+    await modal.$("[data-role='remove-torrent-only']").waitForClickable()
+    await modal.$(".deny.button").click()
+    await modal.waitForDisplayed({ reverse: true })
+    assert.isTrue(await $(`#torrentTable tbody tr[data-id='${torrents[0].hash}']`).isExisting())
+    await remove.click()
+    await modal.waitForDisplayed()
+    await modal.$("[data-role='remove-torrent-only']").click()
+    await eventually(async () => (await $$("#torrentTable tbody tr[data-id]")).length).equals(2)
+    assert.isFalse(await $(`#torrentTable tbody tr[data-id='${torrents[0].hash}']`).isExisting())
+    assert.isTrue(await $(`#torrentTable tbody tr[data-id='${torrents[2].hash}']`).isExisting())
+    await $(".torrent-selection-menu").waitForExist({ reverse: true })
   })
 })
 

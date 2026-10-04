@@ -13,6 +13,9 @@ interface TorrentControllerScope extends angular.IScope {
     deleteModalref?: ModalController;
     deleteConfirmation?: {
         action: ((torrents: any[]) => Promise<void>) | null;
+        removeAction?: ((torrents: any[]) => Promise<void>) | null;
+        deleteDataAction?: ((torrents: any[]) => Promise<void>) | null;
+        mode?: "confirm" | "remove-options";
         label: string;
         torrents: any[];
     };
@@ -43,7 +46,7 @@ export class TorrentsPageController {
         const SLOW_LATENCY_FACTOR = 3;
 
         let selected: any[] = [];
-        let lastSelected: any = null;
+        let detailsTorrent: any = null;
         let timeout: angular.IPromise<void> | undefined;
         let reconnect: angular.IPromise<void> | undefined;
         let slowSyncTimer: angular.IPromise<void> | undefined;
@@ -145,6 +148,9 @@ export class TorrentsPageController {
         $scope.uploadAdvancedOptionsKey = "Ctrl";
         $scope.deleteConfirmation = {
             action: null,
+            removeAction: null,
+            deleteDataAction: null,
+            mode: "confirm",
             label: "",
             torrents: [],
         };
@@ -280,7 +286,7 @@ export class TorrentsPageController {
             $scope.connectionLost = false;
             setSyncConnectionState("normal");
             deselectAll();
-            lastSelected = null;
+            detailsTorrent = null;
             clearAll();
             syncDetailsPanel();
             $scope.filters = {
@@ -382,18 +388,31 @@ export class TorrentsPageController {
         function clearDeleteConfirmation() {
             $scope.deleteConfirmation = {
                 action: null,
+                removeAction: null,
+                deleteDataAction: null,
+                mode: "confirm",
                 label: "",
                 torrents: [],
             };
         }
 
-        function getCurrentSelectedTorrent() {
-            return lastSelected || selected[0] || null;
+        function getCurrentDetailsTorrent() {
+            return detailsTorrent;
         }
 
-        function syncDetailsPanel(allowOpen = false) {
-            $rootScope.$emit("torrentDetails:sync", getCurrentSelectedTorrent(), allowOpen);
+        function syncDetailsPanel() {
+            if (detailsTorrent) {
+                detailsTorrent = $scope.torrents[detailsTorrent.id] || null;
+            }
+            $rootScope.$emit("torrentDetails:sync", getCurrentDetailsTorrent(), false);
             syncSelectedTorrents();
+        }
+
+        function openTorrentDetails(torrent: any) {
+            const currentTorrent = torrent && $scope.torrents[torrent.id];
+            if (!currentTorrent) return;
+            detailsTorrent = currentTorrent;
+            $rootScope.$emit("torrentDetails:open", currentTorrent);
         }
 
         function syncSelectedTorrents() {
@@ -407,11 +426,12 @@ export class TorrentsPageController {
             });
         }
 
-        function openDeleteConfirmation(action: (torrents: any[]) => Promise<void>, label: string) {
+        function openDeleteConfirmation(action: (torrents: any[]) => Promise<void>, label: string, torrents = selected) {
             $scope.deleteConfirmation = {
                 action,
+                mode: "confirm",
                 label,
-                torrents: selected.slice(),
+                torrents: torrents.slice(),
             };
             $scope.deleteModalref?.showModal();
         }
@@ -443,6 +463,12 @@ export class TorrentsPageController {
         $scope.getDeleteConfirmationMessage = () => {
             const label = ($scope.deleteConfirmation?.label || "Delete").toLowerCase();
             const torrents = $scope.deleteConfirmation?.torrents || [];
+            if ($scope.deleteConfirmation?.mode === "remove-options") {
+                if (!$scope.deleteConfirmation.deleteDataAction) {
+                    return `Remove ${getDeleteConfirmationTarget(torrents)} from the client?`;
+                }
+                return `Choose whether to remove ${getDeleteConfirmationTarget(torrents)} from the client only or remove it with its downloaded files.`;
+            }
             return `Are you sure you want to ${label} ${getDeleteConfirmationTarget(torrents)}?`;
         };
 
@@ -474,6 +500,32 @@ export class TorrentsPageController {
             return runContextAction(pendingDelete.action || undefined, pendingDelete.torrents);
         };
 
+        $scope.confirmRemoveSelection = (deleteData: boolean) => {
+            const confirmation = $scope.deleteConfirmation;
+            const action = deleteData ? confirmation?.deleteDataAction : confirmation?.removeAction;
+            const torrents = (confirmation?.torrents || []).slice();
+            clearDeleteConfirmation();
+            $scope.deleteModalref?.hideModal();
+            return runContextAction(action || undefined, torrents);
+        };
+
+        $scope.removeSelected = () => {
+            if (!selected.length) return $q.resolve();
+            const torrentClient = $rootScope.$btclient;
+            const configuredDeleteAction = findContextActionByRole(torrentClient?.contextMenu || [], "delete");
+            const deleteDataAction = configuredDeleteAction?.deletesLocalData ? configuredDeleteAction : null;
+            $scope.deleteConfirmation = {
+                action: null,
+                removeAction: torrentClient?.deleteTorrents || null,
+                deleteDataAction: deleteDataAction?.click || null,
+                mode: "remove-options",
+                label: "Remove",
+                torrents: selected.slice(),
+            };
+            $scope.deleteModalref?.showModal();
+            return $q.resolve();
+        };
+
         function remove() {
             const selectedTorrents = $scope.arrayTorrents.filter(({ selected: isSelected }: { selected: boolean }) => isSelected);
             if (selectedTorrents.length === 0) {
@@ -496,7 +548,6 @@ export class TorrentsPageController {
                 torrent.selected = true;
                 selected.push(torrent);
             }
-            lastSelected = $scope.arrayTorrents[0] || null;
             syncDetailsPanel();
             $scope.$apply();
         }
@@ -647,7 +698,7 @@ export class TorrentsPageController {
 
         $scope.filterByStatus = (status: string) => {
             deselectAll();
-            lastSelected = null;
+            detailsTorrent = null;
             $scope.filters.status = status;
             $scope.torrentLimit = LIMIT;
             refreshTorrents();
@@ -657,7 +708,7 @@ export class TorrentsPageController {
         $scope.filterBySearch = () => {
             $scope.isSearching = true;
             deselectAll();
-            lastSelected = null;
+            detailsTorrent = null;
             $scope.torrentLimit = LIMIT;
             refreshTorrents();
             syncDetailsPanel();
@@ -665,7 +716,7 @@ export class TorrentsPageController {
 
         $scope.filterByLabel = (label?: string) => {
             deselectAll();
-            lastSelected = null;
+            detailsTorrent = null;
             $scope.filters.label = label;
             $scope.torrentLimit = LIMIT;
             refreshTorrents();
@@ -674,7 +725,7 @@ export class TorrentsPageController {
 
         $scope.filterByTracker = (tracker?: string) => {
             deselectAll();
-            lastSelected = null;
+            detailsTorrent = null;
             $scope.filters.tracker = tracker;
             $scope.torrentLimit = LIMIT;
             refreshTorrents();
@@ -682,26 +733,20 @@ export class TorrentsPageController {
         };
 
         $scope.showContextMenu = (event: Event, torrent: any) => {
-            if (!torrent.selected) {
-                singleSelect(torrent);
-            }
-            $scope.contextMenu.show(event, selected);
+            const contextActionTorrents = torrent.selected ? selected.slice() : [torrent];
+            $scope.contextMenu.show(event, contextActionTorrents);
         };
 
         $scope.openTorrentDetails = (torrent: any) => {
-            singleSelect(torrent);
-
-            const currentTorrent = getCurrentSelectedTorrent();
-            if (currentTorrent) {
-                $rootScope.$emit("torrentDetails:open", currentTorrent);
-            }
+            openTorrentDetails(torrent);
         };
 
         $scope.noneSelected = () => {
             return selected.length === 0;
         };
+        $scope.selectedCount = () => selected.length;
 
-        function toggleSelect(target: any, allowOpen = true) {
+        function toggleSelect(target: any) {
             const torrent = $scope.torrents[target.id];
             if (!torrent.selected) {
                 selected.push(torrent);
@@ -711,8 +756,7 @@ export class TorrentsPageController {
                 });
             }
             torrent.selected = !torrent.selected;
-            lastSelected = torrent;
-            syncDetailsPanel(allowOpen);
+            syncDetailsPanel();
         }
 
         function deselectAll() {
@@ -722,59 +766,15 @@ export class TorrentsPageController {
             selected = [];
         }
 
-        function singleSelect(target: any) {
-            deselectAll();
-            const torrent = $scope.torrents[target.id];
-            if (!torrent) {
-                return;
-            }
-            torrent.selected = true;
-            selected.push(torrent);
-            lastSelected = torrent;
-            syncDetailsPanel(true);
-        }
-
-        function multiSelect(index: number) {
-            const lastIndex = $scope.arrayTorrents.indexOf(lastSelected);
-            if (lastIndex < 0) {
-                return;
-            }
-
-            let start: number;
-            let end: number;
-            if (lastIndex < index) {
-                start = lastIndex;
-                end = index;
-            } else {
-                start = index;
-                end = lastIndex;
-            }
-
-            deselectAll();
-            while (start <= end) {
-                $scope.arrayTorrents[start].selected = true;
-                selected.push($scope.arrayTorrents[start]);
-                start += 1;
-            }
-            lastSelected = $scope.arrayTorrents[index];
-            syncDetailsPanel(true);
-        }
-
-        $scope.setSelected = (event: MouseEvent, torrent: any, index: number) => {
-            if (event.ctrlKey || event.metaKey) {
-                toggleSelect(torrent);
-            } else if (event.shiftKey) {
-                multiSelect(index);
-            } else {
-                singleSelect(torrent);
-            }
+        $scope.setSelected = (event: MouseEvent, torrent: any) => {
+            openTorrentDetails(torrent);
 
             (event.currentTarget as HTMLElement).closest("table")?.focus({ preventScroll: true });
         };
 
         $scope.toggleTerminalSelection = (event: MouseEvent, torrent: any) => {
             event.stopPropagation();
-            toggleSelect(torrent, false);
+            toggleSelect(torrent);
             (event.currentTarget as HTMLElement).closest("table")?.focus({ preventScroll: true });
         };
 
@@ -801,11 +801,10 @@ export class TorrentsPageController {
                 if (!target.selected) {
                     target.selected = true;
                     selected.push(target);
-                    lastSelected = target;
                     syncDetailsPanel();
                 }
             } else {
-                singleSelect(target);
+                openTorrentDetails(target);
             }
             $scope.torrentLimit = Math.max($scope.torrentLimit, targetIndex + 1);
             $timeout(() => {
@@ -850,43 +849,41 @@ export class TorrentsPageController {
                 });
         };
 
-        $scope.doContextAction = (action: any, label: string, item: any) => {
+        $scope.doContextAction = (action: any, label: string, item: any, contextTorrents?: any[]) => {
+            const actionTorrents = contextTorrents?.length ? contextTorrents : selected;
             if (item?.role === "details") {
-                const currentTorrent = getCurrentSelectedTorrent();
-                if (currentTorrent) {
-                    $rootScope.$emit("torrentDetails:open", currentTorrent);
-                }
+                openTorrentDetails(actionTorrents[0] || detailsTorrent || selected[0]);
                 return $q.resolve();
             }
             if (item?.role === "set-location") {
-                if (selected.length >= 1) {
-                    $scope.setLocationModalRef?.open(selected.slice());
+                if (actionTorrents.length >= 1) {
+                    $scope.setLocationModalRef?.open(actionTorrents.slice());
                 }
                 return $q.resolve();
             }
             if (item?.role === "set-label") {
-                if (selected.length >= 1) {
-                    $scope.setLabelModalRef?.open(selected.slice());
+                if (actionTorrents.length >= 1) {
+                    $scope.setLabelModalRef?.open(actionTorrents.slice());
                 }
                 return $q.resolve();
             }
             if (item?.role === "set-speed-limits") {
-                if (selected.length >= 1) {
-                    $scope.speedLimitModalRef?.open(selected.slice());
+                if (actionTorrents.length >= 1) {
+                    $scope.speedLimitModalRef?.open(actionTorrents.slice());
                 }
                 return $q.resolve();
             }
             if (item?.role === "set-ratio") {
-                if (selected.length >= 1) {
-                    $scope.setRatioModalRef?.open(selected.slice());
+                if (actionTorrents.length >= 1) {
+                    $scope.setRatioModalRef?.open(actionTorrents.slice());
                 }
                 return $q.resolve();
             }
             if (item && item.role === "delete" && settings.confirmTorrentDeletion !== false) {
-                openDeleteConfirmation(action, label);
+                openDeleteConfirmation(action, label, actionTorrents);
                 return $q.resolve();
             }
-            return runContextAction(action, selected);
+            return runContextAction(action, actionTorrents);
         };
 
         function fetchTorrents(): any[] {
@@ -1032,18 +1029,8 @@ export class TorrentsPageController {
                 }
             });
             selected = newSelected;
-            reassignLastSelected();
-        }
-
-        function reassignLastSelected() {
-            if (!lastSelected) {
-                return;
-            }
-            const lastDelegate = $scope.torrents[lastSelected.id];
-            if (lastDelegate) {
-                lastSelected = lastDelegate;
-            } else {
-                lastSelected = null;
+            if (detailsTorrent) {
+                detailsTorrent = $scope.torrents[detailsTorrent.id] || null;
             }
         }
 
@@ -1059,8 +1046,8 @@ export class TorrentsPageController {
                 return true;
             });
 
-            if (lastSelected && deletedIdSet.has(lastSelected.id)) {
-                lastSelected = null;
+            if (detailsTorrent && deletedIdSet.has(detailsTorrent.id)) {
+                detailsTorrent = null;
             }
         }
 

@@ -11,7 +11,13 @@ const revision = execFileSync('git', ['-C',path.resolve(process.argv[2] || '.dre
 const version = JSON.parse(fs.readFileSync(path.resolve(process.argv[2] || '.dream-loop/deck-latest','package.json'),'utf8')).version;
 const source = path.resolve(process.argv[2] || '.dream-loop/deck-latest');
 const target = 'src/renderer/styles/app/partials/deck-reference.less';
-const files = ['valentine','halloween','christmas','new-year','independence','core','signatures','matrix','independence-reference','sports-expansion','sports','darkhand','mets','sports-bespoke'];
+const files = ['valentine','halloween','christmas','new-year','independence','core','signatures','matrix','independence-reference','sports-expansion','sports','darkhand','mets','sports-bespoke','yankees','sports-heritage'];
+if (fs.existsSync(path.join(source, 'src/themes/core-refined.css'))) files.push('core-refined');
+if (files.includes('core-refined')) {
+  const palettePath = 'src/renderer/styles/deck-palettes.less';
+  const palettes = fs.readFileSync(palettePath, 'utf8').replace(/(:root\[data-theme="(?:dark|light|ocean|forest|sunset)"\]):not\(#dream-loop-skip\)/g, '$1');
+  fs.writeFileSync(palettePath, palettes);
+}
 const classes = {
   'app-shell':'main.wrapper', 'main-content':'main-panel', workspace:'deck-overview',
   'table-shell':'main-content', topbar:'deck-control-strip', 'topbar-heading':'deck-overview-heading',
@@ -20,6 +26,7 @@ const classes = {
   'nav-label':'deck-sidebar-caption', 'nav-item':'nav-item', 'sidebar-bottom':'torrent-sidebar-footer',
   'sidebar-toggle':'torrent-sidebar-toggle', 'search-wrap':'ui.fluid.search',
   'progress-wrap':'deck-progress', 'progress-track':'deck-progress-track', 'progress-bar':'bar',
+  'independence-flag':'deck-progress-flag',
   'deck-status-rail':'status-bar', 'torrent-name':'torrent-name-content',
   'modal-card':'ui.modal', 'detail-drawer':'torrent-details-panel',
   'context-menu':'ui.context.menu', 'column-resize-handle':'rz-handle',
@@ -52,9 +59,13 @@ for (const name of files) {
 fs.writeFileSync(target, output);
 fs.cpSync(path.join(source,'src/assets'),'src/renderer/assets/deck',{recursive:true});
 const { SPORTS_DESIGNS } = await import(pathToFileURL(path.join(source,'src/app/sports-designs.js')));
+const { SPORTS_CLUBS } = await import(pathToFileURL(path.join(source,'src/app/sports-clubs.js')));
 const metadataPath = 'src/shared/deck-themes.ts';
 let metadata = fs.readFileSync(metadataPath,'utf8').replace(/\nexport const DECK_SPORTS_DESIGNS[\s\S]*$/,'');
 metadata = metadata.replace(/^\/\/ Synced from micro23\/deluge-deck[^\n]*/, `// Synced from micro23/deluge-deck ${version} (${revision}).`);
+metadata = metadata.replace(/export const DECK_SPORTS_CLUBS = [\s\S]*$/, 'export const DECK_SPORTS_CLUBS = '+JSON.stringify(SPORTS_CLUBS,null,4)+';\n');
+metadata = metadata.replace('"independence": "Independence"', '"independence": "USA"');
 metadata += '\nexport const DECK_SPORTS_DESIGNS = '+JSON.stringify(SPORTS_DESIGNS,null,4)+';\n';
+metadata += '\nexport const DECK_CORE_THEMES = '+JSON.stringify({dark:'Midnight',light:'Paper',ocean:'Ocean',forest:'Forest',sunset:'Sunset'},null,4)+';\n';
 fs.writeFileSync(metadataPath,metadata);
 console.log('Imported '+files.length+' theme material files and local assets.');

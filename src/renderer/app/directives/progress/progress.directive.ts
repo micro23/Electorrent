@@ -22,6 +22,7 @@ export class ProgressDirective implements IDirective {
     constructor(private $timeout: ITimeoutService) {}
 
     link(scope: IScope, element: IAugmentedJQuery, attr: unknown, controller: ProgressController) {
+        controller.svgId = `torrent-progress-${scope.$id}`;
         let idle = true;
         const bar = element.find(".bar");
 

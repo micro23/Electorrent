@@ -193,4 +193,8 @@ export class RtorrentTorrent extends Torrent {
         }
     };
 
+    manualStatusText(): string {
+        return this.statusText();
+    }
+
 }

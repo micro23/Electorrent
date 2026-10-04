@@ -1,13 +1,13 @@
 <a
     ng-repeat-start="item in actionItems track by $index"
     ng-if="item.type === 'button'"
-    class="ui labeled icon button"
+    class="ui button torrent-action-button"
     ng-class="[item.color, {disabled: enabled && !item.alwaysActive}]"
     data-role="{{item.role}}"
     ng-click="invoke(item.click, item.label)"
 >
     <i class="ui icon" ng-class="item.icon"></i>
-    {{item.label}}
+    <span class="torrent-action-label">{{item.label}}</span>
 </a>
 
 <span

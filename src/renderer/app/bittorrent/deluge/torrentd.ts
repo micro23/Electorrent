@@ -82,12 +82,16 @@ export class DelugeTorrent extends Torrent {
         return this.state === "Error"
     };
 
+    isStatusChecking(): boolean {
+        return /^checking(?:[\s_-]*resume[\s_-]*data)?$/i.test(this.state || "");
+    }
+
     isStatusStopped(): boolean {
         return this.state === "Paused"
     };
 
     isStatusQueued(): boolean {
-        return this.state === "Queued"
+        return this.state === "Queued" || this.state === "Allocating"
     };
 
     isStatusCompleted(): boolean {
@@ -103,8 +107,23 @@ export class DelugeTorrent extends Torrent {
     };
 
     isStatusPaused() {
-        return false
+        return this.state === "Paused"
     };
+
+    manualStatusText(): string {
+        if (this.isStatusChecking()) return "Checking";
+        const knownStates: Record<string, string> = {
+            allocating: "Allocating",
+            downloading: "Downloading",
+            error: "Error",
+            moving: "Moving",
+            paused: "Paused",
+            queued: "Queued",
+            seeding: "Seeding",
+        };
+        const state = String(this.state || "").trim();
+        return knownStates[state.toLowerCase()] || (state ? state.replace(/([a-z])([A-Z])/g, "$1 $2") : super.manualStatusText());
+    }
 
     seedsPeersRatioText() {
         if (!Number.isFinite(this.seedsPeersRatio)) {

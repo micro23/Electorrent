@@ -176,8 +176,8 @@ export class SortHeaderController implements SortHeader {
         this.render();
     }
 
-    private readonly onMouseDown = () => {
-        if (this.disabled) {
+    private readonly onMouseDown = (event: JQuery.TriggeredEvent) => {
+        if (this.disabled || $(event.target).closest(".rz-handle").length) {
             return;
         }
         this.isDragging = false;
@@ -188,11 +188,11 @@ export class SortHeaderController implements SortHeader {
         this.isDragging = true;
     };
 
-    private readonly onMouseUp = () => {
+    private readonly onMouseUp = (event: JQuery.TriggeredEvent) => {
         const wasDragging = this.isDragging;
         this.isDragging = false;
         this.windowElement.off("mousemove", this.onWindowMouseMove);
-        if (!this.disabled && !wasDragging) {
+        if (!this.disabled && !wasDragging && !$(event.target).closest(".rz-handle").length) {
             this.sorting?.select(this.sortKey);
         }
     };

@@ -97,30 +97,75 @@ html[data-theme="matrix"][data-theme] body #page-torrents .main-content > div { 
 html[data-theme="darkhand"][data-theme] body .main.wrapper { background:#0d1014 !important; }
 html[data-theme="darkhand"][data-theme] body #page-torrents { padding:16px 16px 0; }
 html[data-theme="darkhand"][data-theme] body torrent-sidebar { left:16px; top:16px; bottom:12px; width:248px; }
+/* The native sidebar wrapper must not show square gray corners behind the card. */
+html[data-theme="darkhand"][data-theme] body #page-torrents torrent-sidebar {
+    height:auto !important;
+    max-height:none !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .torrent.sidebar .torrent-sidebar-footer {
+    padding:12px 16px 16px !important;
+    min-height:58px;
+    align-items:center;
+}
 html[data-theme="darkhand"][data-theme] body #page-torrents .torrent.sidebar { border:1px solid var(--line) !important; border-radius:18px !important; width:100% !important; }
 html[data-theme="darkhand"][data-theme] body #page-torrents .torrent.sidebar .sidebar-scroll { padding:0 0 12px; }
 html[data-theme="darkhand"][data-theme] body #page-torrents .dh-brand { padding:0 30px; }
 html[data-theme="darkhand"][data-theme] body #page-torrents .deck-sidebar-add { margin:16px auto !important; }
-html[data-theme="darkhand"][data-theme] body .main-panel { width:calc(100% - 264px); }
+html[data-theme="darkhand"][data-theme] body #page-torrents .main-panel { width:calc(100% - var(--torrent-sidebar-width) - 16px); }
 html[data-theme="darkhand"][data-theme] body #page-torrents .deck-overview { padding:52px 0 16px; }
 html[data-theme="darkhand"][data-theme] body #page-torrents .main-content { flex:0 1 auto; min-height:0 !important; max-height:calc(100vh - 300px); margin:0 0 16px !important; border-radius:18px; }
 html[data-theme="darkhand"][data-theme] body #page-torrents #torrentTable th { background:var(--surface) !important; text-transform:uppercase; letter-spacing:.06em; }
 html[data-theme="darkhand"][data-theme] body #page-torrents #torrentTable tbody td { height:34px; }
 html[data-theme="darkhand"][data-theme] body #page-torrents .status-bar { margin:auto 0 12px; }
 html[data-theme="darkhand"][data-theme] body #page-torrents .deck-progress-track { height:14px !important; }
-html[data-theme="darkhand"][data-theme] body #page-torrents .is-sidebar-collapsed torrent-sidebar { width:120px; }
-html[data-theme="darkhand"][data-theme] body #page-torrents .is-sidebar-collapsed .main-panel { width:calc(100% - 136px); }
-html[data-theme="darkhand"][data-theme] body #page-torrents .is-sidebar-collapsed .dh-brand { justify-content:center; padding:0; }
-html[data-theme="darkhand"][data-theme] body #page-torrents .is-sidebar-collapsed .dh-brand span { display:none; }
+html[data-theme="darkhand"][data-theme] body #page-torrents.is-sidebar-collapsed torrent-sidebar { width:120px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents.is-sidebar-collapsed .main-panel { width:calc(100% - 136px); }
+html[data-theme="darkhand"][data-theme] body #page-torrents.is-sidebar-collapsed .dh-brand { justify-content:center; padding:0; }
+html[data-theme="darkhand"][data-theme] body #page-torrents.is-sidebar-collapsed .dh-brand span { display:none; }
 html[data-theme="darkhand"][data-theme] body #page-torrents .torrent-sidebar-toggle { display:block !important; }
-.deck-theme-category { grid-column:1/-1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-.deck-theme-category h3 { grid-column:1/-1; margin:5px 0; font-size:12px; color:var(--muted); }
+html[data-theme] body settings-general .ui.cards > .ui.card.deck-theme-settings { width:calc(100% - 2em) !important; }
+html[data-theme] body settings-general .ui.card > .content.deck-theme-gallery {
+    display:block;
+    flex:0 0 auto;
+    width:100%;
+    min-width:0;
+    max-height:420px;
+    overflow:auto;
+    padding:12px !important;
+}
+html[data-theme] body settings-general .deck-theme-gallery::before,
+html[data-theme] body settings-general .deck-theme-gallery::after { content:none; }
+html[data-theme] body settings-general .deck-theme-category {
+    display:grid;
+    width:100%;
+    min-width:0;
+    grid-template-columns:repeat(auto-fit,minmax(min(110px,100%),1fr));
+    gap:10px;
+    margin:0 0 16px;
+}
+html[data-theme] body settings-general .deck-theme-category h3 { grid-column:1/-1; margin:5px 0; font-size:12px; color:var(--muted); }
+html[data-theme] body settings-general .deck-theme-category .deck-theme-preview {
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    min-width:0;
+    margin:0;
+}
+html[data-theme] body settings-general .deck-theme-preview .deck-matrix-preview {
+    width:100%;
+    height:auto;
+    aspect-ratio:16 / 9;
+}
+html[data-theme] body settings-general .deck-theme-preview span { width:100%; font-size:11px; }
 .deck-matrix-preview { height:65px; overflow:hidden; padding:8px; background:#030906; color:#68ff86; font:11px/1.3 monospace; }
 @media(max-width:1100px) {
     html[data-theme]:not([data-theme="terminal"]) { --torrent-sidebar-width:200px; }
     html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
     html[data-theme]:not([data-theme="terminal"]) body #page-torrents .deck-stat-copy { width:100%; }
-    html[data-theme="darkhand"][data-theme] body .main-panel { width:calc(100% - 264px); }
+    html[data-theme="darkhand"][data-theme] body #page-torrents .main-panel { width:calc(100% - var(--torrent-sidebar-width) - 16px); }
 }
 @media(prefers-reduced-motion:reduce) {
     html[data-theme] *,html[data-theme] *::before,html[data-theme] *::after { animation:none !important; transition:none !important; }
@@ -166,7 +211,7 @@ html[data-theme="darkhand"][data-theme] body #page-torrents .torrent-details-pan
     html[data-theme="darkhand"][data-theme] body #page-torrents.dh-details-right:has(.torrent-details-panel) .main-content,
     html[data-theme="darkhand"][data-theme] body #page-torrents.dh-details-right:has(.torrent-details-panel) .dh-overview { margin-right:calc(var(--deck-details-width,400px) + 16px) !important; }
     html[data-theme="darkhand"][data-theme] body #page-torrents.dh-details-right .torrent-details-panel {
-        position:absolute; right:0; top:95px; bottom:54px; width:400px; height:auto !important;
+        position:absolute; right:0; top:95px; bottom:54px; z-index:3; width:400px; height:auto !important;
     }
     html[data-theme="darkhand"][data-theme] body #page-torrents.dh-details-right .torrent-details-panel-resizer { cursor:ew-resize; top:0; bottom:0; left:-4px; width:8px; height:100%; }
 }
@@ -207,9 +252,6 @@ html[data-theme]:not([data-theme="terminal"]) body #page-torrents #torrentTable 
 html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar .nav > li > .icon { margin:0; }
 html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar .torrent.sort.label { color:var(--muted) !important; font-size:11px; }
 html[data-theme="matrix"][data-theme] body #page-torrents #torrentTable th .rz-handle::after { box-shadow:none; background:#89c996 !important; }
-html[data-theme="darkhand"][data-theme] body #page-torrents .deck-empty-details { order:3; flex:0 0 auto; margin-bottom:16px; }
-html[data-theme="darkhand"][data-theme] body #page-torrents .deck-empty-details button { display:block; width:100%; background:none; border:0; padding:7px; font-size:11px; color:var(--muted); cursor:pointer; }
-html[data-theme="darkhand"][data-theme] body #page-torrents .deck-empty-details-space { height:115px; }
 /* Deck 1.0.78 Matrix uses a cinematic masthead and horizontal telemetry. */
 html[data-theme]:not([data-theme="terminal"]) body #page-torrents .torrent.sidebar { padding:0 !important; }
 html[data-theme="matrix"][data-theme] body #page-torrents .torrent.sidebar .sidebar-scroll { padding:26px 16px 20px; }
@@ -230,7 +272,7 @@ html[data-theme="matrix"][data-theme] body #page-torrents #torrentTable thead th
 html[data-theme="matrix"][data-theme] body #page-torrents #torrentTable tbody td { height:56px; font-family:var(--matrix-mono) !important; }
 html[data-theme="matrix"][data-theme] body #page-torrents #torrentTable .torrent-name-content { font-family:var(--matrix-ui) !important; }
 html[data-theme="matrix"][data-theme] body #page-torrents .deck-sidebar-add { width:100% !important; height:42px; }
-html[data-theme="matrix"][data-theme] body #page-torrents .deck-progress-track { height:6px !important; }
+html[data-theme="matrix"][data-theme] body #page-torrents .deck-progress-track { height:22px !important; }
 html[data-theme="matrix"][data-theme] body #page-torrents .main-content { background:#0c1110 !important; }
 html[data-theme="matrix"][data-theme] body #page-torrents .main-content::before,
 html[data-theme="matrix"][data-theme] body #page-torrents .main-content::after { content:none !important; }
@@ -251,6 +293,315 @@ html[data-theme="terminal"] body #page-torrents #torrentTable.ui.table th .rz-ha
   width:1px !important;
 }
 
-/* Keep torrent rows accessible when bottom details and stats fill a short window. */
-html[data-theme="darkhand"][data-theme] body #page-torrents .main-panel { overflow-y:auto !important; }
-html[data-theme="darkhand"][data-theme] body #page-torrents .main-content { flex-shrink:0; }
+/* Keep Darkhand's actions, centered search, and layout choices in one toolbar. */
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(240px,34%) minmax(0,1fr);
+    align-items:center;
+    gap:12px;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-left {
+    grid-column:1;
+    display:flex;
+    min-width:0;
+    align-items:center;
+    gap:8px;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip .actions.left {
+    flex:0 1 auto;
+    min-width:0;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-left .terminal-session-actions {
+    flex:0 0 auto;
+    gap:4px;
+    margin:0;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-search {
+    grid-column:2;
+    min-width:0;
+    width:100%;
+    max-width:none !important;
+    justify-self:center;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-search .ui.fluid.search { width:100%; max-width:none; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-search .ui.input { width:100%; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-right {
+    grid-column:3;
+    display:flex;
+    min-width:0;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip .actions.right { flex:0 0 auto; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-switches {
+    position:static !important;
+    inset:auto !important;
+    display:flex !important;
+    flex:1 1 auto;
+    justify-content:flex-end !important;
+    flex-wrap:nowrap;
+    gap:8px;
+    min-height:0;
+    margin:0 !important;
+    padding:0 !important;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-switches > div { display:flex; align-items:center; gap:5px; white-space:nowrap; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-switches > div > div { display:flex; gap:0; padding:2px; border:1px solid var(--line); border-radius:8px; background:var(--surface-2); }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-switches button { height:25px; min-height:25px; padding:0 7px; border:0; border-radius:6px; background:transparent; color:var(--muted); font-size:10px; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .dh-switches button[aria-pressed="true"] { background:var(--surface-3); color:var(--text); box-shadow:inset 0 0 0 1px var(--line-strong); }
+@media(max-width:1250px) {
+    html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip {
+        grid-template-columns:minmax(0,1fr) minmax(210px,32%) minmax(0,1fr);
+        gap:7px;
+    }
+    html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-left { gap:4px; }
+    html[data-theme="darkhand"][data-theme] body #page-torrents .dh-switches > div > span { display:none; }
+}
+@media(max-width:900px) {
+    html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip {
+        position:relative !important;
+        inset:auto !important;
+        height:auto !important;
+        min-height:0 !important;
+        margin:8px 12px 0 !important;
+        padding:8px !important;
+        grid-template-columns:minmax(0,1fr) minmax(180px,1fr);
+        row-gap:8px;
+    }
+    html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-left { grid-column:1; grid-row:1; }
+    html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-search { grid-column:2; grid-row:1; }
+    html[data-theme="darkhand"][data-theme] body #page-torrents .deck-toolbar-right { grid-column:1 / -1; grid-row:2; justify-content:space-between; }
+    html[data-theme="darkhand"][data-theme] body #page-torrents .dh-switches > div > span { display:inline; }
+}
+
+/* The legacy Semantic UI colors and icon spacing are too strong for
+   Darkhand's compact toolbar. Keep the two transport actions palette-aware. */
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="start"],
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="resume"] {
+    display:inline-flex !important;
+    align-items:center;
+    gap:7px;
+    min-height:32px !important;
+    height:32px !important;
+    padding:0 12px !important;
+    border-radius:9px !important;
+    font-size:11px !important;
+    font-weight:750 !important;
+    line-height:1 !important;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="stop"],
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="pause"] {
+    display:inline-flex !important;
+    align-items:center;
+    gap:7px;
+    min-height:32px !important;
+    height:32px !important;
+    padding:0 12px !important;
+    border-radius:9px !important;
+    font-size:11px !important;
+    font-weight:750 !important;
+    line-height:1 !important;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="stop"] .icon,
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="pause"] .icon { color:inherit !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="start"] .icon,
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="resume"] .icon,
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="stop"] .icon,
+html[data-theme="darkhand"][data-theme] body #page-torrents .deck-control-strip #torrent-action-header [data-role="pause"] .icon {
+    position:static !important;
+    width:auto !important;
+    height:auto !important;
+    margin:0 !important;
+    opacity:1 !important;
+}
+
+/* Keep bottom details in the page's flex layout. A viewport-fixed panel hid the
+   table and stats instead of sharing the available vertical space with them. */
+html[data-theme="darkhand"][data-theme] body #page-torrents:not(.dh-details-right) .main-content {
+    flex:1 1 0 !important;
+    min-height:64px !important;
+    max-height:none !important;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents:not(.dh-details-right) torrent-details-panel {
+    flex:0 0 auto;
+}
+html[data-theme="darkhand"][data-theme] body #page-torrents:not(.dh-details-right) torrent-details-panel .torrent-details-panel {
+    position:relative !important;
+    inset:auto !important;
+    width:100% !important;
+    height:clamp(160px, 36vh, 320px) !important;
+    min-height:0 !important;
+    max-height:40vh !important;
+    margin:0 0 12px !important;
+    z-index:2 !important;
+}
+
+/* Detail views inherit each theme's palette instead of Semantic UI's
+   legacy light/dark variables. Keep one shared treatment across every theme. */
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-panel {
+    color:var(--text) !important;
+    background:var(--surface) !important;
+    border:1px solid var(--line) !important;
+    box-shadow:var(--deck-shadow,0 16px 42px #0005) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-tabs.ui.menu {
+    color:var(--muted) !important;
+    background:var(--surface-2) !important;
+    border:0 !important;
+    border-bottom:1px solid var(--line) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-tabs.ui.menu > .item {
+    color:var(--muted) !important;
+    background:transparent !important;
+    border:0 !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-tabs.ui.menu > .item:hover,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-tabs.ui.menu > .item:focus-visible {
+    color:var(--text) !important;
+    background:var(--cyan-soft) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-tabs.ui.menu > .item.active {
+    color:var(--text) !important;
+    background:var(--surface) !important;
+    box-shadow:inset 0 -2px var(--cyan) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-tabs .right.menu {
+    background:transparent !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-add-tracker.ui.button {
+    color:var(--accent-fg,#fff) !important;
+    background:var(--cyan) !important;
+    border:1px solid color-mix(in srgb,var(--cyan) 65%,var(--line)) !important;
+    box-shadow:none !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-add-tracker.ui.button:hover,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-add-tracker.ui.button:focus-visible {
+    filter:brightness(1.12);
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-panel-body,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-info,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-files,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-peers,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-trackers {
+    color:var(--text) !important;
+    background:var(--bg) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-section {
+    color:var(--text) !important;
+    background:var(--surface) !important;
+    box-shadow:inset -1px -1px var(--line) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-section-header {
+    color:var(--text) !important;
+    background:var(--surface-2) !important;
+    border-bottom:1px solid var(--line) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-section-header h3,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-section-header .icon {
+    color:var(--cyan) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-field {
+    color:var(--text) !important;
+    border-color:color-mix(in srgb,var(--line) 60%,transparent) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-field:hover {
+    background:var(--surface-2) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-field dt,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-empty-state,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-state-content {
+    color:var(--muted) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-field dd,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-field-copy {
+    color:var(--text) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.torrent.table,
+html[data-theme] body #page-torrents torrent-details-panel .ui.torrent.table thead th,
+html[data-theme] body #page-torrents torrent-details-panel .ui.torrent.table tbody td,
+html[data-theme] body #page-torrents torrent-details-panel .ui.table,
+html[data-theme] body #page-torrents torrent-details-panel .ui.table thead th,
+html[data-theme] body #page-torrents torrent-details-panel .ui.table tbody td {
+    color:var(--text) !important;
+    background:var(--surface) !important;
+    border-color:var(--line) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.torrent.table thead th,
+html[data-theme] body #page-torrents torrent-details-panel .ui.table thead th {
+    color:var(--muted) !important;
+    background:var(--surface-2) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.torrent.table tbody tr:hover td,
+html[data-theme] body #page-torrents torrent-details-panel .ui.table tbody tr:hover td {
+    background:var(--surface-2) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel [data-role="torrent-details-close"],
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-folder-toggle.ui.button {
+    color:var(--muted) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel [data-role="torrent-details-close"]:hover,
+html[data-theme] body #page-torrents torrent-details-panel [data-role="torrent-details-close"]:focus-visible,
+html[data-theme] body #page-torrents torrent-details-panel .torrent-details-folder-toggle.ui.button:hover {
+    color:var(--text) !important;
+    background:var(--cyan-soft) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.dropdown,
+html[data-theme] body #page-torrents torrent-details-panel .ui.dropdown .menu,
+html[data-theme] body #page-torrents torrent-details-panel .ui.dropdown .menu > .item {
+    color:var(--text) !important;
+    background:var(--surface-2) !important;
+    border-color:var(--line) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.checkbox label,
+html[data-theme] body #page-torrents torrent-details-panel .ui.checkbox input:focus ~ label {
+    color:var(--text) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.checkbox label::before {
+    background:var(--surface-2) !important;
+    border-color:var(--line-strong) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.checkbox input:checked ~ label::before {
+    background:var(--cyan) !important;
+    border-color:var(--cyan) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.checkbox input:checked ~ label::after {
+    color:var(--accent-fg,#fff) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.progress {
+    background:var(--surface-3) !important;
+    border:1px solid var(--line) !important;
+}
+html[data-theme] body #page-torrents torrent-details-panel .ui.progress .bar {
+    background:var(--cyan) !important;
+}
+
+/* Latest source artwork sits within the native desktop controls and panels. */
+html[data-theme] body #page-torrents.is-sidebar-collapsed :is(.sports-identity,.usa-identity,.matrix-identity) { display:none !important; }
+html[data-theme] body #page-torrents .sports-facts-masthead { flex-wrap:wrap; }
+html[data-theme] body #page-torrents .sports-stat-icon { width:32px !important; height:32px !important; }
+html[data-theme="matrix"] body #page-torrents .deck-stat-icon { position:static !important; flex:0 0 30px; }
+html[data-theme="matrix"] body #page-torrents .deck-progress-track { height:22px !important; }
+html[data-theme="matrix"] body #page-torrents .drawer-progress { padding:12px 16px; }
+html[data-theme="matrix"] body #page-torrents .drawer-progress .deck-progress-track { height:28px !important; }
+html[data-theme="independence"][data-theme] body #page-torrents .deck-control-strip { height:auto !important; min-height:48px !important; padding:8px 12px !important; }
+html[data-theme="independence"][data-theme] body #page-torrents .deck-control-strip .ui.fluid.search { display:block !important; width:100% !important; max-width:none !important; height:auto !important; margin:0 !important; padding:0 !important; }
+html[data-theme="independence"][data-theme] body #page-torrents .deck-overview { padding:62px 16px 12px !important; }
+html[data-theme="independence"] body #page-torrents .status-bar { position:relative; overflow:visible; }
+html[data-theme="independence"] body #page-torrents .usa-footer-eagle { pointer-events:none; }
+
+html[data-theme="independence"] body .title-bar,
+html[data-theme="independence"] body .title-bar-menu-trigger { color:var(--text) !important; }
+html[data-theme="independence"] body #page-torrents .torrent.sidebar .nav > li { color:#efe7d5 !important; background:transparent !important; }
+html[data-theme="independence"] body #page-torrents .torrent.sidebar .nav > li.active,
+html[data-theme="independence"] body #page-torrents .torrent.sidebar .nav > li:hover { background:#223c50 !important; border-color:#b4a07a !important; }
+html[data-theme="independence"] body #page-torrents .torrent.sidebar .torrent.sort.label,
+html[data-theme="independence"] body #page-torrents .torrent.sidebar .torrent-sidebar-footer .terminal-preferences { color:#efe7d5 !important; }
+/* Native geometry for the five additional core theme refinements. */
+html[data-theme]:is([data-theme="dark"],[data-theme="light"],[data-theme="ocean"],[data-theme="forest"],[data-theme="sunset"]) body #page-torrents .deck-overview { padding:62px 12px 9px !important; }
+html[data-theme]:is([data-theme="dark"],[data-theme="light"],[data-theme="ocean"],[data-theme="forest"],[data-theme="sunset"]) body #page-torrents .deck-control-strip { position:absolute !important; inset:7px 12px auto !important; height:35px !important; min-height:35px !important; padding:0 !important; }
+html[data-theme]:is([data-theme="dark"],[data-theme="light"],[data-theme="ocean"],[data-theme="forest"],[data-theme="sunset"]) body #page-torrents .deck-control-strip .ui.fluid.search { width:100% !important; max-width:none !important; margin:0 !important; height:auto !important; }
+html[data-theme] body #page-torrents.is-sidebar-collapsed .core-identity { display:none !important; }
+html[data-theme] body #page-torrents .core-stat-icon { width:30px !important; height:30px !important; }
+html[data-theme="forest"] body #page-torrents .torrent.sidebar .torrent.sort.label,
+html[data-theme="forest"] body #page-torrents .torrent.sidebar .terminal-preferences { color:#e1efd7 !important; }

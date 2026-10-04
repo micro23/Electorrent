@@ -102,6 +102,10 @@ export class SettingsPageController {
             });
         });
 
+        $scope.$on("setting:theme-picker", () => {
+            $scope.page = "general";
+        });
+
         function writeSettings() {
             return settingsService.saveAllSettings($scope.settings)
                 .then(() => {

@@ -18,6 +18,20 @@ mac:
   category: public.app-category.utilities
   extendInfo:
     NSLocalNetworkUsageDescription: Electorrent connects to torrent clients running on devices on your local network.
+    CFBundleDocumentTypes:
+      - CFBundleTypeName: BitTorrent document
+        CFBundleTypeRole: Viewer
+        LSHandlerRank: Owner
+        LSItemContentTypes:
+          - org.bittorrent.torrent
+    UTImportedTypeDeclarations:
+      - UTTypeIdentifier: org.bittorrent.torrent
+        UTTypeDescription: BitTorrent document
+        UTTypeConformsTo:
+          - public.data
+        UTTypeTagSpecification:
+          public.filename-extension: torrent
+          public.mime-type: application/x-bittorrent
   target:
     - target: dmg
       arch:
@@ -48,6 +62,8 @@ fileAssociations:
   - ext: torrent
     name: Bittorrent Document
     role: Viewer
+    rank: Owner
+    mimeType: application/x-bittorrent
     description: Torrent Files
 afterPack: ./util/after-pack.js
 electronVersion: 42.0.1

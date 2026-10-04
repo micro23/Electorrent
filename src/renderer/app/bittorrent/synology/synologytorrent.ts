@@ -57,6 +57,10 @@ export class SynologyTorrent extends Torrent {
         return this.statusMessage === "error";
     };
 
+    isStatusChecking(): boolean {
+        return /(?:hash[_\s-]?checking|checking|verifying)/i.test(this.statusMessage || "");
+    }
+
     /**
      * Returns whether this torrent is stopped. Torrents in this group shows up in
      * the 'Stopped' tab to the left in the GUI
@@ -72,7 +76,7 @@ export class SynologyTorrent extends Torrent {
      * @return {boolean} isStatusQueue
      */
     isStatusQueued(): boolean {
-        return
+        return this.statusMessage === "waiting" || this.statusMessage === "filehosting_waiting";
     };
 
     /**
@@ -109,7 +113,7 @@ export class SynologyTorrent extends Torrent {
      * @return {boolean} isStatusDownloading
      */
     isStatusPaused(): boolean {
-        return
+        return this.statusMessage === "paused";
     };
 
     /**
@@ -119,7 +123,9 @@ export class SynologyTorrent extends Torrent {
      * @return {string} color
      */
     statusColor(): string {
-        if (this.isStatusError()) {
+        if (this.isStatusChecking()) {
+            return 'blue';
+        } else if (this.isStatusError()) {
             return 'error';
         } else if (this.isStatusStopped()) {
             return 'grey';
@@ -141,7 +147,21 @@ export class SynologyTorrent extends Torrent {
      * @return {string} status
      */
     statusText(): string {
-        if (this.isStatusError()) {
+        if (this.isStatusChecking()) {
+            return 'Checking';
+        } else if (this.statusMessage === "preprocessing") {
+            return 'Preparing';
+        } else if (this.statusMessage === "repairing") {
+            return 'Repairing';
+        } else if (this.statusMessage === "extracting") {
+            return 'Extracting';
+        } else if (this.statusMessage === "finishing") {
+            return 'Finishing';
+        } else if (this.statusMessage === "filehosting_waiting") {
+            return 'Waiting';
+        } else if (this.isStatusQueued()) {
+            return 'Queued';
+        } else if (this.isStatusError()) {
             return 'Error';
         } else if (this.isStatusStopped()) {
             return 'Paused';
@@ -152,8 +172,13 @@ export class SynologyTorrent extends Torrent {
         } else if (this.isStatusSeeding()) {
             return 'Seeding';
         } else {
-            return 'Waiting';
+            const state = String(this.statusMessage || "").trim();
+            return state ? state.replace(/[_-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Unknown';
         }
     };
+
+    manualStatusText(): string {
+        return this.statusText();
+    }
 
 }

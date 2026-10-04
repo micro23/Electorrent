@@ -1,5 +1,5 @@
 import { IScope } from "angular";
-import { DECK_THEME_ORDER, DECK_SPORTS_CLUBS, DECK_SPORTS_DESIGNS } from "@shared/deck-themes";
+import { DECK_THEME_ORDER, DECK_SPORTS_CLUBS, DECK_SPORTS_DESIGNS, DECK_CORE_THEMES } from "@shared/deck-themes";
 import type { ColorTheme, DeckThemeId, ThemePreference } from "@shared/ipc-contract";
 
 interface AppThemeScope extends IScope {
@@ -22,11 +22,12 @@ export class AppThemeController {
             const design = DECK_SPORTS_DESIGNS[deckTheme as keyof typeof DECK_SPORTS_DESIGNS];
             Object.assign($scope.$root, {
                 deckTheme,
-                deckClub: club ? { ...club, id: deckTheme, lettering: design?.lettering || "serif", motif: design?.motif || "" } : null,
+                deckCore: DECK_CORE_THEMES[deckTheme as keyof typeof DECK_CORE_THEMES] || null,
+                deckClub: club ? { ...club, id: deckTheme, championshipLabel: ({ Baseball: "WORLD SERIES", Basketball: "NBA", Football: "SUPER BOWL", Hockey: "STANLEY CUP" })[club.sport], lettering: design?.lettering || "serif", motif: design?.motif || "" } : null,
             });
             $scope.theme = deckTheme === "light" || deckTheme === "dark"
                 ? deckTheme
-                : deckTheme === "forest" || deckTheme === "valentine" || deckTheme === "st-patricks"
+                : deckTheme === "forest" || deckTheme === "valentine" || deckTheme === "st-patricks" || deckTheme === "independence"
                     ? "light"
                     : "dark";
         };

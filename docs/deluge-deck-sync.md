@@ -2,7 +2,8 @@
 
 Compared October 4, 2026. Electorrent fork created October 4 at 02:12:11 UTC.
 Reference baseline: `619328af5f8549d6b7068fd228c61329f928b765` (1.0.73).
-Latest source used: `43b32f004a0973ecd352a993f9b5a28d8d090bc2` (1.0.80).
+Latest source used: `4fe589ac19ce` (1.0.89). Repository HEAD was checked at
+`2700503dd03f`; that later commit only updates the reference README screenshots.
 
 The original `deluge-deck-reference` checkout is read-only and remains unchanged.
 A separate, ignored checkout under `.dream-loop/deck-latest` supplied the current
@@ -17,9 +18,10 @@ source, artwork, typography and visual reference screenshots.
 | `4cd3c4a` | 1.0.76: Darkhand default and shortcuts | Darkhand on a new installation, direct D shortcut, Darkhand first in the canonical theme order, configured connection password focus. Existing theme preferences remain saved. |
 | `ba26ca3` | Matrix and tighter spacing | Complete Matrix colors, typography, code rain SVG, identity, card finishes, table/sidebar materials and reduced-motion support; compact table spacing. |
 | `25d40e3` | 1.0.78 cinematic Matrix rebuild | Actual atmosphere artwork, Matrix glyph identity, cinematic masthead, horizontal telemetry cards, clean data table and updated typefaces. |
-| `267ff36` | 1.0.79 USA heritage theme | Replace Independence fireworks and flag progress art with a compact USA masthead, monument engraving, ivory paper, navy ink and muted red controls. |
-| `43b32f0` | 1.0.80 USA flag progress and footer artwork | Refine the compact flag mark, restore a clipped flag fill for transfer progress, and add the eagle illustration at the status rail. |
 | `f801582` | 1.0.77 release | Matrix appears in theme selection and T/Shift+T cycling; Regular, Holiday and Sports categories. |
+| `0e543bc` | 1.0.87 Terminal label cleanup | Expanded shelf reads `[ Menu ]`; collapsed shelf retains `[ > ]`; preview refreshed. |
+| `bb6b91b` | 1.0.88 core theme redesign | Ported distinct Midnight, Paper, Ocean, Forest and Sunset identities, artwork, opaque palettes, typography, dashboard symbols, progress patterns and reduced-motion behavior. |
+| `4fe589a` | 1.0.89 theme gallery refresh | Refreshed the bundled theme previews from the latest source. Web plugin packaging and README screenshots do not apply to the Electron app. |
 
 Latest default columns: Torrent, State, Size, Progress, Download, Upload, ETA,
 Ratio, Seeds, Peers, Seeding time. Optional columns remain in the existing
@@ -29,8 +31,9 @@ statistics are shown as unavailable rather than inferred from active time.
 ## Theme material port
 
 All 38 theme choices share `src/shared/deck-themes.ts`. Current source materials
-are imported from 14 reference CSS files into `deck-reference.less`, with the
-native Angular/Electron geometry in `deck-reference-adapter.less`. Run:
+are imported from 17 reference CSS files into `deck-reference.less`, with the
+native Angular/Electron geometry in `deck-reference-adapter.less`. The importer
+also refreshes local artwork, fonts, club metadata and 1.0.89 gallery previews. Run:
 
 ```sh
 node scripts/sync-deck-reference.mjs /absolute/path/to/reference-copy
@@ -63,10 +66,12 @@ session-only fields as a dash.
 ## Verification
 
 - Production webpack build succeeds (existing bundle-size warnings).
-- ESLint succeeds. The combined lint/typecheck command still reports existing
-  Axios parameter inference errors in the unrelated Synology client.
-- Standard headless smoketest attempted: its setup is blocked by missing Docker
-  and an unavailable matching ChromeDriver executable.
+- ESLint and TypeScript now both pass; Synology request configuration has an
+  explicit AxiosRequestConfig return type.
+- ChromeDriver is available. Both local headless smoke checks pass with an
+  isolated mock client (36 seconds); the original Docker qBittorrent check is
+  `smoketest:integration` and still requires a Docker engine.
+  See `docs/testing.md` for the test setup and validation scope.
 - Live Electron sweep: all 38 choices render, torrent rows remain present,
   artwork loads, and table viewports fit vertically; no renderer exceptions.
 - Direct D and forward cycling were checked in the running app. Additional

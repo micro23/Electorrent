@@ -160,7 +160,8 @@ export class QBittorrentTorrent extends Torrent {
         return this.getStatus('queuedUP', 'queuedDL', 'allocating');
     };
     isStatusCompleted() {
-        return (this.percent === 1000) || this.getStatus('checkingUP', 'moving');
+        // `moving` is a storage operation and can apply to incomplete torrents.
+        return (this.percent === 1000) || this.getStatus('checkingUP');
     };
     isStatusDownloading() {
         return this.getStatus('downloading', 'stalledDL', 'metaDL', 'forcedDL') || this.isStatusChecking();
@@ -169,8 +170,7 @@ export class QBittorrentTorrent extends Torrent {
         return this.getStatus('uploading', 'stalledUP', 'forcedUP');
     };
     isStatusPaused() {
-        /* qBittorrent only has started and stopped torrents */
-        return false;
+        return this.getStatus('paused', 'pausedUP', 'pausedDL', 'stopped', 'stoppedUP', 'stoppedDL');
     };
 
     /* Additional custom states */
@@ -179,13 +179,32 @@ export class QBittorrentTorrent extends Torrent {
     }
 
     manualStatusText() {
-        if (this.getStatus('moving')) {
-            return 'Moving';
-        } else if (this.isStatusChecking()) {
-            return 'Checking';
-        } else {
-            return super.manualStatusText();
-        }
+        const labels: Record<string, string> = {
+            allocating: 'Allocating',
+            checkingDL: 'Checking',
+            checkingResumeData: 'Checking Resume Data',
+            checkingUP: 'Checking',
+            error: 'Error',
+            forcedDL: 'Downloading (Forced)',
+            forcedUP: 'Seeding (Forced)',
+            metaDL: 'Fetching Metadata',
+            missingFiles: 'Missing Files',
+            moving: 'Moving',
+            paused: 'Paused',
+            pausedDL: 'Paused',
+            pausedUP: 'Paused',
+            queuedDL: 'Queued',
+            queuedUP: 'Queued',
+            stalledDL: 'Stalled',
+            stalledUP: 'Seeding (Stalled)',
+            stopped: 'Stopped',
+            stoppedDL: 'Stopped',
+            stoppedUP: 'Stopped',
+            unknown: 'Unknown',
+            uploading: 'Seeding',
+            downloading: 'Downloading',
+        };
+        return labels[this.state] || super.manualStatusText();
     };
 
     static COL_AVAILABILITY = new Column({

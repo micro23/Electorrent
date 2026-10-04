@@ -1,5 +1,15 @@
 export class ProgressController {
     torrent: any;
+    svgId = "";
+
+    matrixState() {
+        if (this.torrent.isStatusError()) return "error";
+        if (this.percentValue() >= 99.95) return "complete";
+        if (this.torrent.isStatusChecking()) return "checking";
+        if (this.torrent.isStatusPaused() || this.torrent.isStatusStopped()) return "paused";
+        if (this.torrent.isStatusQueued()) return "queued";
+        return this.torrent.isStatusDownloading() ? "downloading" : "idle";
+    }
 
     class() {
         return this.torrent.statusColor();
@@ -19,7 +29,7 @@ export class ProgressController {
 
     label() {
         let label = this.torrent.statusText();
-        if (this.torrent.isStatusDownloading() || this.torrent.isStatusCompleted() || this.torrent.isStatusSeeding()) {
+        if (!this.torrent.isStatusChecking() && (this.torrent.isStatusDownloading() || this.torrent.isStatusCompleted() || this.torrent.isStatusSeeding())) {
             label += ` ${this.torrent.getPercentStr()}`;
         }
 

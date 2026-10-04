@@ -73,12 +73,19 @@ export class Aria2Torrent extends Torrent {
     }
 
     isStatusError() { return this.aria2Status === "error" }
-    isStatusPaused() { return false }
+    isStatusChecking() { return this.verifyIntegrityPending }
+    isStatusPaused() { return this.aria2Status === "paused" }
     isStatusQueued() { return this.aria2Status === "waiting" }
     isStatusCompleted() { return this.aria2Status === "complete" }
     isStatusDownloading() { return this.aria2Status === "active" && !this.isStatusSeeding() }
     isStatusSeeding() { return this.aria2Status === "active" && this.percent >= 1000 }
     isStatusStopped() { return this.aria2Status === "paused" || this.aria2Status === "removed" }
+
+    manualStatusText() {
+        if (this.isStatusChecking()) return "Checking";
+        if (this.aria2Status === "removed") return "Removed";
+        return super.manualStatusText();
+    }
 
     static COL_GID = new Column({
         name: "GID",

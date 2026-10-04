@@ -104,7 +104,7 @@ export class DelugeRuntime implements BittorrentRuntime {
         { role: "set-speed-limits", label: "Set Speed Limits", icon: "dashboard" },
         { role: "set-ratio", label: "Set Ratio", icon: "percent" },
         { role: "remove", label: "Remove", action: "remove", icon: "remove" },
-        { label: "Remove and delete", action: "removeAndDelete", icon: "trash", role: "delete" },
+        { label: "Remove and delete", action: "removeAndDelete", icon: "trash", role: "delete", deletesLocalData: true },
     ]
     private url(server: BittorrentServerConfig, endpoint?: string) {
         return serverUrl(server, endpoint)

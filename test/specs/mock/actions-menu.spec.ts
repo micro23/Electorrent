@@ -63,6 +63,8 @@ describe("mock Actions menu", function () {
     const row = $("#torrentTable tbody tr[data-id]")
     await row.waitForClickable()
     await row.click()
+    assert.equal(await row.$(".terminal-row-check").getAttribute("aria-pressed"), "false")
+    await row.$(".terminal-row-check").click()
 
     await eventually(async () => (await getNativeAction("Start")).enabled).equals(true)
   })
@@ -110,6 +112,8 @@ describe("mock Actions menu", function () {
     const row = $("#torrentTable tbody tr[data-id]")
     await row.waitForClickable()
     await row.click()
+    const checkbox = row.$(".terminal-row-check")
+    if (await checkbox.getAttribute("aria-pressed") !== "true") await checkbox.click()
 
     const actionsMenu = $("//button[contains(@class, 'title-bar-menu-trigger') and normalize-space(.)='Actions']")
     await actionsMenu.waitForClickable()

@@ -134,6 +134,7 @@ export interface ContextActionButton<T extends Torrent> {
     click(torrents: T[]): Promise<void>
     icon?: string
     role?: TorrentActionRole
+    deletesLocalData?: boolean
     check?(torrent: T): boolean
 }
 

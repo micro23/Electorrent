@@ -90,6 +90,8 @@ export class AppShellController {
                 return;
             }
             if (event.key === "Escape") {
+                if (document.querySelector(".ui.modal.active, .ui.modal.visible")) return;
+                if (document.querySelector('[data-role="torrent-details-panel"]')) event.preventDefault();
                 $rootScope.$broadcast("shortcut:escape");
                 return;
             }
@@ -327,7 +329,7 @@ export class AppShellController {
                     pageSettings("connection", server.id);
                 }
             }).then(() => {
-                $scope.$apply();
+                $scope.$applyAsync();
             });
         };
 
@@ -336,7 +338,7 @@ export class AppShellController {
             ($rootScope as any).$activeServer = null;
             $rootScope.$btclient = null;
             pageWelcome();
-            $scope.$apply();
+            $scope.$applyAsync();
         });
 
         $scope.$on("connect:server", (event: unknown, server: any, notifyOnConnect?: boolean) => {
@@ -352,6 +354,17 @@ export class AppShellController {
             $scope.$applyAsync();
         });
 
+        $scope.$on("show:theme-picker", () => {
+            $scope.$broadcast("setting:load");
+            $scope.$broadcast("setting:theme-picker");
+            page = PAGE_SETTINGS;
+            $timeout(() => {
+                const picker = document.querySelector<HTMLElement>(".deck-theme-gallery");
+                picker?.scrollIntoView({ block: "center" });
+                picker?.querySelector<HTMLButtonElement>(".is-selected, button")?.focus({ preventScroll: true });
+            });
+        });
+
         $scope.$on("show:servers", () => {
             pageServers();
         });
@@ -363,7 +376,7 @@ export class AppShellController {
 
         $scope.$on("show:welcome", () => {
             page = PAGE_WELCOME;
-            $scope.$apply();
+            $scope.$applyAsync();
         });
 
         $scope.$on("show:torrents", () => {

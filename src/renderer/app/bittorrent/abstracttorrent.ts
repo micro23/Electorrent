@@ -141,13 +141,22 @@ export abstract class Torrent implements TorrentProps {
     abstract isStatusSeeding(): boolean;
     abstract isStatusStopped(): boolean;
 
+    /** True while a client verifies torrent data or resume metadata. */
+    isStatusChecking(): boolean {
+        return false;
+    }
+
     getPercentStr(): string {
         const percent = Math.floor(Math.min(this.percent || 0, 1000)) / 10;
         return percent.toFixed(1) + '%';
     };
 
     statusColor(): string {
-        if (this.isStatusPaused()){
+        if (this.isStatusChecking()){
+            return 'blue';
+        } else if (this.isStatusError()){
+            return 'error';
+        } else if (this.isStatusPaused()){
             return 'grey';
         } else if (this.isStatusSeeding()){
             return 'orange';
@@ -155,8 +164,6 @@ export abstract class Torrent implements TorrentProps {
             return 'yellow'
         } else if (this.isStatusDownloading()){
             return 'blue';
-        } else if (this.isStatusError()){
-            return 'error';
         } else if (this.isStatusCompleted()){
             return 'success';
         } else {
@@ -165,7 +172,11 @@ export abstract class Torrent implements TorrentProps {
     };
 
     manualStatusText(): string {
-        if (this.isStatusPaused()){
+        if (this.isStatusChecking()){
+            return 'Checking';
+        } else if (this.isStatusError()){
+            return 'Error';
+        } else if (this.isStatusPaused()){
             return 'Paused';
         } else if (this.isStatusStopped()){
             return 'Stopped';
@@ -175,8 +186,6 @@ export abstract class Torrent implements TorrentProps {
             return 'Queued';
         } else if (this.isStatusDownloading()){
             return 'Downloading';
-        } else if (this.isStatusError()){
-            return 'Error';
         } else if (this.isStatusCompleted()){
             return 'Finished';
         } else {
@@ -186,6 +195,7 @@ export abstract class Torrent implements TorrentProps {
 
     statusText(): string {
         const statusRegex = /[^a-zA-Z(): ]/g;
+        if (this.isStatusChecking()) return 'Checking';
         if (!this.statusMessage) return this.manualStatusText();
         return this.statusMessage.replace(statusRegex, '');
     };
@@ -227,7 +237,7 @@ export abstract class Torrent implements TorrentProps {
     static COL_NAME = new Column({
       name: 'Torrent',
       enabled: true,
-      template: '<span class="terminal-name-cell"><button type="button" class="terminal-row-check" ng-click="toggleTerminalSelection($event, torrent)" ng-attr-aria-pressed="{{torrent.selected}}" aria-label="Select torrent">{{torrent.selected ? "[✓]" : "[ ]"}}</button><span class="deck-row-state" ng-attr-title="{{torrent.manualStatusText()}}"><i class="icon" ng-class="{\'arrow down\': torrent.isStatusDownloading(), \'arrow up\': torrent.isStatusSeeding(), \'pause\': torrent.isStatusPaused() || torrent.isStatusStopped(), \'clock\': torrent.isStatusQueued(), \'exclamation triangle\': torrent.isStatusError()}"></i></span><span class="torrent-name-content">{{settings.ui.cleanNames ? torrent.decodedName : torrent.name}}</span></span>',
+      template: '<span class="terminal-name-cell"><button type="button" class="terminal-row-check" ng-click="toggleTerminalSelection($event, torrent)" ng-attr-aria-pressed="{{torrent.selected}}" aria-label="Select torrent">{{torrent.selected ? "[✓]" : "[ ]"}}</button><span class="deck-row-state" ng-attr-title="{{torrent.manualStatusText()}}"><i class="icon" ng-class="{\'arrow down\': torrent.isStatusDownloading() && !torrent.isStatusChecking(), \'arrow up\': torrent.isStatusSeeding() && !torrent.isStatusChecking(), \'pause\': (torrent.isStatusPaused() || torrent.isStatusStopped()) && !torrent.isStatusChecking(), \'clock\': torrent.isStatusQueued() && !torrent.isStatusChecking(), \'refresh\': torrent.isStatusChecking(), \'exclamation triangle\': torrent.isStatusError()}"></i></span><span class="torrent-name-content">{{settings.ui.cleanNames ? torrent.decodedName : torrent.name}}</span></span>',
       attribute: 'decodedName',
       sort: Column.ALPHABETICAL
     })

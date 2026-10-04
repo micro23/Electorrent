@@ -110,7 +110,8 @@ export class ContextMenuIpcDirective implements IDirective {
         const unsubscribe = window.electorrent.contextMenu.onAction((actionId) => {
             const item = actions.get(actionId)
             if (item) {
-                scope.$applyAsync(() => scope.click(item.click, item.label, item))
+                const contextTorrents = scope.selectedItems.slice()
+                scope.$applyAsync(() => scope.click(item.click, item.label, item, contextTorrents))
             }
         })
         const onPointerDown = () => hide()

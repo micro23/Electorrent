@@ -8,7 +8,7 @@ import type { ClientId } from "../../src/shared/client-metadata"
 import { parseServerAddressInput } from "../../src/shared/server-address"
 import { eventually } from "./eventually"
 import { waitForModalClose, waitForModalOpen } from "./modal"
-import { Key, type ChainablePromiseElement } from "webdriverio"
+import type { ChainablePromiseElement } from "webdriverio"
 
 /**
  * Options to use during the login screen of the app to connect to your torrent client
@@ -74,12 +74,7 @@ export class App {
     const portForm = $("#connection-port")
     await portForm.waitForDisplayed()
     if (!parsedHost.hasExplicitPort) {
-      // Number inputs with a client-specific default can retain it during WebDriver clear.
-      await portForm.click()
-      await browser.keys([Key.Ctrl, 'a'])
-      await browser.keys('Backspace')
-      await portForm.addValue(String(options.port))
-      await eventually(() => portForm.getValue()).equals(String(options.port))
+      await portForm.setValue(options.port);
     }
 
     const submit = $("#connection-submit")
@@ -198,8 +193,7 @@ export class App {
   async getNotificationError(opts?: { timeout: number }) {
       const msg = $("#notifications .negative")
       try {
-        await msg.waitForDisplayed({ timeout: opts?.timeout ?? 1000 })
-        await msg.$(".header").waitForDisplayed({ timeout: opts?.timeout ?? 1000 })
+        await msg.waitForExist({ timeout: opts?.timeout ?? 1000 })
         return {
           title: await msg.$(".header").getText(),
           message: await msg.$("p").getText()
@@ -485,7 +479,9 @@ export class App {
       return
     }
 
-    const settingsButton = $('torrent-sidebar .terminal-preferences')
+    const headerSettingsButton = $('button[data-role="show-settings"]')
+    const settingsButton = await headerSettingsButton.isDisplayed()
+      ? headerSettingsButton : $(".terminal-preferences")
     await settingsButton.waitForDisplayed()
     await settingsButton.waitForClickable()
     await settingsButton.click()
