@@ -29,7 +29,7 @@ describe("layout", function () {
     await this.app.settingsGotoTab("layout")
 
     const layoutColumns = await this.app.getLayoutColumns()
-    const targetColumn = layoutColumns.find((column) => column.enabled && column.name !== "Name")
+    const targetColumn = layoutColumns.find((column) => column.enabled && column.name !== "Torrent")
     assert.isOk(targetColumn, "expected at least one enabled column")
 
     await this.app.setLayoutColumnEnabled(targetColumn!.name, false)

@@ -21,7 +21,7 @@ writeFileSync(launcher, `#!/bin/sh\ncd ${quote(tmpdir())}\nexec ${quote(electron
 
 const useDistribution = process.argv.includes('--dist')
 const useHeadless = process.argv.includes('--headless')
-const concurrency = process.argv.includes('--parallel') ? 4 : 1
+const concurrency = process.argv.includes('--parallel') ? 2 : 1
 
 function requestedClients() {
     return process.argv.flatMap((argument, index, arguments_) => {

@@ -485,7 +485,7 @@ export class App {
       return
     }
 
-    const settingsButton = $('button[data-role="show-settings"]')
+    const settingsButton = $('torrent-sidebar .terminal-preferences')
     await settingsButton.waitForDisplayed()
     await settingsButton.waitForClickable()
     await settingsButton.click()
