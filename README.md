@@ -2,12 +2,14 @@
   <img src="assets/electron-icon.png" width="256">
 </p>
 <p align="center">
-  <a href="https://github.com/tympanix/Electorrent/actions/workflows/electorrent-workflow.yml"><img src="https://github.com/tympanix/Electorrent/actions/workflows/electorrent-workflow.yml/badge.svg"></a>
-  <a href="https://github.com/tympanix/Electorrent/releases/latest"><img src="https://img.shields.io/github/release/tympanix/Electorrent.svg?maxAge=86400"></a>
-  <a href="https://github.com/tympanix/Electorrent/releases"><img src="https://img.shields.io/github/downloads/tympanix/Electorrent/total.svg?maxAge=86400"></a>
+  <a href="https://github.com/micro23/Electorrent/actions/workflows/electorrent-workflow.yml"><img src="https://github.com/micro23/Electorrent/actions/workflows/electorrent-workflow.yml/badge.svg"></a>
+  <a href="https://github.com/micro23/Electorrent/releases"><img src="https://img.shields.io/github/release/micro23/Electorrent.svg?maxAge=86400"></a>
+  <a href="https://github.com/micro23/Electorrent/releases"><img src="https://img.shields.io/github/downloads/micro23/Electorrent/total.svg?maxAge=86400"></a>
 </p>
 
 # Electorrent
+
+This fork adds the Deck interface and updates hosted by [micro23/Electorrent](https://github.com/micro23/Electorrent). Based on [tympanix/Electorrent](https://github.com/tympanix/Electorrent), under GPL-3.0.
 No more! Stop copy/pasting magnet links and uploading torrent files through a tedious webinterface. Electorrent is your new desktop remote torrenting application. Remote control your NAS, VPS, seedbox - you name it.
 
 ## Support
@@ -20,10 +22,9 @@ Electorrent can connect to the following bittorrent clients:
 * [Deluge](https://deluge-torrent.org/)
 
 ## Downloads
-*Please note: I do not own code signing certificates which may results in anti-virus warnings!*
-* [Windows](https://electorrent.vercel.app/download/win32) (64 bit only)
-* [MacOS](https://electorrent.vercel.app/download/dmg)
-* [Linux](https://electorrent.vercel.app/download/appimage)
+Download Windows, macOS, and Linux installers from [this fork’s GitHub Releases](https://github.com/micro23/Electorrent/releases).
+
+The first release is a preview while the full client integration suite is being repaired. Install this fork manually once to switch update sources. Builds are unsigned; macOS updates download a DMG for manual installation. Stable Windows and supported Linux releases support in-app updates. See [release instructions](docs/github-releases.md).
 
 ## Features
 - [x] Connects to your favorite torrent client

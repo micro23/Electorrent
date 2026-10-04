@@ -21,4 +21,6 @@ Run `npm run lint`, `npm run build`, `node --test test/unit/github-updater.test.
 
 Before shipping, verify a real older-to-newer signed release update on Windows, macOS, and Linux. Local mocked tests cannot verify OS installer behavior or Apple signing.
 
-Release 2.18.1 validation: lint/typechecking, production build, all six updater unit checks, and the packaged download/dialog test (seven checks) passed. Test browser profiles are isolated from the user’s running app. CI runs each backend suite serially while backend jobs run concurrently, avoiding shared-profile locks. Native older-to-newer installer upgrades still require verification on each operating system.
+Release 2.18.1 validation: lint/typechecking, production build, all six updater unit checks, and the packaged download/dialog test (seven checks) passed. Test browser profiles are isolated from the user’s running app. CI gives each spec a fresh profile and allows two isolated backend fixtures per client. Native older-to-newer installer upgrades still require verification on each operating system.
+
+Release 2.18.1 is published as a preview because the complete integration matrix is not yet green. All twelve local interface test files and seven unit checks passed; cross-platform installer builds passed. Stable update feeds exclude this preview. Install it manually to test the fork, and publish a higher stable version after the remaining integration failures are resolved.
