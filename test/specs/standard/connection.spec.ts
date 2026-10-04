@@ -83,7 +83,7 @@ describe("connection authentication", function () {
     }
     assert.equal(error.title, "Connection problem")
     assert.equal(error.message, "Incorrect username or password.")
-    await this.app.welcomePageIsVisible()
+    await this.app.settingsPageConnectionIsVisible()
   })
 })
 

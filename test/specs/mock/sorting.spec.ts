@@ -79,8 +79,8 @@ describe("mock torrent table sorting", function () {
   }
 
   async function getColumnHeader(columnName: string) {
-    const key = { Name: "decodedName", Size: "size", Progress: "percent" }[columnName]
-    const header = $(`#torrentTable th[sort-key='${key}']`)
+    const label = columnName === "Name" ? "Torrent" : columnName
+    const header = $(`//table[@id='torrentTable']//th[contains(normalize-space(.), '${label}')]`)
     await header.waitForDisplayed()
     await header.waitForClickable()
     return header
