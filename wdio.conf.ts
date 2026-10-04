@@ -1,6 +1,6 @@
 import { browser } from '@wdio/globals'
 import { fileURLToPath } from 'node:url'
-import { mkdtempSync } from 'node:fs'
+import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import electronBinary from 'electron'
@@ -14,6 +14,11 @@ delete process.env.ELECTRON_RUN_AS_NODE
 const standardSpecs = [
     'test/specs/standard/**/*.spec.ts',
 ]
+const launcherDir = mkdtempSync(path.join(tmpdir(), 'electorrent-launcher-'))
+const launcher = path.join(launcherDir, 'electron')
+const quote = (value: string) => `'${value.replace(/'/g, "'\\''")}'`
+writeFileSync(launcher, `#!/bin/sh\ncd ${quote(tmpdir())}\nexec ${quote(electronBinary as unknown as string)} "$@"\n`, { mode: 0o755 })
+
 const useDistribution = process.argv.includes('--dist')
 const useHeadless = process.argv.includes('--headless')
 const concurrency = process.argv.includes('--parallel') ? 4 : 1
@@ -50,16 +55,17 @@ function electronCapability(client: (typeof selectedClients)[number]): Webdriver
         'wdio:electronServiceOptions': {
             ...useDistribution ? {} : { appBinaryPath: electronBinary as unknown as string },
             appArgs: [
-                ...(useDistribution ? [] : [`--app=${path.resolve('.')}`]),
+                ...(useDistribution ? [] : [`--app=${process.env.ELECTORRENT_TEST_APP || path.resolve('.')}`]),
                 '--test',
                 `--test-user-data-dir=${testUserData}`,
+                `--user-data-dir=${testUserData}`,
                 ...(client.appArgs ?? []),
                 ...(useHeadless ? ['--headless'] : []),
             ],
         },
         'goog:chromeOptions': {
+            ...(useDistribution || process.platform !== 'darwin' ? {} : { binary: launcher }),
             args: [
-                `--user-data-dir=${testUserData}`,
                 '--no-sandbox',
                 '--disable-dev-shm-usage',
             ],
@@ -74,12 +80,18 @@ function clientLabel(capabilities: WebdriverIO.Capabilities) {
     return (capabilities['electorrent:client'] as { key?: string } | undefined)?.key ?? 'unknown client'
 }
 
+let testElectronPid: number | undefined
+
 async function quitElectronApp() {
-    if (!browser.electron) return
-    await browser.electron.execute((electron) => {
-        // Return from the inspector call before exiting the disposable test app.
-        setTimeout(() => electron.app.exit(0), 100).unref?.()
-    }).catch(() => undefined)
+    if (!testElectronPid) return
+    // Only terminate the process identified through this test session's bridge.
+    // An inspector request during shutdown can wait forever after app.quit().
+    try {
+        process.kill(testElectronPid, 'SIGTERM')
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ESRCH') throw error
+    }
+    testElectronPid = undefined
 }
 
 export const config: WebdriverIO.Config = {
@@ -252,6 +264,12 @@ export const config: WebdriverIO.Config = {
      * @param  {object} execArgv list of string arguments passed to the worker process
      */
     onWorkerStart: function (cid, caps, specs, args) {
+        // Each spec gets a fresh profile; saved connections must not leak between workers.
+        const profile = mkdtempSync(path.join(tmpdir(), 'electorrent-test-'))
+        const chromeOptions = caps['goog:chromeOptions'] as { args?: string[] }
+        chromeOptions.args = (chromeOptions.args ?? []).filter((arg) =>
+            !arg.startsWith('--test-user-data-dir=') && !arg.startsWith('--user-data-dir='))
+        chromeOptions.args.push(`--test-user-data-dir=${profile}`, `--user-data-dir=${profile}`)
         const label = clientLabel(caps)
         workerClientLabels.set(cid, label)
         args.reporters = [[specReporterPath, {
@@ -330,8 +348,11 @@ export const config: WebdriverIO.Config = {
     /**
      * Function to be executed before a test (in Mocha/Jasmine) starts.
      */
-    // beforeTest: function (test, context) {
-    // },
+    beforeTest: async function () {
+        if (browser.electron && !testElectronPid) {
+            testElectronPid = await browser.electron.execute(() => process.pid)
+        }
+    },
     /**
      * Hook that gets executed _before_ a hook within the suite starts (e.g. runs before calling
      * beforeEach in Mocha)
@@ -389,9 +410,8 @@ export const config: WebdriverIO.Config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {Array.<String>} specs List of spec file paths that ran
      */
-    afterSession: async function () {
-        await quitElectronApp()
-    },
+    // The after hook closes Electron while its inspector is still connected.
+    // Do not send another inspector request after the session has ended.
     /**
      * Gets executed after all workers got shut down and the process is about to exit. An error
      * thrown in the onComplete hook will result in the test run failing.

@@ -4,7 +4,7 @@ import { browser, $, $$ } from '@wdio/globals'
 import { eventually } from "./eventually"
 import { waitForModalClose, waitForModalOpen } from "./modal"
 
-export type ColumnName = "decodedName" | "size" | "downloadSpeed" | "uploadSpeed" | "uploaded" | "downloadLimit" | "uploadLimit" | "percent" | "label" | "dateAdded" | "dateCompleted" | "peersConnected" | "seedsConnected" | "torrentQueueOrder" | "eta" | "ratio" | "ratioLimit"
+export type ColumnName = "statusMessage" | "decodedName" | "size" | "downloadSpeed" | "uploadSpeed" | "uploaded" | "downloadLimit" | "uploadLimit" | "percent" | "label" | "dateAdded" | "dateCompleted" | "peersConnected" | "seedsConnected" | "torrentQueueOrder" | "eta" | "ratio" | "ratioLimit"
 
 export class Torrent {
   app: App
@@ -60,9 +60,9 @@ export class Torrent {
   }
 
   async waitForStates(states: string[], { timeout = this.timeout } = {}) {
-    await eventually(() => this.getColumn("percent")).satisfies(
+    await eventually(() => this.getColumn("statusMessage")).satisfies(
       `include one of ${states.join(", ")}`,
-      (percent) => states.some((state) => percent.toLowerCase().includes(state.toLowerCase())),
+      (status) => states.some((state) => status.toLowerCase().includes(state.toLowerCase())),
       { timeout },
     )
   }
@@ -80,8 +80,8 @@ export class Torrent {
     } catch (err: any) {
       const allState = $("#page-torrents li[data-state=all]")
       await allState.click()
-      const currentValue = await elem.isExisting() ? await this.getColumn("percent") : "<missing>"
-      throw new Error(`${err.message}. Current percent column: ${currentValue || "<empty>"}`)
+      const currentValue = await elem.isExisting() ? await this.getColumn("statusMessage") : "<missing>"
+      throw new Error(`${err.message}. Current State column: ${currentValue || "<empty>"}`)
     }
   }
 

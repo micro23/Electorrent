@@ -391,8 +391,8 @@ export class TorrentsPageController {
             return lastSelected || selected[0] || null;
         }
 
-        function syncDetailsPanel() {
-            $rootScope.$emit("torrentDetails:sync", getCurrentSelectedTorrent());
+        function syncDetailsPanel(allowOpen = false) {
+            $rootScope.$emit("torrentDetails:sync", getCurrentSelectedTorrent(), allowOpen);
             syncSelectedTorrents();
         }
 
@@ -701,7 +701,7 @@ export class TorrentsPageController {
             return selected.length === 0;
         };
 
-        function toggleSelect(target: any) {
+        function toggleSelect(target: any, allowOpen = true) {
             const torrent = $scope.torrents[target.id];
             if (!torrent.selected) {
                 selected.push(torrent);
@@ -712,7 +712,7 @@ export class TorrentsPageController {
             }
             torrent.selected = !torrent.selected;
             lastSelected = torrent;
-            syncDetailsPanel();
+            syncDetailsPanel(allowOpen);
         }
 
         function deselectAll() {
@@ -731,7 +731,7 @@ export class TorrentsPageController {
             torrent.selected = true;
             selected.push(torrent);
             lastSelected = torrent;
-            syncDetailsPanel();
+            syncDetailsPanel(true);
         }
 
         function multiSelect(index: number) {
@@ -757,7 +757,7 @@ export class TorrentsPageController {
                 start += 1;
             }
             lastSelected = $scope.arrayTorrents[index];
-            syncDetailsPanel();
+            syncDetailsPanel(true);
         }
 
         $scope.setSelected = (event: MouseEvent, torrent: any, index: number) => {
@@ -774,7 +774,7 @@ export class TorrentsPageController {
 
         $scope.toggleTerminalSelection = (event: MouseEvent, torrent: any) => {
             event.stopPropagation();
-            toggleSelect(torrent);
+            toggleSelect(torrent, false);
             (event.currentTarget as HTMLElement).closest("table")?.focus({ preventScroll: true });
         };
 

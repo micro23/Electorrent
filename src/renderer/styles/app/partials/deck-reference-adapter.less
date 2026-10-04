@@ -250,3 +250,7 @@ html[data-theme] body #page-torrents #torrentTable.ui.table th .rz-handle::after
 html[data-theme="terminal"] body #page-torrents #torrentTable.ui.table th .rz-handle::after {
   width:1px !important;
 }
+
+/* Keep torrent rows accessible when bottom details and stats fill a short window. */
+html[data-theme="darkhand"][data-theme] body #page-torrents .main-panel { overflow-y:auto !important; }
+html[data-theme="darkhand"][data-theme] body #page-torrents .main-content { flex-shrink:0; }

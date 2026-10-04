@@ -41,9 +41,9 @@ export class TorrentDetailsPanelController {
     const openListener = this.rootScope.$on("torrentDetails:open", (_event, torrent) => {
       this.open(torrent);
     });
-    const syncListener = this.rootScope.$on("torrentDetails:sync", (_event, torrent) => {
+    const syncListener = this.rootScope.$on("torrentDetails:sync", (_event, torrent, allowOpen) => {
       if (!this.scope.isOpen) {
-        if (this.rootScope.deckTheme === "darkhand" && torrent) this.open(torrent);
+        if (allowOpen && this.rootScope.deckTheme === "darkhand" && torrent) this.open(torrent);
         else return;
       }
 

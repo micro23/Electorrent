@@ -1,8 +1,9 @@
 import chai from "chai"
-import { $, $$, browser } from "@wdio/globals"
 import { Key } from "webdriverio"
+import { $, $$, browser } from "@wdio/globals"
+import { Torrent } from "../../e2e/e2e_torrent"
 import { eventually } from "../../e2e/eventually"
-import { configureSpec } from "../../framework/fixture"
+import { configureSpec, getTestFixture } from "../../framework/fixture"
 
 const assert: Chai.AssertStatic = chai.assert
 
@@ -24,12 +25,30 @@ describe("mock bulk torrent actions", function () {
       .equals(torrents.length)
   })
 
+  it("keeps rows accessible for range selection with bottom details open", async function () {
+    const first = $(`#torrentTable tbody tr[data-id='${torrents[0].hash}'] td[data-col='decodedName']`)
+    const second = $(`#torrentTable tbody tr[data-id='${torrents[1].hash}'] td[data-col='decodedName']`)
+    await first.waitForClickable()
+    await first.click()
+    await browser.action("key").down(Key.Shift).perform(true)
+    try {
+      await second.waitForClickable()
+      await second.click()
+    } finally {
+      await browser.action("key").up(Key.Shift).perform()
+    }
+    await eventually(getSelectedIds).satisfies("select both rows", (ids) => ids.length === 2
+      && ids.includes(torrents[0].hash) && ids.includes(torrents[1].hash))
+  })
+
   it("applies a stop and resume action to every selected torrent", async function () {
-    const firstSelected = await $(`#torrentTable tbody tr[data-id='${torrents[0].hash}']`)
+    const firstName = $(`#torrentTable tbody tr[data-id='${torrents[0].hash}'] td[data-col='decodedName']`)
+    await firstName.click()
     const secondSelected = await $(`#torrentTable tbody tr[data-id='${torrents[1].hash}']`)
-    await firstSelected.waitForClickable()
-    await firstSelected.click()
-    await shiftClick(secondSelected)
+    const secondCheckbox = secondSelected.$(".terminal-row-check")
+    // First row is selected by its name; add the second through its checkbox.
+    await secondCheckbox.waitForClickable()
+    await secondCheckbox.click()
 
     await eventually(getSelectedIds).satisfies(
       "include both selected torrents",
@@ -62,23 +81,6 @@ async function invokeMockAction(action: string, ...args: any[]) {
   }, { action, args })
 }
 
-async function shiftClick(row: Awaited<ReturnType<typeof $>>) {
-  await browser.actions([
-    browser.action("key")
-      .down(Key.Shift)
-      .pause(0)
-      .pause(0)
-      .pause(0)
-      .up(Key.Shift),
-    browser.action("pointer")
-      .pause(0)
-      .move({ origin: row, duration: 0 })
-      .down({ button: 0 })
-      .up({ button: 0 })
-      .pause(0),
-  ])
-}
-
 async function getSelectedIds() {
   const rows = await $$("#torrentTable tbody tr.active[data-id]")
   const ids: string[] = []
@@ -89,10 +91,9 @@ async function getSelectedIds() {
 }
 
 async function getTorrentState(id: string) {
-  return $(`#torrentTable tbody tr[data-id='${id}'] td[data-col='percent']`).getText()
+  return $(`#torrentTable tbody tr[data-id='${id}'] td[data-col='statusMessage']`).getText()
 }
 
 async function expectTorrentState(id: string, expected: string) {
-  await eventually(() => getTorrentState(id))
-    .satisfies(`include ${expected}`, (state) => state.includes(expected))
+  await new Torrent({ id, app: getTestFixture().app }).waitForState(expected)
 }
