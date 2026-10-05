@@ -12,21 +12,34 @@ const executeFile = promisify(execFile)
 const reclaimTorrentScript = `
 ObjC.import('Foundation');
 ObjC.import('CoreServices');
+ObjC.import('AppKit');
 function run(argv) {
     var bundle = $.NSBundle.bundleWithPath(argv[0]);
     var bundleId = ObjC.unwrap(bundle.bundleIdentifier);
     if (!bundleId) throw new Error('Application bundle has no identifier');
     var registration = $.LSRegisterURL(bundle.bundleURL, true);
     if (registration !== 0) throw new Error('Launch Services registration failed: ' + registration);
-    var preferred = $.UTTypeCreatePreferredIdentifierForTag($.kUTTagClassFilenameExtension, $('torrent'), null);
-    var types = ['org.bittorrent.torrent'];
-    if (preferred) types.push(ObjC.unwrap(ObjC.castRefToObject(preferred)));
+    $.NSBundle.bundleWithPath('/System/Library/Frameworks/UniformTypeIdentifiers.framework').load;
+    var typeClass = $.NSClassFromString('UTType');
+    if (!typeClass) throw new Error('This macOS version does not support default app setup. Use Finder Get Info → Open with → Torrent-Deck → Change All.');
+    var workspace = $.NSWorkspace.sharedWorkspace;
+    var types = [typeClass.typeWithFilenameExtension($('torrent')), typeClass.typeWithIdentifier($('org.bittorrent.torrent'))];
+    var bundlePath = ObjC.unwrap(bundle.bundleURL.URLByResolvingSymlinksInPath.path);
     types.forEach(function(type) {
-        var current = $.LSCopyDefaultRoleHandlerForContentType($(type), 0xffffffff);
-        if (current && ObjC.unwrap(ObjC.castRefToObject(current)) === bundleId) return;
-        var status = $.LSSetDefaultRoleHandlerForContentType($(type), 0xffffffff, $(bundleId));
-        if (status !== 0) throw new Error('Could not claim ' + type + ': ' + status);
+        if (!type) return;
+        function isSelected() {
+            var selected = workspace.URLForApplicationToOpenContentType(type);
+            return selected && ObjC.unwrap(selected.URLByResolvingSymlinksInPath.path) === bundlePath;
+        }
+        if (isSelected()) return;
+        workspace.setDefaultApplicationAtURLToOpenContentTypeCompletionHandler(bundle.bundleURL, type, null);
+        var deadline = Date.now() + 10000;
+        while (!isSelected() && Date.now() < deadline) {
+            $.NSRunLoop.currentRunLoop.runUntilDate($.NSDate.dateWithTimeIntervalSinceNow(0.1));
+        }
+        if (!isSelected()) throw new Error('macOS has not selected Torrent-Deck yet. Confirm its default-app prompt, or use Finder Get Info → Open with → Torrent-Deck → Change All.');
     });
+    return bundlePath;
 }
 `
 
@@ -58,7 +71,7 @@ export async function reclaimTorrentFileAssociation(force = false): Promise<stri
     if (process.platform === 'darwin') {
         const bundlePath = path.resolve(path.dirname(process.execPath), '..', '..')
         await executeFile('/usr/bin/osascript', ['-l', 'JavaScript', '-e', reclaimTorrentScript, bundlePath], {
-            timeout: 10000, maxBuffer: 64 * 1024,
+            timeout: 25000, maxBuffer: 64 * 1024,
         })
     } else if (process.platform === 'win32') {
         // Register capabilities and an executable-specific handler; never alter Windows UserChoice hashes.

@@ -36,6 +36,8 @@ test('macOS registers the actual installed bundle and records its version', asyn
   const f = setup('darwin')
   await f.api.reclaimTorrentFileAssociation()
   assert.equal(f.calls[0].args.at(-1), '/Applications/Torrent-Deck.app')
+  assert.match(f.calls[0].args[3], /setDefaultApplicationAtURLToOpenContentTypeCompletionHandler/)
+  assert.match(f.calls[0].args[3], /if \(!isSelected\(\)\) throw/)
   assert.equal(JSON.parse(f.files.get('/profile/torrent-file-handler.json')).version, '2.19.0')
 })
 test('an older copy does not replace an installed newer handler', async () => {

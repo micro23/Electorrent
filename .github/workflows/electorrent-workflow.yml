@@ -9,6 +9,10 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
+      build_only:
+        description: 'Build installers only when the same application changes have already passed client validation'
+        type: boolean
+        default: false
       clients:
         description: 'JSON array of explicitly requested clients; empty tests Deluge only'
         required: false
@@ -29,6 +33,7 @@ env:
 
 jobs:
   test:
+    if: inputs.build_only != true
     runs-on: ubuntu-latest
 
     strategy:

@@ -4,6 +4,7 @@
 
 - New Torrent-Deck name, layered-deck icon, macOS bundle ID, Windows executable and handler registration, Linux desktop entry, and separate settings folder.
 - Migrate existing fork profiles and certificates without modifying their original copies.
+- macOS uses the current NSWorkspace default-app API and verifies the selected installed path; the deprecated API could report success while leaving the old app selected.
 - Reclaim torrent file associations on installed macOS/Linux launches; Windows registers capabilities and offers the required Default Apps selection. Help provides a repeatable default-app setup command.
 - Version-aware handler registration avoids replacing a recorded newer installation with an older Torrent-Deck copy. When a newer version starts while an older Torrent-Deck instance is running, the older instance relaunches the newer executable.
 - Opening a torrent retains the actual file bytes even when optional preview metadata cannot be parsed. Deluge decides whether the file is supported.
