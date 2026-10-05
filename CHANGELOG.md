@@ -1,5 +1,11 @@
 # Changes since the Electorrent fork
 
+## 2.19.4 — Deluge Deck theme sync
+
+- Sync the desktop theme materials and sports venue artwork with Deluge Deck 1.0.95.
+- Refine Darkhand dashboard spacing while preserving Torrent-Deck's desktop controls and multi-client support.
+- Document the complete upstream comparison through 1.0.95.
+
 ## 2.19.3 — streamlined downloads and update overlays
 
 - Ship one manual-update package format per platform: architecture-specific macOS ZIPs and the Windows NSIS installer with its required update metadata.

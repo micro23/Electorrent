@@ -1,9 +1,10 @@
 # Deluge Deck source comparison and desktop port
 
-Compared October 4, 2026. Electorrent fork created October 4 at 02:12:11 UTC.
+Compared October 5, 2026. Electorrent fork created October 4 at 02:12:11 UTC.
 Reference baseline: `619328af5f8549d6b7068fd228c61329f928b765` (1.0.73).
-Latest source used: `4fe589ac19ce` (1.0.89). Repository HEAD was checked at
-`2700503dd03f`; that later commit only updates the reference README screenshots.
+Latest source used: Deluge Deck 1.0.95 at `39b5882a7caf379166245e6dd12435d26fb59bbe`.
+The intervening source changes through 1.0.95 were reviewed; the later cleanup
+commit removes unused source assets and recompresses the stadium photography.
 
 The original `deluge-deck-reference` checkout is read-only and remains unchanged.
 A separate, ignored checkout under `.dream-loop/deck-latest` supplied the current
@@ -22,6 +23,13 @@ source, artwork, typography and visual reference screenshots.
 | `0e543bc` | 1.0.87 Terminal label cleanup | Expanded shelf reads `[ Menu ]`; collapsed shelf retains `[ > ]`; preview refreshed. |
 | `bb6b91b` | 1.0.88 core theme redesign | Ported distinct Midnight, Paper, Ocean, Forest and Sunset identities, artwork, opaque palettes, typography, dashboard symbols, progress patterns and reduced-motion behavior. |
 | `4fe589a` | 1.0.89 theme gallery refresh | Refreshed the bundled theme previews from the latest source. Web plugin packaging and README screenshots do not apply to the Electron app. |
+| `65bed43` | 1.0.90 refreshed core themes | Imported the revised palette, typography and surface materials across the core themes. |
+| `ac10760` | 1.0.91 Forest AAA and centered search | Imported Forest contrast refinements and centered-search materials while retaining the desktop toolbar adapter. |
+| `faa8c2f` | 1.0.92 centered statistics and spacing | Imported centered card statistics, simplified stat icons and tightened checkbox spacing. |
+| `f179441` | 1.0.93 real stadium photography | Imported authentic venue photography and refined sports masthead branding. |
+| `42e115b` | 1.0.94 base-aware stadium paths | Imported corrected asset URL resolution for Electron-bundled sports artwork. |
+| `55a6c1e` | 1.0.95 authentic venue photos | Replaced sports venue backdrops with current photography; all 24 club assets are bundled locally. |
+| `39b5882` | source asset cleanup | Kept the latest optimized sports backdrops and omitted source-only unused files from the desktop port. |
 
 Latest default columns: Torrent, State, Size, Progress, Download, Upload, ETA,
 Ratio, Seeds, Peers, Seeding time. Optional columns remain in the existing
@@ -31,7 +39,7 @@ statistics are shown as unavailable rather than inferred from active time.
 ## Theme material port
 
 All 38 theme choices share `src/shared/deck-themes.ts`. Current source materials
-are imported from 17 reference CSS files into `deck-reference.less`, with the
+are imported from 18 reference CSS files into `deck-reference.less`, with the
 native Angular/Electron geometry in `deck-reference-adapter.less`. The importer
 also refreshes local artwork, fonts, club metadata and 1.0.89 gallery previews. Run:
 
