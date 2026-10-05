@@ -34,6 +34,7 @@ export default {
   aria2: defineClient({
     key: "aria2",
     clientId: "aria2",
+    host: "127.0.0.1",
     features,
     fixture: "clients/aria2",
     version: "edge",
