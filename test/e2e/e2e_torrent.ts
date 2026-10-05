@@ -436,7 +436,7 @@ export class Torrent {
   }
 
   async checkInState(states: string[]) {
-    const allStates = ["all", "downloading", "finished", "seeding", "stopped", "error"];
+    const allStates = [...new Set(["all", "downloading", "finished", "seeding", "error", ...states])];
 
     for (const state of allStates.reverse()) {
       const stateBtn = $(`#page-torrents li[data-state=${state}]`)

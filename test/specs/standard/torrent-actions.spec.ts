@@ -240,7 +240,7 @@ describe("torrent actions", function () {
     this.timeout(40 * 1000)
     await torrent.stop({ state: client.stopLabel, timeout: 20 * 1000 })
     await torrent.waitForState(client.stopLabel, { timeout: 20 * 1000 })
-    await torrent.checkInState(["all", "stopped"])
+    await torrent.checkInState(["all", client.stopLabel === "Paused" ? "paused" : "stopped"])
     await torrent.resume({ waitForState: false })
     await torrent.waitForDownloading({ timeout: 20 * 1000 })
     await torrent.checkInState(["all", "downloading"])
