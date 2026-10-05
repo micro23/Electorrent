@@ -9,7 +9,7 @@ import { IPC_CHANNELS } from '@shared/ipc'
 import * as electorrent from './electorrent'
 import logger from './logger'
 
-const RELEASES_URL = 'https://github.com/micro23/Electorrent/releases'
+const RELEASES_URL = 'https://github.com/micro23/Torrent-Deck/releases'
 const UPDATE_CONNECTION_ERROR = 'Could not check version automatically. Please visit the website instead'
 const version = app.getVersion()
 
@@ -71,7 +71,12 @@ export function manualQuitAndUpdate() {
     const updatePath = downloadedUpdate
 
     if (path.extname(updatePath).toLowerCase() === '.dmg') {
-        void shell.openPath(updatePath)
+        void shell.openPath(updatePath).then((error) => {
+            if (!error) return
+            logger.error('Could not open downloaded macOS installer', error)
+            notifyConnectionError()
+            dialog.showErrorBox('Could not open installer', `Open the downloaded installer manually:\n${updatePath}`)
+        })
         return
     }
     const isExecutable = fs.constants.F_OK | fs.constants.X_OK
@@ -155,6 +160,7 @@ function manualDownloader() {
             if (state === 'interrupted') {
                 logger.error('The download update was interrupted', state)
                 dialog.showErrorBox('Download error', `The download of ${item.getFilename()} was interrupted`)
+                sendUpdateStatus({ type: 'error', message: 'The update download was interrupted. Check your connection and try again.' })
             }
 
             if (state === 'completed') {
@@ -205,7 +211,7 @@ function manualUpdater() {
 function manualMacUpdater() {
     notifyCheckingUpdate()
     request({
-        url: 'https://api.github.com/repos/micro23/Electorrent/releases/latest',
+        url: 'https://api.github.com/repos/micro23/Torrent-Deck/releases/latest',
         headers: { 'User-Agent': 'Torrent-Deck', Accept: 'application/vnd.github+json' },
         timeout: 15000,
     }, (error: Error | null, response: { statusCode: number }, body: string) => {
@@ -214,7 +220,7 @@ function manualMacUpdater() {
             return
         }
         if (response.statusCode === 404) {
-            notifyUpToDate()
+            notifyConnectionError()
             return
         }
         try {
@@ -228,7 +234,7 @@ function manualMacUpdater() {
             const suffix = process.arch === 'arm64' ? '-macOS-arm64.dmg' : '-macOS-universal.dmg'
             const asset = release.assets.find((item: { name: string }) => item.name.endsWith(suffix))
                 || release.assets.find((item: { name: string }) => item.name.endsWith('-macOS-universal.dmg'))
-            if (!asset || !asset.browser_download_url.startsWith('https://github.com/micro23/Electorrent/releases/download/')) {
+            if (!asset || !asset.browser_download_url.startsWith('https://github.com/micro23/Torrent-Deck/releases/download/')) {
                 throw new Error('Release has no compatible macOS installer')
             }
             update = { name: newVersion, notes: release.body, pub_date: release.published_at, url: release.html_url }

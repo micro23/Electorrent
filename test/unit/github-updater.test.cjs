@@ -63,7 +63,7 @@ test('packaged updater offers stable releases before downloading and sends insta
   assert.equal(status.type, 'downloaded')
   assert.equal(status.data.manual, false)
   assert.equal(status.data.releaseName, '2.18.0')
-  assert.equal(status.data.updateUrl, 'https://github.com/micro23/Electorrent/releases')
+  assert.equal(status.data.updateUrl, 'https://github.com/micro23/Torrent-Deck/releases')
   f.api.quitAndInstall()
   assert.equal(f.installs(), 1)
 })
@@ -89,7 +89,7 @@ test('explicit legacy test feed offers a download without invoking native update
 test('release configuration points all platforms at the fork and provides updater targets', () => {
   const config = yaml.load(fs.readFileSync('electron-builder.yml', 'utf8'))
   assert.equal(config.publish[0].owner, 'micro23')
-  assert.equal(config.publish[0].repo, 'Electorrent')
+  assert.equal(config.publish[0].repo, 'Torrent-Deck')
   assert.equal(config.win.target, 'nsis')
   assert.ok(config.mac.target.some(target => target.target === 'zip'))
   assert.ok(config.linux.target.includes('AppImage'))
@@ -97,11 +97,11 @@ test('release configuration points all platforms at the fork and provides update
 
 
 test('unsigned macOS downloads a compatible DMG and requires manual installation', () => {
-  const download = 'https://github.com/micro23/Electorrent/releases/download/v2.18.0/Electorrent-2.18.0-macOS-arm64.dmg'
+  const download = 'https://github.com/micro23/Torrent-Deck/releases/download/v2.18.0/Torrent-Deck-2.18.0-macOS-arm64.dmg'
   const f = fixture(true, {
     tag_name: 'v2.18.0', body: 'Release notes', published_at: '2026-10-04',
-    html_url: 'https://github.com/micro23/Electorrent/releases/tag/v2.18.0',
-    assets: [{ name: 'Electorrent-2.18.0-macOS-arm64.dmg', browser_download_url: download }],
+    html_url: 'https://github.com/micro23/Torrent-Deck/releases/tag/v2.18.0',
+    assets: [{ name: 'Torrent-Deck-2.18.0-macOS-arm64.dmg', browser_download_url: download }],
   })
   f.api.initialise(f.window)
   f.api.checkForUpdates(true)

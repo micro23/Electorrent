@@ -3,9 +3,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/micro23/Electorrent/actions/workflows/electorrent-workflow.yml"><img src="https://github.com/micro23/Electorrent/actions/workflows/electorrent-workflow.yml/badge.svg" alt="Build status"></a>
-  <a href="https://github.com/micro23/Electorrent/releases"><img src="https://img.shields.io/github/release/micro23/Electorrent.svg?maxAge=86400" alt="Latest release"></a>
-  <a href="https://github.com/micro23/Electorrent/releases"><img src="https://img.shields.io/github/downloads/micro23/Electorrent/total.svg?maxAge=86400" alt="GitHub downloads"></a>
+  <a href="https://github.com/micro23/Torrent-Deck/actions/workflows/torrent-deck-release.yml"><img src="https://github.com/micro23/Torrent-Deck/actions/workflows/torrent-deck-release.yml/badge.svg" alt="Build status"></a>
+  <a href="https://github.com/micro23/Torrent-Deck/releases"><img src="https://img.shields.io/github/release/micro23/Torrent-Deck.svg?maxAge=86400" alt="Latest release"></a>
+  <a href="https://github.com/micro23/Torrent-Deck/releases"><img src="https://img.shields.io/github/downloads/micro23/Torrent-Deck/total.svg?maxAge=86400" alt="GitHub downloads"></a>
 </p>
 
 # Torrent-Deck
@@ -14,11 +14,11 @@ Torrent-Deck is a desktop remote-control application for managing torrents on cl
 
 ## Download and platform status
 
-Download published installers from [GitHub Releases](https://github.com/micro23/Electorrent/releases). The current release workflow builds **macOS packages only** while macOS support is being stabilized. Windows and Linux support remains part of the cross-platform project, but their release builds are deferred for now.
+Download published installers from [GitHub Releases](https://github.com/micro23/Torrent-Deck/releases). Releases provide macOS packages and a Windows installer. Linux support remains in the shared source and packaging configuration while its release builds are deferred.
 
-The macOS packages are unsigned because Apple Developer signing credentials are not configured. macOS can check for new GitHub releases, but installing an update requires downloading and opening the new DMG. Depending on your macOS security settings, you may need to approve the app in System Settings after opening it.
+The macOS packages are unsigned because Apple Developer signing credentials are not configured. Torrent-Deck checks GitHub for updates and downloads the compatible DMG; macOS then requires you to open the DMG and replace Torrent-Deck in Applications. Windows checks GitHub and installs approved updates through its NSIS installer. Windows may show a SmartScreen warning because the installer is unsigned.
 
-Install **Torrent-Deck.app** into Applications and launch it once to register torrent files. Your existing fork profiles and certificates migrate into a separate Torrent-Deck profile. The GitHub repository remains `micro23/Electorrent` so existing update links continue to work. Updates are checked against this repository’s public GitHub Releases. See [release and update details](docs/github-releases.md).
+Install Torrent-Deck and launch it once to register torrent files. Your existing fork profiles and certificates migrate into a separate Torrent-Deck profile. Updates are checked against the public [Torrent-Deck GitHub Releases](https://github.com/micro23/Torrent-Deck/releases). See [release and update details](docs/github-releases.md).
 
 ## Supported torrent clients
 
@@ -101,7 +101,7 @@ Bug reports, client compatibility reports, and pull requests are welcome. Please
 
 This repository is an independently maintained continuation of [Electorrent by tympanix](https://github.com/tympanix/Electorrent). The original project established the desktop app, client integrations, and torrent-management workflow that this project builds upon. We are grateful to the original author and contributors for that foundation. This fork has since moved to a modernized application codebase and adds its own interface, themes, platform work, and release process.
 
-This project is maintained at [micro23/Electorrent](https://github.com/micro23/Electorrent). It is not an official release of the original project and is not affiliated with its original maintainers. Electorrent is licensed under [GPL-3.0](LICENSE); see the license and original repository for project history and attribution.
+This project is maintained at [micro23/Torrent-Deck](https://github.com/micro23/Torrent-Deck). It is not an official release of the original project and is not affiliated with its original maintainers. Electorrent is licensed under [GPL-3.0](LICENSE); see the license and original repository for project history and attribution.
 
 The Deck-inspired theme collection was ported from [Deluge Deck](https://github.com/micro23/deluge-deck), which is kept as a separate, read-only reference project. Torrent-Deck remains a remote client for multiple BitTorrent applications; it does not require Deluge Deck or install a plugin into it.
 

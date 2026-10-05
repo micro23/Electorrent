@@ -11,4 +11,4 @@ with ZipFile(root / 'dist' / 'Torrent-Deck-Icons.zip', 'w', ZIP_DEFLATED) as arc
                          ('LICENSE', 'LICENSE.txt'),
                          ('CREDITS.md', 'CREDITS.md')]:
         archive.write(root / source, name)
-    archive.writestr('README.txt', 'Torrent-Deck original identity assets. GPL-3.0. Source and credits: https://github.com/micro23/Electorrent\n')
+    archive.writestr('README.txt', 'Torrent-Deck original identity assets. GPL-3.0. Source and credits: https://github.com/micro23/Torrent-Deck\n')

@@ -42,7 +42,7 @@ export class NotificationsCenterController {
 
         $scope.updateData = {
             releaseDate: "Just now...",
-            updateUrl: "https://github.com/micro23/Electorrent/releases",
+            updateUrl: "https://github.com/micro23/Torrent-Deck/releases",
         };
 
         $scope.notifications = [];

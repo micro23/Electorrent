@@ -1,6 +1,6 @@
 {
   "name": "torrent-deck",
-  "version": "2.19.0",
+  "version": "2.19.1",
   "description": "A themed desktop remote client for managing torrents across your servers",
   "type": "module",
   "main": "app/main.js",
@@ -29,7 +29,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/micro23/Electorrent.git"
+    "url": "https://github.com/micro23/Torrent-Deck.git"
   },
   "author": "tympanix",
   "dependencies": {

@@ -14,7 +14,7 @@ extraResources:
 publish:
   - provider: github
     owner: micro23
-    repo: Electorrent
+    repo: Torrent-Deck
     releaseType: draft
 files:
   - '!**/*.map'

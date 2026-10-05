@@ -1,5 +1,12 @@
 # Changes since the Electorrent fork
 
+## 2.19.1 — renamed repository and desktop updates
+
+- Renamed the GitHub repository to `micro23/Torrent-Deck` and updated app metadata, release links, update feeds, workflow names, and documentation.
+- Build Windows NSIS installers and publish the `latest.yml`, installer, and blockmap assets required for in-app updates.
+- Keep macOS update checks and compatible DMG downloads working with the renamed GitHub release URLs; report download and installer-open errors in the app.
+- Document platform update behavior: Windows installs approved updates through NSIS; unsigned macOS builds open a DMG for manual replacement.
+
 ## 2.19.0 — Torrent-Deck identity and file opening
 
 - New Torrent-Deck name, layered-deck icon, macOS bundle ID, Windows executable and handler registration, Linux desktop entry, and separate settings folder.
