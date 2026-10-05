@@ -130,6 +130,7 @@ describe("mock bulk torrent actions", function () {
         await $(".usa-footer-eagle").waitForDisplayed()
       }
       if (theme === "matrix") {
+        await eventually(async () => $$(".matrix-rain > span").length).equals(22)
         assert.equal(await $$(".matrix-rain > span").length, 22)
         assert.notInclude(await $(".matrix-masthead").getText(), "SOURCE")
         const progress = $(`#torrentTable tr[data-id='${torrents[0].hash}'] .matrix-code-progress`)

@@ -194,6 +194,11 @@ export class App {
       const msg = $("#notifications .negative")
       try {
         await msg.waitForExist({ timeout: opts?.timeout ?? 1000 })
+        await msg.waitForDisplayed({ timeout: opts?.timeout ?? 1000 })
+        await browser.waitUntil(async () => (await msg.$(".header").getText()).trim().length > 0, {
+          timeout: opts?.timeout ?? 1000,
+          timeoutMsg: "The error notification title was not rendered",
+        })
         return {
           title: await msg.$(".header").getText(),
           message: await msg.$("p").getText()
