@@ -65,25 +65,6 @@ for (const name of files) {
   css.walkDecls(decl => { decl.value = decl.value.replace(/\.\.\/assets\//g,'../../assets/deck/').replace(/\?inline/g,''); });
   output += '\n/* '+name+'.css */\n'+css.toString()+'\n';
 }
-// These shared source layers were missing from the original import. Scope their
-// generic rules away from Darkhand and Terminal so those themes stay unchanged.
-for (const name of ['sidebar','sizing','tablet','mobile']) {
-  const css = postcss.parse(fs.readFileSync(path.join(source,'src/themes',name+'.css'),'utf8'));
-  css.walkRules(rule => {
-    if (rule.parent.type === 'atrule' && rule.parent.name.endsWith('keyframes')) return;
-    const selectors = postcss.list.comma(rule.selector)
-      .map(selector => selector
-        .replace(/,\s*\[data-theme="(?:darkhand|terminal)"\]/g, ''))
-      .filter(selector => !/\[data-theme="(?:darkhand|terminal)"\]/.test(selector))
-      .map(selector => selector
-        .replace(/:root/g, 'html[data-theme]:not([data-theme="darkhand"]):not([data-theme="terminal"])')
-        .replace(/\.([\w-]+)/g, (match,key) => classes[key] ? '.'+classes[key] : match)
-        .replace(/tr\.selected/g,'tr.active'));
-    if (!selectors.length) { rule.remove(); return; }
-    rule.selector = selectors.map(selector => selector.startsWith('html') ? selector : 'html[data-theme]:not([data-theme="darkhand"]):not([data-theme="terminal"]) '+selector).join(', ');
-  });
-  output += '\n/* '+name+'.css · shared source layer, excluding Darkhand and Terminal */\n'+css.toString()+'\n';
-}
 fs.writeFileSync(target, output.trimEnd()+'\n');
 fs.cpSync(path.join(source,'src/assets'),'src/renderer/assets/deck',{recursive:true,filter:assetPath => !/theme-previews\/(?:darkhand|terminal)-optimized\.webp$/.test(assetPath)});
 const { SPORTS_DESIGNS } = await import(pathToFileURL(path.join(source,'src/app/sports-designs.js')));
@@ -96,4 +77,4 @@ metadata = metadata.replace('"independence": "Independence"', '"independence": "
 metadata += '\nexport const DECK_SPORTS_DESIGNS = '+JSON.stringify(SPORTS_DESIGNS,null,4)+';\n';
 metadata += '\nexport const DECK_CORE_THEMES = '+JSON.stringify({dark:'Midnight',light:'Paper',ocean:'Ocean',forest:'Forest',sunset:'Sunset'},null,4)+';\n';
 fs.writeFileSync(metadataPath,metadata);
-console.log('Synchronized '+(files.length-1)+' theme styles, 4 shared layout layers, and local assets.');
+console.log('Imported '+(files.length-1)+' Deck theme materials and local assets.');

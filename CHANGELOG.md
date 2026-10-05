@@ -2,8 +2,8 @@
 
 ## 2.19.5 — complete Deck theme refresh
 
-- Import the latest Deluge Deck shared sidebar, sizing, tablet, and mobile theme layers, while preserving Darkhand and Terminal.
-- Show authentic stadium photography in every sports-team masthead.
+- Refresh theme materials from Deluge Deck 1.0.95 and show authentic stadium photography in every sports-team masthead.
+- Preserve Darkhand and Terminal styling.
 - Publish the Windows installer now; universal macOS packages remain gated on signing and notarization credentials.
 
 ## 2.19.4 — Deluge Deck theme sync
