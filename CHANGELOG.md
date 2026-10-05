@@ -4,6 +4,7 @@
 
 - Sync the desktop theme materials and sports venue artwork with Deluge Deck 1.0.95.
 - Refine Darkhand dashboard spacing while preserving Torrent-Deck's desktop controls and multi-client support.
+- Require Developer ID signing and Apple notarization for macOS releases; block tagged releases without the signing credentials.
 - Document the complete upstream comparison through 1.0.95.
 
 ## 2.19.3 — streamlined downloads and update overlays

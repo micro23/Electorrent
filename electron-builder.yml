@@ -21,6 +21,8 @@ files:
 mac:
   artifactName: "${productName}-${version}-macOS-${arch}.${ext}"
   category: public.app-category.utilities
+  hardenedRuntime: true
+  notarize: true
   extendInfo:
     NSLocalNetworkUsageDescription: Torrent-Deck connects to torrent clients running on devices on your local network.
     CFBundleDocumentTypes:
