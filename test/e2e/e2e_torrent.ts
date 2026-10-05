@@ -385,7 +385,7 @@ export class Torrent {
     const parentWindow = await browser.getWindowHandle()
     for (let attempt = 0; attempt < 3; attempt++) {
       const existingWindowHandles = new Set(await browser.getWindowHandles())
-      await elem.click(options)
+      await elem.$("[data-col=decodedName] .torrent-name-content").click(options)
       try {
         const contextMenuWindow = await browser.waitUntil(async () => {
           const handles = await browser.getWindowHandles()

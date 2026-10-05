@@ -50,12 +50,12 @@ export function configureSpec(options: { login?: boolean, clearTorrents?: boolea
     }, createDefaultSettings())
     fs.rmSync(path.join(userDataPath, "certs"), { recursive: true, force: true })
     await browser.execute(() => window.localStorage.clear())
-    await browser.refresh()
+    await browser.url(await browser.getUrl())
 
     current.app = new App()
     this.app = current.app
     this.backend = current.backend
-    this.retries(3)
+    this.retries(0)
     if (options.login !== false) {
       await current.app.login(current.client)
       await current.app.torrentsPageIsVisible()

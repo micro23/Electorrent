@@ -64,7 +64,10 @@ export class App {
 
     const clientForm = $("#connection-client")
     await clientForm.waitForDisplayed()
-    await clientForm.waitForClickable()
+    await clientForm.waitForClickable().catch(async error => {
+      for (const modal of await $$(".ui.modal.active")) console.error("Blocking modal:", await modal.getText())
+      throw error
+    })
     await clientForm.click();
 
     const clientFormSelect = $(`#connection-client-${options.clientId}`)

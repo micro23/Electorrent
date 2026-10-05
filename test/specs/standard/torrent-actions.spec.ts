@@ -101,11 +101,11 @@ describe("torrent actions", function () {
   })
 
   it("opens the context menu at the mouse position", async function () {
-    const torrentRow = $(torrent.query)
+    const torrentRow = $(torrent.query).$("[data-col=decodedName] .torrent-name-content")
     const rowLocation = await torrentRow.getLocation()
     const rowSize = await torrentRow.getSize()
     const clickOffset = {
-      x: -Math.floor(rowSize.width / 2) + 50,
+      x: 0,
       y: 0,
     }
     const expectedMenuLocation = {
