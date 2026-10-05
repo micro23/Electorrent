@@ -95,13 +95,15 @@ describe("mock bulk torrent actions", function () {
     await expectTorrentState(torrents[0].hash, "Downloading")
     await expectTorrentState(torrents[1].hash, "Downloading")
     assert.include(await getTorrentState(torrents[2].hash), "Downloading")
+    await firstCheckbox.waitForClickable()
     await firstCheckbox.click()
+    await eventually(getSelectedIds).satisfies("leave only the second torrent selected", ids => ids.length === 1 && ids[0] === torrents[1].hash)
+    await secondCheckbox.waitForClickable()
     await secondCheckbox.click()
     await selectionMenu.waitForExist({ reverse: true })
   })
 
   it("shows the bottom selection menu with clear transport labels in every theme", async function () {
-    this.timeout(180000)
     const terminalCheckbox = $(`#torrentTable tbody tr[data-id='${torrents[0].hash}'] .terminal-row-check`)
     await terminalCheckbox.scrollIntoView({ block: "center", inline: "nearest" })
     await terminalCheckbox.waitForClickable()
@@ -199,7 +201,7 @@ describe("mock bulk torrent actions", function () {
     }
     await cycleTheme()
     await eventually(async () => $("html").getAttribute("data-theme")).equals("terminal")
-  })
+  }).timeout(180000)
 
   it("shows Matrix code progress in the details panel with independent SVG fills", async function () {
     await cycleTheme()

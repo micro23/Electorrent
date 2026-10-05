@@ -24,4 +24,8 @@ export class SettingsGeneralController {
     chooseTheme(theme: any) {
         this.settings.ui.theme = theme.basename;
     }
+
+    checkForUpdates() {
+        void window.electorrent.updates.check(true);
+    }
 }

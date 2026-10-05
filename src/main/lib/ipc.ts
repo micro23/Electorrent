@@ -314,6 +314,10 @@ export function registerHandlers({ isDebug, forceTitleBarMenu, getWindow, consum
         updater.checkForUpdates(verbose)
     })
 
+    ipcMain.handle(IPC_CHANNELS.updates.download, async function() {
+        updater.downloadUpdateAfterApproval()
+    })
+
     ipcMain.handle(IPC_CHANNELS.updates.installDownloaded, async function() {
         updater.manualQuitAndUpdate()
     })

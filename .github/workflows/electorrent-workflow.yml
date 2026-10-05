@@ -8,6 +8,15 @@ on:
       - "v*"
   pull_request:
   workflow_dispatch:
+    inputs:
+      clients:
+        description: 'JSON array of clients to test; empty runs the full matrix'
+        required: false
+        default: ''
+      spec:
+        description: 'Optional targeted test spec'
+        required: false
+        default: ''
   schedule:
     - cron: '0 0 * * 0' # every Sunday at midnight
 
@@ -25,18 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        client:
-          - aria2
-          - mock
-          - qbittorrent:4
-          - qbittorrent:5
-          - qbittorrent:latest
-          - rtorrent
-          - rtorrent:latest
-          - transmission
-          - deluge:1
-          - deluge:2
-          - utorrent
+        client: ${{ fromJSON(inputs.clients || '["aria2","mock","qbittorrent:4","qbittorrent:5","qbittorrent:latest","rtorrent","rtorrent:latest","transmission","deluge:1","deluge:2","utorrent"]') }}
 
     steps:
     - name: Checkout source code
@@ -74,9 +72,16 @@ jobs:
     - name: Build web application
       run: npm run build
     - name: Run tests
-      run: xvfb-run -a --server-args="-screen 0 1600x1200x24" -- npm test -- --client "${{ matrix.client }}" --headless
+      env:
+        TEST_CLIENT: ${{ matrix.client }}
+        TEST_SPEC: ${{ inputs.spec }}
+      run: |
+        args=(--client "$TEST_CLIENT" --headless)
+        if [ -n "$TEST_SPEC" ]; then args+=(--spec "$TEST_SPEC"); fi
+        xvfb-run -a --server-args="-screen 0 1600x1200x24" -- npm test -- "${args[@]}"
 
   build:
+    if: inputs.clients == ''
     strategy:
       fail-fast: false
       matrix:

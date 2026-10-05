@@ -11,8 +11,10 @@ function fixture(packaged = true, macRelease) {
   const updater = new EventEmitter()
   let checks = 0
   let installs = 0
+  let autoDownloads = 0
   updater.checkForUpdates = async () => { checks++ }
   updater.quitAndInstall = () => { installs++ }
+  updater.downloadUpdate = async () => { autoDownloads++ }
   const statuses = []
   const downloads = []
   const window = {
@@ -37,13 +39,13 @@ function fixture(packaged = true, macRelease) {
   const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true } }).outputText
   const exports = {}
   vm.runInNewContext(compiled, { exports, require: name => modules[name] || require(name), process: { env: {}, platform: macRelease ? 'darwin' : 'win32', arch: 'arm64' } })
-  return { api: exports, updater, window, statuses, downloads, checks: () => checks, installs: () => installs }
+  return { api: exports, updater, window, statuses, downloads, checks: () => checks, installs: () => installs, autoDownloads: () => autoDownloads }
 }
 
-test('packaged updater downloads stable releases and sends installable metadata', () => {
+test('packaged updater offers stable releases before downloading and sends installable metadata', () => {
   const f = fixture()
   f.api.initialise(f.window)
-  assert.equal(f.updater.autoDownload, true)
+  assert.equal(f.updater.autoDownload, false)
   assert.equal(f.updater.autoInstallOnAppQuit, true)
   assert.equal(f.updater.allowPrerelease, false)
   assert.equal(f.updater.allowDowngrade, false)
@@ -51,6 +53,11 @@ test('packaged updater downloads stable releases and sends installable metadata'
   assert.equal(f.checks(), 1)
   const info = { version: '2.18.0', releaseDate: '2026-10-04', releaseNotes: 'New release' }
   f.updater.emit('update-available', info)
+  assert.equal(f.statuses.at(-1).data.installedVersion, '2.17.1')
+  assert.equal(f.statuses.at(-1).data.latestVersion, '2.18.0')
+  assert.equal(f.autoDownloads(), 0)
+  f.api.downloadUpdateAfterApproval()
+  assert.equal(f.autoDownloads(), 1)
   f.updater.emit('update-downloaded', info)
   const status = f.statuses.at(-1)
   assert.equal(status.type, 'downloaded')
@@ -69,10 +76,12 @@ test('development builds skip network update checks', () => {
   assert.equal(f.statuses.at(-1).type, 'error')
 })
 
-test('explicit legacy test feed still downloads without invoking native updater', () => {
+test('explicit legacy test feed offers a download without invoking native updater', () => {
   const f = fixture(false)
   f.api.initialise(f.window, 'http://localhost/update')
   f.api.checkForUpdates(true)
+  assert.deepEqual(f.downloads, [])
+  f.api.downloadUpdateAfterApproval()
   assert.deepEqual(f.downloads, ['http://localhost/download'])
   assert.equal(f.checks(), 0)
 })
@@ -96,9 +105,12 @@ test('unsigned macOS downloads a compatible DMG and requires manual installation
   })
   f.api.initialise(f.window)
   f.api.checkForUpdates(true)
+  assert.deepEqual(f.downloads, [])
+  assert.equal(f.statuses.at(-1).data.latestVersion, '2.18.0')
+  assert.equal(f.statuses.at(-1).data.manual, true)
+  f.api.downloadUpdateAfterApproval()
   assert.deepEqual(f.downloads, [download])
   assert.equal(f.checks(), 0)
-  assert.equal(f.statuses.at(-1).data.manual, true)
 })
 
 test('unsigned macOS rejects releases without compatible installers', () => {

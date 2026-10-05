@@ -72,6 +72,7 @@ const electorrentBridge: ElectorrentBridge = {
     },
     updates: {
         check: (verbose?: boolean) => invoke(IPC_CHANNELS.updates.check, { verbose }),
+        download: () => invoke(IPC_CHANNELS.updates.download),
         installDownloaded: () => invoke(IPC_CHANNELS.updates.installDownloaded),
         installAuto: () => invoke(IPC_CHANNELS.updates.installAuto),
         onStatus: (callback) => subscribe(IPC_CHANNELS.updates.status, callback),

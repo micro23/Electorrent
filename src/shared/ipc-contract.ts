@@ -377,7 +377,7 @@ export interface AppSettings<TServer = StoredServerConfig> {
 }
 
 export interface UpdateEvent {
-    type: "checking" | "available" | "downloaded" | "up-to-date" | "error"
+    type: "checking" | "available" | "downloading" | "downloaded" | "up-to-date" | "error"
     message?: string
     data?: {
         manual?: boolean
@@ -504,6 +504,7 @@ export interface ElectorrentBridge {
     }
     updates: {
         check(verbose?: boolean): Promise<void>
+        download(): Promise<void>
         installDownloaded(): Promise<void>
         installAuto(): Promise<void>
         onStatus(callback: (event: UpdateEvent) => void): Unsubscribe

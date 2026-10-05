@@ -5,14 +5,14 @@ import type { CertificatePrompt, UpdateEvent } from "@shared/ipc-contract";
 
 interface NotificationsCenterScope extends IScope {
     updateData: {
-        releaseDate: string;
-        updateUrl: string;
+        releaseDate?: string;
+        updateUrl?: string;
         [key: string]: any;
     };
     notifications: any[];
     manualUpdate?: boolean;
     close: (index: number) => void;
-    installUpdate: () => void;
+    installUpdate: () => boolean;
     installCertificate: () => void;
     allowInsecureTls: () => void;
     confirmInsecureTls: () => boolean | void;
@@ -73,31 +73,31 @@ export class NotificationsCenterController {
         };
 
         electorrent.updates.onStatus((event: UpdateEvent) => {
-            if (event.type !== "downloaded") {
-                return;
-            }
-
-            const data = Object.assign({
-                releaseDate: $scope.updateData.releaseDate,
-                updateUrl: $scope.updateData.updateUrl,
-            }, event.data || {});
-            $scope.manualUpdate = !!data.manual;
-
-            // Both update paths supply release information with the event.
-            // GitHub release pages are HTML, rather than the old JSON feed.
-            data.releaseNotes ||= "Not available. Please go to the website for more info";
-            $scope.updateData = data;
             $timeout(() => {
+                const data = Object.assign(event.type === "checking" ? {} : $scope.updateData, event.data || {}, {
+                    status: event.type,
+                    message: event.message,
+                });
+                $scope.manualUpdate = !!data.manual;
+                $scope.updateData = data;
                 $scope.updateModalRef?.showModal();
-            }, $scope.manualUpdate ? 500 : 0);
+                $scope.updateModalRef?.refreshModal();
+            }, 0);
         });
 
         $scope.installUpdate = () => {
+            if ($scope.updateData.status === "available") {
+                $scope.updateData.status = "downloading";
+                void electorrent.updates.download();
+                return false;
+            }
+            if ($scope.updateData.status !== "downloaded") return false;
             if ($scope.manualUpdate) {
                 electorrent.updates.installDownloaded();
             } else {
                 electorrent.updates.installAuto();
             }
+            return true;
         };
 
         electorrent.certificates.onChallenge((cert: CertificatePrompt) => {

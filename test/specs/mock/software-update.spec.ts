@@ -61,7 +61,7 @@ describe("software updates", function () {
     await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()))
   })
 
-  it("downloads a newer version and shows the update modal", async function () {
+  it("shows installed and latest versions, then downloads only after confirmation", async function () {
     const helpMenu = $("//button[contains(@class, 'title-bar-menu-trigger') and normalize-space(.)='Help']")
     await helpMenu.waitForClickable()
     await helpMenu.click()
@@ -73,9 +73,14 @@ describe("software updates", function () {
     const modal = $("#updateModal")
     await waitForModalOpen(modal, 20_000)
 
-    assert.equal(await modal.$(".header").getText(), "Update Available")
+    assert.equal(await modal.$(".header").getText(), "Software Updates")
     assert.include(await modal.$(".content").getText(), "99.0.0")
+    assert.include(await modal.$(".content").getText(), "Installed version:")
+    assert.equal(await modal.$("button.approve").getText(), "Download Update")
     assert.isDefined(updatePath)
+    assert.isFalse(fs.existsSync(updatePath!), "checking must not start a download")
+    await modal.$("button.approve").click()
+    await browser.waitUntil(async () => (await modal.$("button.approve").getText()).includes("Open Downloaded Installer"))
     assert.deepEqual(fs.readFileSync(updatePath!), updateContents)
 
     await modal.$("button.deny").click()

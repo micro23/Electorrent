@@ -47,6 +47,7 @@ export const IPC_CHANNELS = {
     },
     updates: {
         check: 'updates:check',
+        download: 'updates:download',
         installDownloaded: 'updates:install-downloaded',
         installAuto: 'updates:install-auto',
         status: 'updates:status',

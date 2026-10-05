@@ -5,30 +5,36 @@
     ng-ref="modalRef">
     <i class="close icon"></i>
     <div class="header">
-        Update Available
+        Software Updates
     </div>
     <div class="content">
         <h4 class="ui header">
             <div class="content">
-                Version:
-                {{data.releaseName}}
-                <div class="sub header">{{data.releaseDate | releaseDate}}</div>
+                Installed version: {{data.installedVersion}}
+                <div class="sub header">Latest GitHub version: {{data.latestVersion || 'Not yet checked'}}</div>
+                <div class="sub header" ng-if="data.releaseDate">{{data.releaseDate | releaseDate}}</div>
             </div>
         </h4>
 
-        <h4 class="ui horizontal divider header" style="margin-top: 14px">
+        <p ng-if="data.status === 'checking'"><i class="spinner loading icon"></i> Checking GitHub for the latest release…</p>
+        <p ng-if="data.status === 'up-to-date'">You’re up to date.</p>
+        <p ng-if="data.status === 'available'">A new version is available. Download it when you’re ready.</p>
+        <p ng-if="data.status === 'downloading'"><i class="spinner loading icon"></i> Downloading the update…</p>
+        <p ng-if="data.status === 'error'">{{data.message}}</p>
+        <p ng-if="data.manual && data.status === 'downloaded'">Open the installer and drag Electorrent into Applications to replace the installed app.</p>
+        <h4 ng-if="data.releaseNotes" class="ui horizontal divider header" style="margin-top: 14px">
             <i class="tag icon"></i>
             Release Notes
         </h4>
 
-        <p marked="data.releaseNotes"></p>
+        <p ng-if="data.releaseNotes" marked="data.releaseNotes"></p>
     </div>
     <div class="actions">
         <button type="button" class="ui black deny button">
-            Update Later
+            Close
         </button>
-        <button type="button" class="ui green right labeled icon approve button">
-            Quit And Install
+        <button ng-if="data.status === 'available' || data.status === 'downloaded'" type="button" class="ui primary right labeled icon approve button">
+            {{data.status === 'available' ? 'Download Update' : (data.manual ? 'Open Downloaded Installer' : 'Quit And Install')}}
             <i class="arrow alternate circle up icon"></i>
         </button>
     </div>

@@ -18,6 +18,7 @@ let updateUrl: string | undefined
 let mainWindow: BrowserWindow | null = null
 let update: any = null
 let downloadedUpdate: string | null = null
+let pendingManualDownloadUrl: string | null = null
 let verbose = false
 let manualMacUpdates = false
 
@@ -89,6 +90,19 @@ export function quitAndInstall() {
     autoUpdater.quitAndInstall()
 }
 
+export function downloadUpdateAfterApproval() {
+    if (!update) return
+    sendUpdateStatus({ type: 'downloading' })
+    if (updateUrl || manualMacUpdates) {
+        if (pendingManualDownloadUrl) downloadUpdate(pendingManualDownloadUrl)
+        return
+    }
+    void autoUpdater.downloadUpdate().catch((error: Error) => {
+        logger.error('GitHub update download failed', error)
+        notifyConnectionError()
+    })
+}
+
 export function openUpdateFilePath() {
     if (!downloadedUpdate) return
     shell.showItemInFolder(downloadedUpdate)
@@ -109,6 +123,9 @@ function notifyUpdateDownloaded(filePath: string) {
             releaseDate: update.pub_date,
             updateUrl: update.url,
             manual: true,
+            installedVersion: version,
+            latestVersion: update.name,
+            downloaded: true,
         },
     })
 }
@@ -149,6 +166,7 @@ function manualDownloader() {
 
 function manualUpdater() {
     if (!updateUrl) return
+    notifyCheckingUpdate()
 
     request(updateUrl, function(error: Error | null, response: { statusCode: number }, body: string) {
         if (error) {
@@ -175,8 +193,10 @@ function manualUpdater() {
 
             if (semver.gt(newVersion, version)) {
                 update = info
-                downloadUpdate(info.url)
+                pendingManualDownloadUrl = info.url
                 notifyUpdateAvailable()
+            } else {
+                notifyUpToDate(newVersion)
             }
         }
     })
@@ -202,7 +222,7 @@ function manualMacUpdater() {
             const newVersion = semver.clean(release.tag_name)
             if (!newVersion || !semver.valid(newVersion)) throw new Error('Invalid release version')
             if (!semver.gt(newVersion, version)) {
-                notifyUpToDate()
+                notifyUpToDate(newVersion)
                 return
             }
             const suffix = process.arch === 'arm64' ? '-macOS-arm64.dmg' : '-macOS-universal.dmg'
@@ -212,7 +232,7 @@ function manualMacUpdater() {
                 throw new Error('Release has no compatible macOS installer')
             }
             update = { name: newVersion, notes: release.body, pub_date: release.published_at, url: release.html_url }
-            downloadUpdate(asset.browser_download_url)
+            pendingManualDownloadUrl = asset.browser_download_url
             notifyUpdateAvailable()
         } catch (error) {
             logger.error('macOS manual update check failed', error)
@@ -234,7 +254,11 @@ function notify({ title = '', message = '', type = 'info' }) {
 
 function sendUpdateStatus(payload: unknown) {
     if (!mainWindow || mainWindow.isDestroyed()) return
-    mainWindow.webContents.send(IPC_CHANNELS.updates.status, payload)
+    const status = payload as { data?: Record<string, unknown> }
+    mainWindow.webContents.send(IPC_CHANNELS.updates.status, {
+        ...status,
+        data: { installedVersion: version, ...status.data },
+    })
 }
 
 function notifyUpdateError() {
@@ -271,20 +295,23 @@ function notifyUpdateAvailable() {
             releaseDate: update && update.pub_date,
             updateUrl: update && update.url,
             manual: !!updateUrl || manualMacUpdates,
+            installedVersion: version,
+            latestVersion: update && update.name,
         },
     })
     notify({
         title: 'Update Available!',
-        message: 'We are downloading the newest version of Electorrent for you!',
+        message: 'A newer version is available. Choose Download Update to install it.',
         type: 'info',
     })
 }
 
-function notifyUpToDate() {
+function notifyUpToDate(latestVersion = version) {
     if (!verbose) return
 
     sendUpdateStatus({
         type: 'up-to-date',
+        data: { latestVersion, updateUrl: RELEASES_URL },
     })
     notify({
         title: 'Up to date!',
@@ -314,12 +341,14 @@ function releaseData(info: UpdateInfo) {
         releaseDate: info.releaseDate,
         updateUrl: RELEASES_URL,
         manual: false,
+        installedVersion: version,
+        latestVersion: info.version,
     }
 }
 
 function githubUpdater() {
     // The packaged app-update.yml is generated from electron-builder.yml.
-    autoUpdater.autoDownload = true
+    autoUpdater.autoDownload = false
     autoUpdater.autoInstallOnAppQuit = true
     autoUpdater.allowPrerelease = false
     autoUpdater.allowDowngrade = false
@@ -330,11 +359,11 @@ function githubUpdater() {
         notifyConnectionError()
     })
     autoUpdater.on('checking-for-update', notifyCheckingUpdate)
-    autoUpdater.on('update-not-available', notifyUpToDate)
+    autoUpdater.on('update-not-available', (info: UpdateInfo) => notifyUpToDate(info.version))
     autoUpdater.on('update-available', (info: UpdateInfo) => {
         update = {
             notes: releaseData(info).releaseNotes,
-            name: info.releaseName || info.version,
+            name: info.version,
             pub_date: info.releaseDate,
             url: RELEASES_URL,
         }
@@ -345,6 +374,6 @@ function githubUpdater() {
     })
     autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
         mainWindow?.setProgressBar(-1)
-        sendUpdateStatus({ type: 'downloaded', data: releaseData(info) })
+        sendUpdateStatus({ type: 'downloaded', data: { ...releaseData(info), downloaded: true } })
     })
 }

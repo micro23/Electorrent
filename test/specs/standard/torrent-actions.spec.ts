@@ -171,7 +171,7 @@ describe("torrent actions", function () {
   })
 
   it("CmdOrCtrl+Delete shows the delete confirmation modal", async function () {
-    await $(torrent.query).click()
+    await torrent.select()
     await sendRemoveAndDeleteShortcut()
 
     const modal = $("#deleteTorrentModal")
@@ -195,7 +195,7 @@ describe("torrent actions", function () {
     const torrentToRemove = await this.app.uploadTorrent({ filename })
 
     await torrentToRemove.waitForExist({ timeout: 20 * 1000 })
-    await $(torrentToRemove.query).click()
+    await torrentToRemove.select()
     await sendRemoveShortcut()
     await torrentToRemove.waitForGone()
 
@@ -219,7 +219,7 @@ describe("torrent actions", function () {
     await this.app.torrentsPageIsVisible()
 
     try {
-      await $(torrentToDelete.query).click()
+      await torrentToDelete.select()
       await sendRemoveAndDeleteShortcut()
       await torrentToDelete.waitForGone()
       assert.isFalse(await $("#deleteTorrentModal").isDisplayed())

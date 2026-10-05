@@ -143,9 +143,9 @@ describe("settings", function () {
     const initialTheme = await this.app.getGeneralDropdownValue("Theme")
     const initialThemeHref = await this.app.getAppliedThemeHref()
     const availableThemes = this.app.getThemeOptions()
-    assert.deepEqual(availableThemes, ["System", "Light", "Dark"])
+    assert.includeMembers(availableThemes, ["System", "Paper", "Midnight", "Darkhand", "Terminal"])
     assert.include(availableThemes, initialTheme, `expected a supported theme, got: ${initialTheme}`)
-    const nextTheme = (initialThemeHref || "").includes("/dark.css") ? "Light" : "Dark"
+    const nextTheme = (initialThemeHref || "").includes("/dark.css") ? "Paper" : "Midnight"
 
     await this.app.selectGeneralDropdownValue("Theme", nextTheme)
     assert.equal(await this.app.getGeneralDropdownValue("Theme"), nextTheme)

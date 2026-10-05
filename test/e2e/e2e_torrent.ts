@@ -91,7 +91,7 @@ export class Torrent {
 
     const elem = $(this.query)
     await elem.waitForExist({ timeout: this.timeout })
-    await elem.click()
+    await this.select()
 
     const buttonElem = $(button)
     await buttonElem.waitForEnabled()
@@ -297,7 +297,7 @@ export class Torrent {
     const elem = $(this.query)
     await elem.waitForExist()
     await elem.waitForDisplayed()
-    await elem.click()
+    await this.select()
 
     const labelsElem = $("#torrent-action-header dropdown[data-role=labels]")
     await labelsElem.waitForDisplayed()
@@ -355,6 +355,15 @@ export class Torrent {
   async click(options: ClickOptions) {
     const elem = $(this.query)
     await elem.click(options)
+  }
+
+  async select() {
+    const checkbox = $(this.query).$(".terminal-row-check")
+    await checkbox.waitForClickable()
+    if (await checkbox.getAttribute("aria-pressed") !== "true") {
+      await checkbox.click()
+    }
+    await eventually(() => checkbox.getAttribute("aria-pressed")).equals("true")
   }
 
   async openContextMenu(options: Partial<ClickOptions> = { button: "right" }) {

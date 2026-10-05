@@ -9,6 +9,7 @@ import { parseServerAddressInput } from "../../src/shared/server-address"
 import { eventually } from "./eventually"
 import { waitForModalClose, waitForModalOpen } from "./modal"
 import type { ChainablePromiseElement } from "webdriverio"
+import { DECK_THEME_ORDER, DECK_THEME_TITLES } from "../../src/shared/deck-themes"
 
 /**
  * Options to use during the login screen of the app to connect to your torrent client
@@ -85,7 +86,16 @@ export class App {
 
   async torrentsPageIsVisible(opts?: { timeout: number }) {
     const pageTorrents = $("#page-torrents")
-    await pageTorrents.waitForDisplayed({ timeout: opts?.timeout ?? this.timeout })
+    try {
+      await pageTorrents.waitForDisplayed({ timeout: opts?.timeout ?? this.timeout })
+    } catch (error) {
+      const profile = await browser.electron.execute(electron => electron.app.getPath("userData"))
+      const log = path.join(profile, "logfile.log")
+      if (fs.existsSync(log)) {
+        console.error(fs.readFileSync(log, "utf8").split("\n").filter(line => line.includes("Bittorrent connection failed")).slice(-3).join("\n"))
+      }
+      throw error
+    }
   }
 
   async getTitleBarServerName(): Promise<string> {
@@ -664,8 +674,8 @@ export class App {
     return values.filter(Boolean)
   }
 
-  getThemeOptions(): readonly ["System", "Light", "Dark"] {
-    return ["System", "Light", "Dark"] as const
+  getThemeOptions(): string[] {
+    return ["System", ...DECK_THEME_ORDER.map(theme => DECK_THEME_TITLES[theme])]
   }
 
   async selectGeneralDropdownValue(settingName: string, optionText: string) {
