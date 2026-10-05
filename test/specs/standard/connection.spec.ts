@@ -129,7 +129,7 @@ describe("insecure tls connection", function () {
   configureSpec({ login: false })
 
   it("connects when certificate identity verification fails", async function () {
-    this.retries(3)
+    this.retries(0)
     await this.app.login({
       ...client,
       host: "127.0.0.1",
@@ -147,10 +147,10 @@ describe("tls connection host scheme", function () {
   configureSpec({ login: false })
 
   it("accepts a self-signed certificate when the host includes an https scheme", async function () {
-    this.retries(3)
+    this.retries(0)
     await this.app.login({
       ...client,
-      host: `https://${client.host}:${fixture.proxyPort}/`,
+      host: `https://localhost:${fixture.proxyPort}/`,
       https: false,
       port: 1,
     })
@@ -164,9 +164,10 @@ describe("tls connection", function () {
   configureSpec({ login: false })
 
   it("accepts a self-signed certificate", async function () {
-    this.retries(3)
+    this.retries(0)
     await this.app.login({
       ...client,
+      host: "localhost",
       https: true,
       port: fixture.proxyPort,
     })
