@@ -498,6 +498,13 @@ export class App {
         const centerY = rect.top + rect.height / 2
         const hit = document.elementFromPoint(centerX, centerY)
         const style = getComputedStyle(element)
+        const activeModals = Array.from(document.querySelectorAll(".ui.modal.active, .ui.active.modal")).map((modal) => ({
+          id: (modal as HTMLElement).id,
+          title: modal.querySelector(".header")?.textContent?.trim(),
+          text: modal.textContent?.trim().slice(0, 240),
+          display: getComputedStyle(modal).display,
+          visibility: getComputedStyle(modal).visibility,
+        }))
         return {
           selector: targetSelector,
           theme: document.documentElement.dataset.theme,
@@ -505,6 +512,7 @@ export class App {
           rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
           style: { display: style.display, visibility: style.visibility, opacity: style.opacity, pointerEvents: style.pointerEvents, zIndex: style.zIndex },
           hit: hit ? { tag: hit.tagName, id: (hit as HTMLElement).id, className: (hit as HTMLElement).className } : null,
+          activeModals,
         }
       }, settingsButtonSelector)
       console.log("Settings button clickability diagnostic:", JSON.stringify(diagnostic))
@@ -530,6 +538,7 @@ export class App {
     await saveBtn.waitForClickable()
     await saveBtn.click()
     await this.settingsPageIsHidden()
+    await $(".app-content > .overlay .ui.inverted.solid.dimmer").waitForDisplayed({ reverse: true })
   }
 
   async settingsCancel() {

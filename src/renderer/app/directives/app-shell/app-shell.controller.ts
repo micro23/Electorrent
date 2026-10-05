@@ -381,6 +381,10 @@ export class AppShellController {
 
         $scope.$on("show:torrents", () => {
             pageTorrents();
+            // Settings saves show a loading overlay while applying changes.
+            // A save does not necessarily change the torrent rows, so the
+            // repeat-render callback may never run to dismiss that overlay.
+            $rootScope.$broadcast("hide:loading");
         });
 
         $scope.$on("emit:new:settings", (event: unknown, data: unknown) => {
