@@ -50,6 +50,7 @@ describe("mock bulk torrent actions", function () {
     await this.app.openSettings()
     await this.app.settingsGotoTab("general")
     const terminalTheme = $("button[aria-label='Choose Terminal theme']")
+    await terminalTheme.scrollIntoView({ block: "center", inline: "nearest" })
     await terminalTheme.waitForClickable()
     await terminalTheme.click()
     await this.app.settingsSave()
@@ -96,7 +97,10 @@ describe("mock bulk torrent actions", function () {
 
   it("shows the bottom selection menu with clear transport labels in every theme", async function () {
     this.timeout(180000)
-    await $(`#torrentTable tbody tr[data-id='${torrents[0].hash}'] .terminal-row-check`).click()
+    const terminalCheckbox = $(`#torrentTable tbody tr[data-id='${torrents[0].hash}'] .terminal-row-check`)
+    await terminalCheckbox.scrollIntoView({ block: "center", inline: "nearest" })
+    await terminalCheckbox.waitForClickable()
+    await terminalCheckbox.click()
     const startIndex = DECK_THEME_ORDER.indexOf("terminal")
     for (let offset = 0; offset < DECK_THEME_ORDER.length; offset++) {
       const theme = DECK_THEME_ORDER[(startIndex + offset) % DECK_THEME_ORDER.length]

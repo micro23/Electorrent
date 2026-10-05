@@ -74,7 +74,7 @@ jobs:
     - name: Build web application
       run: npm run build
     - name: Run tests
-      run: xvfb-run -a -- npm test -- --client "${{ matrix.client }}" --parallel --headless
+      run: xvfb-run -a --server-args="-screen 0 1600x1200x24" -- npm test -- --client "${{ matrix.client }}" --parallel --headless
 
   build:
     strategy:
