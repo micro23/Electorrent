@@ -16,7 +16,7 @@ Torrent-Deck is a desktop remote-control application for managing torrents on cl
 
 Download published installers from [GitHub Releases](https://github.com/micro23/Torrent-Deck/releases). Releases provide macOS packages and a Windows installer. Linux support remains in the shared source and packaging configuration while its release builds are deferred.
 
-The macOS packages are unsigned because Apple Developer signing credentials are not configured. Torrent-Deck checks GitHub for updates and downloads the compatible DMG; macOS then requires you to open the DMG and replace Torrent-Deck in Applications. Windows checks GitHub and installs approved updates through its NSIS installer. Windows may show a SmartScreen warning because the installer is unsigned.
+The macOS packages are unsigned because Apple Developer signing credentials are not configured. Torrent-Deck checks GitHub for updates and downloads the compatible ZIP; open it and move the extracted app into Applications to replace Torrent-Deck. Windows checks GitHub and installs approved updates through its NSIS installer. Windows may show a SmartScreen warning because the installer is unsigned.
 
 Install Torrent-Deck and launch it once to register torrent files. Your existing fork profiles and certificates migrate into a separate Torrent-Deck profile. Updates are checked against the public [Torrent-Deck GitHub Releases](https://github.com/micro23/Torrent-Deck/releases). See [release and update details](docs/github-releases.md).
 
@@ -52,7 +52,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the changes from the original Electorrent t
 - Use native desktop notifications and configure certificate trust for self-signed HTTPS endpoints.
 - Choose from 38 bundled themes, including Darkhand, Terminal, Matrix, five redesigned core themes, and seasonal and sports styles. Theme assets and refreshed gallery previews are bundled locally.
 - Use the Darkhand dashboard’s live transfer statistics and history, and arrange statistics and torrent details to suit the window.
-- Check this project’s GitHub Releases from Help or Settings to compare the installed and latest versions, then choose Download Update. macOS offers the downloaded DMG for manual installation; platform-specific update behavior is described in the [release guide](docs/github-releases.md).
+- Check this project’s GitHub Releases from Help or Settings to compare the installed and latest versions, then choose Download Update. macOS offers the downloaded ZIP for manual installation; platform-specific update behavior is described in the [release guide](docs/github-releases.md).
 
 Feature availability can vary by client. Removing a torrent’s downloaded data is destructive, so check the confirmation and selected removal option before proceeding.
 

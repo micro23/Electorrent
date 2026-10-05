@@ -130,32 +130,22 @@ jobs:
       run: npm run dist -- --config.mac.identity=null --config.extraMetadata.manualMacUpdates=true
       env:
         CSC_IDENTITY_AUTO_DISCOVERY: false
-    - name: Set up Python for Windows asset archive
+    - name: Upload Windows installer and update metadata
       if: runner.os == 'Windows'
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.x'
-    - name: Package identity assets on Windows
-      if: runner.os == 'Windows'
-      run: python scripts/package-brand-assets.py
-    - name: Package identity assets on macOS/Linux
-      if: runner.os != 'Windows'
-      run: python3 scripts/package-brand-assets.py
-    - name: Upload distribution
       uses: actions/upload-artifact@v7
       with:
         name: torrent-deck-dist-${{ runner.os }}
         path: |
           dist/*.exe
-          dist/*.dmg
-          dist/*.zip
-          dist/*.AppImage
-          dist/*.deb
-          dist/*.rpm
-          dist/*.snap
           dist/*.blockmap
           dist/latest*.yml
-          dist/Torrent-Deck-Icons.zip
+        if-no-files-found: error
+    - name: Upload macOS architecture ZIPs
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v7
+      with:
+        name: torrent-deck-dist-${{ runner.os }}
+        path: dist/*.zip
         if-no-files-found: error
 
   release:

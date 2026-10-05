@@ -91,17 +91,18 @@ test('release configuration points all platforms at the fork and provides update
   assert.equal(config.publish[0].owner, 'micro23')
   assert.equal(config.publish[0].repo, 'Torrent-Deck')
   assert.equal(config.win.target, 'nsis')
+  assert.equal(config.mac.target.some(target => target.target === 'dmg'), false)
   assert.ok(config.mac.target.some(target => target.target === 'zip'))
   assert.ok(config.linux.target.includes('AppImage'))
 })
 
 
-test('unsigned macOS downloads a compatible DMG and requires manual installation', () => {
-  const download = 'https://github.com/micro23/Torrent-Deck/releases/download/v2.18.0/Torrent-Deck-2.18.0-macOS-arm64.dmg'
+test('unsigned macOS downloads a compatible ZIP and requires manual installation', () => {
+  const download = 'https://github.com/micro23/Torrent-Deck/releases/download/v2.18.0/Torrent-Deck-2.18.0-macOS-arm64.zip'
   const f = fixture(true, {
     tag_name: 'v2.18.0', body: 'Release notes', published_at: '2026-10-04',
     html_url: 'https://github.com/micro23/Torrent-Deck/releases/tag/v2.18.0',
-    assets: [{ name: 'Torrent-Deck-2.18.0-macOS-arm64.dmg', browser_download_url: download }],
+    assets: [{ name: 'Torrent-Deck-2.18.0-macOS-arm64.zip', browser_download_url: download }],
   })
   f.api.initialise(f.window)
   f.api.checkForUpdates(true)
@@ -113,7 +114,7 @@ test('unsigned macOS downloads a compatible DMG and requires manual installation
   assert.equal(f.checks(), 0)
 })
 
-test('unsigned macOS rejects releases without compatible installers', () => {
+test('unsigned macOS rejects releases without compatible ZIPs', () => {
   const f = fixture(true, { tag_name: 'v2.18.0', assets: [] })
   f.api.initialise(f.window)
   f.api.checkForUpdates(true)

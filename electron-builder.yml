@@ -38,10 +38,6 @@ mac:
           public.filename-extension: torrent
           public.mime-type: application/x-bittorrent
   target:
-    - target: dmg
-      arch:
-        - universal
-        - arm64
     - target: zip
       arch:
         - universal
