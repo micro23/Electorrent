@@ -485,9 +485,30 @@ export class App {
     }
 
     const headerSettingsButton = $('button[data-role="show-settings"]')
-    const settingsButton = await headerSettingsButton.isDisplayed() && await headerSettingsButton.isClickable()
-      ? headerSettingsButton : $(".terminal-preferences")
+    const settingsButtonSelector = await headerSettingsButton.isDisplayed() && await headerSettingsButton.isClickable()
+      ? 'button[data-role="show-settings"]' : ".terminal-preferences"
+    const settingsButton = $(settingsButtonSelector)
     await settingsButton.waitForDisplayed()
+    if (!(await settingsButton.isClickable())) {
+      const diagnostic = await browser.execute((targetSelector) => {
+        const element = document.querySelector(targetSelector)
+        if (!element) return { selector: targetSelector, missing: true }
+        const rect = element.getBoundingClientRect()
+        const centerX = rect.left + rect.width / 2
+        const centerY = rect.top + rect.height / 2
+        const hit = document.elementFromPoint(centerX, centerY)
+        const style = getComputedStyle(element)
+        return {
+          selector: targetSelector,
+          theme: document.documentElement.dataset.theme,
+          sidebarCollapsed: document.querySelector("#page-torrents")?.classList.contains("is-sidebar-collapsed"),
+          rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+          style: { display: style.display, visibility: style.visibility, opacity: style.opacity, pointerEvents: style.pointerEvents, zIndex: style.zIndex },
+          hit: hit ? { tag: hit.tagName, id: (hit as HTMLElement).id, className: (hit as HTMLElement).className } : null,
+        }
+      }, settingsButtonSelector)
+      console.log("Settings button clickability diagnostic:", JSON.stringify(diagnostic))
+    }
     await settingsButton.waitForClickable()
     await settingsButton.click()
     await this.settingsPageIsVisible()
