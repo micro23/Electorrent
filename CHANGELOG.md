@@ -1,5 +1,11 @@
 # Changes since the Electorrent fork
 
+## 2.19.5 — complete Deck theme refresh
+
+- Import the latest Deluge Deck shared sidebar, sizing, tablet, and mobile theme layers, while preserving Darkhand and Terminal.
+- Show authentic stadium photography in every sports-team masthead.
+- Publish the Windows installer now; universal macOS packages remain gated on signing and notarization credentials.
+
 ## 2.19.4 — Deluge Deck theme sync
 
 - Sync the desktop theme materials and sports venue artwork with Deluge Deck 1.0.95.

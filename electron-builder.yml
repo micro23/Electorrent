@@ -43,7 +43,6 @@ mac:
     - target: zip
       arch:
         - universal
-        - arm64
 win:
   artifactName: "${productName}-${version}-Windows-${arch}.${ext}"
   target: nsis
