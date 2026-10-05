@@ -8,6 +8,7 @@
     </div>
     <div class="content">
         <form id="upload-torrent-form" ng-submit="ctl.uploadCurrentTorrent()">
+            <div class="ui negative message" ng-if="ctl.uploadError" role="alert">{{ ctl.uploadError }}</div>
             <h4 class="ui header upload-torrent-heading">
                 <span class="upload-torrent-name">{{ ctl.getCurrentTorrentUploadLabel() }}</span>
                 <span class="upload-torrent-size">{{ ctl.getCurrentTorrentUploadSize() | bytes }}</span>

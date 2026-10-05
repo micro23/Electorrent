@@ -15,13 +15,15 @@ npm run lint
 ```
 
 ## Test
+Current user policy: run only Deluge client tests until the user explicitly requests other clients. Maintain shared Windows/macOS/Linux source, but compile release installers for macOS only. Do not modify the separate Deluge Deck reference project.
+
 Pick one of the following test strategies from context:
 * If user requested particular tests -> run requested targeted test
 * Search for relevant test spec -> run relevant targeted tests
 * Otherwise, if no relevant tests found -> run smoketest
 
 ### Targeted test
-* <client>: affected bittorrent client or `qbittorrent:latest` by default
+* <client>: `deluge:2` by default; other clients require an explicit user request
 * <spec>: a spec file in the directory `test/specs`
 ```shell
 npm run test -- --client "<client>" --spec "<spec>" --headless

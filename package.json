@@ -20,9 +20,9 @@
     "release": "electron-builder",
     "version": "node ./scripts/sync-app-version.js && git add app/package.json",
     "test": "node scripts/run-tests.mjs",
-    "smoketest": "npm test -- --client mock --spec test/specs/mock/headless-window.spec.ts --spec test/specs/mock/bulk-torrent-actions.spec.ts --headless",
+    "smoketest": "npm test -- --client deluge:2 --spec test/specs/standard/torrent-uploads.spec.ts --headless",
     "lint": "eslint ./src ./test ./wdio.conf.ts && tsc --build",
-    "smoketest:integration": "npm test -- --client qbittorrent:latest --mochaOpts.grep \"torrent is stopped and resumed\" --headless"
+    "smoketest:integration": "npm test -- --client deluge:2 --mochaOpts.grep \"torrent is stopped and resumed\" --headless"
   },
   "keywords": [
     "utorrent"

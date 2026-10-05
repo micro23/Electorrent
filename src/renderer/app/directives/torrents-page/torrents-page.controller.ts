@@ -255,10 +255,18 @@ export class TorrentsPageController {
 
             if (shouldPromptForUploadOptions(item, askUploadOptions)) {
                 $scope.pendingTorrentFiles.push(item);
-            } else if (item.type === "file") {
-                await $scope.uploadTorrent(item.data, item.filename, undefined, item.sourcePath);
             } else {
-                await $scope.uploadTorrentURL(item.uri);
+                try {
+                    if (item.type === "file") {
+                        await $scope.uploadTorrent(item.data, item.filename, undefined, item.sourcePath);
+                    } else {
+                        await $scope.uploadTorrentURL(item.uri);
+                    }
+                } catch (error) {
+                    // Preserve automatic uploads for correction and retry in the add dialog.
+                    $scope.pendingTorrentFiles.push(item);
+                    $notify.alert("Could not add torrent", error instanceof Error ? error.message : String(error));
+                }
             }
 
             $scope.$applyAsync();
@@ -306,21 +314,23 @@ export class TorrentsPageController {
 
         $scope.uploadTorrent = async (torrent: Uint8Array, filename: string, options?: TorrentUploadOptions, sourcePath?: string) => {
             try {
-                await $rootScope.$btclient?.uploadTorrent(torrent, filename, options, sourcePath);
+                if (!$rootScope.$btclient) throw new Error("Connect to a torrent server before adding a torrent.");
+                await $rootScope.$btclient.uploadTorrent(torrent, filename, options, sourcePath);
                 void syncAfterTorrentMutation();
             } catch (e) {
-                $notify.alert("Could not upload torrent", "The torrent could not be uploaded to the server");
                 console.error(e);
+                throw e;
             }
         };
 
         $scope.uploadTorrentURL = async (uri: string, options?: TorrentUploadOptions) => {
             try {
-                await $rootScope.$btclient?.addTorrentUrl(uri, options);
+                if (!$rootScope.$btclient) throw new Error("Connect to a torrent server before adding a torrent.");
+                await $rootScope.$btclient.addTorrentUrl(uri, options);
                 void syncAfterTorrentMutation();
             } catch (err) {
-                $notify.alert("Upload failed", "The torrent link could not be uploaded");
                 console.error(err);
+                throw err;
             }
         };
 

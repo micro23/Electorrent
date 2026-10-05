@@ -90,10 +90,10 @@ Useful checks during development:
 ```sh
 npm run lint
 npm run build
-npm run smoketest
+npm test -- --client deluge:2 --spec test/specs/standard/torrent-uploads.spec.ts --headless
 ```
 
-For client integration tests and release validation, see [docs/github-releases.md](docs/github-releases.md). Packaging for Windows and Linux is deferred while the macOS release is being stabilized.
+Client testing currently targets Deluge only. Other client tests require an explicit request. Cross-platform source support is maintained, while Windows and Linux packaging is deferred during macOS refinement. See [docs/github-releases.md](docs/github-releases.md) for release validation.
 
 ## Contributing
 

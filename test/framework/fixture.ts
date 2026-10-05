@@ -6,6 +6,7 @@ import path from "node:path"
 import { App, Torrent } from "../e2e"
 import { DockerComposeService } from "../shared/compose"
 import { setupMochaHooks, waitUntil } from "../testutil"
+import { restartApplication } from "../shared/app.hook"
 import type { TestClient } from "../clients"
 import type { ElectorrentBridge } from "../../src/shared/ipc-contract"
 import { createDefaultSettings } from "../../src/shared/settings-defaults"
@@ -50,7 +51,7 @@ export function configureSpec(options: { login?: boolean, clearTorrents?: boolea
     }, createDefaultSettings())
     fs.rmSync(path.join(userDataPath, "certs"), { recursive: true, force: true })
     await browser.execute(() => window.localStorage.clear())
-    await browser.url(await browser.getUrl())
+    await restartApplication(this)
 
     current.app = new App()
     this.app = current.app

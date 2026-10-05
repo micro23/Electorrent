@@ -114,8 +114,6 @@ export class DelugeRuntime implements BittorrentRuntime {
 
     private rpcUrl = ""
 
-    private uploadUrl = ""
-
     private requestOptions: Record<string, any> = {}
 
     private supportsLabels = false
@@ -184,20 +182,6 @@ export class DelugeRuntime implements BittorrentRuntime {
         })
     }
 
-    private uploadTorrentPayload(torrent: Uint8Array | Buffer, cb: (err: any, body?: any) => void) {
-        const uploadRequest = request({
-            ...this.requestOptions,
-            method: "POST",
-            url: this.uploadUrl,
-            json: true,
-            gzip: true,
-        }, (err: any, _res: any, body: any) => cb(err, body))
-
-        uploadRequest.form().append("file", Buffer.isBuffer(torrent) ? torrent : Buffer.from(torrent), {
-            contentType: "application/x-bittorrent",
-        })
-    }
-
     private addUploadedTorrent(path: string, config: Record<string, any> | undefined, cb: (err: any, value?: any) => void) {
         const options: Record<string, any> = {
             file_priorities: [],
@@ -257,7 +241,6 @@ export class DelugeRuntime implements BittorrentRuntime {
 
     async connect(server: BittorrentServerConfig): Promise<TorrentClientConnection> {
         this.rpcUrl = this.url(server, "json")
-        this.uploadUrl = this.url(server, "upload")
         this.requestId = 0
         this.requestOptions = {
             timeout: HTTP_REQUEST_TIMEOUT,
@@ -535,18 +518,18 @@ export class DelugeRuntime implements BittorrentRuntime {
         await this.applyUploadedTorrentLabel(torrentInfo?.info_hash, uploadOptions.label)
     }
 
-    async uploadTorrent(buffer: Uint8Array, _filename: string, options?: Record<string, any>): Promise<void> {
-        const uploadResponse = await defer<any>((done) => this.uploadTorrentPayload(buffer, done))
-        const uploadPath = uploadResponse?.files?.[0]
-
-        if (!uploadPath) {
-            throw new Error("Deluge upload did not return a torrent path")
-        }
-
+    async uploadTorrent(buffer: Uint8Array, filename: string, options?: Record<string, any>): Promise<void> {
         const uploadOptions = this.getUploadOptions(options)
-        const hash = parseTorrent(Buffer.from(buffer)).infoHash
-        await defer((done) => this.addUploadedTorrent(uploadPath, uploadOptions, done))
-        await this.applyUploadedTorrentLabel(hash, uploadOptions.label)
+        const { label, ...torrentOptions } = uploadOptions
+        // Use the same authenticated JSON endpoint as every other core action.
+        // A reverse proxy may expose /json without forwarding Deluge's /upload.
+        const hash = await defer<string>((done) => this.rpc("core.add_torrent_file", [
+            filename || "upload.torrent", Buffer.from(buffer).toString("base64"), torrentOptions,
+        ], done))
+        if (!hash) {
+            throw new Error("Deluge did not add the torrent. It may already exist or the torrent file may be invalid.")
+        }
+        await this.applyUploadedTorrentLabel(hash, label)
     }
 
     resume(hashes: string[]): Promise<void> {

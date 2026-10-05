@@ -19,6 +19,6 @@ The release repository must be publicly readable. No GitHub access token is embe
 
 ## Validation
 
-Run `npm run lint`, `npm run build`, `node --test test/unit/*.test.cjs`, and `npm test -- --client mock --headless`.
+Run `npm run lint`, `npm run build`, and focused Deluge tests: `npm test -- --client deluge:2 --spec test/specs/standard/torrent-uploads.spec.ts --headless`.
 
-The CI matrix exercises the supported clients, and the macOS build job produces the unsigned installers. Local mocked tests cannot verify macOS Gatekeeper behavior or an older-to-newer manual DMG installation. Windows and Linux installer upgrades should be tested when release builds for those systems resume.
+CI defaults to Deluge 2 only, and the macOS build job produces unsigned installers. Do not run other client tests until explicitly requested. Cross-platform source and packaging configurations remain maintained. Integration tests cannot verify macOS Gatekeeper behavior or an older-to-newer manual DMG installation. Windows and Linux installer upgrades should be tested when release builds for those systems resume.

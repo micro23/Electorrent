@@ -20,6 +20,7 @@ export class AddTorrentModalController {
     uploadOptions: TorrentUploadOptions
     isLoading: boolean
     activeTab: "general" | "files" = "general"
+    uploadError = ""
     private preserveUploadsOnHide: boolean
     private restoreUploadOptionsOnShow: boolean
 
@@ -42,6 +43,7 @@ export class AddTorrentModalController {
     }
 
     onShow() {
+        this.uploadError = ""
         if (this.restoreUploadOptionsOnShow) {
             this.restoreUploadOptionsOnShow = false
             return
@@ -131,8 +133,10 @@ export class AddTorrentModalController {
     }
 
     async uploadCurrentTorrent() {
+        if (this.isLoading) return
         try {
             this.isLoading = true
+            this.uploadError = ""
             const torrent = this.getCurrentTorrentUpload()
             if (torrent.type === 'file') {
                 await this.performTorrentUpload(torrent.data, torrent.filename, this.uploadOptions, torrent.sourcePath)
@@ -145,8 +149,11 @@ export class AddTorrentModalController {
             } else {
                 this.onShow()
             }
+        } catch (error) {
+            this.uploadError = error instanceof Error ? error.message : String(error)
         } finally {
             this.isLoading = false
+            this.scope.$applyAsync()
         }
     }
 

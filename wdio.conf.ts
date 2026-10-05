@@ -41,7 +41,7 @@ if (unknownClientKeys.length) {
 
 const selectedClients = selectedClientKeys.length
     ? selectedClientKeys.map((key) => TEST_CLIENTS[key as keyof typeof TEST_CLIENTS])
-    : Object.values(TEST_CLIENTS)
+    : [TEST_CLIENTS['deluge:2']]
 const workerClientLabels = new Map<string, string>()
 const specReporterPath = fileURLToPath(new URL('./test/framework/spec-reporter.ts', import.meta.url))
 

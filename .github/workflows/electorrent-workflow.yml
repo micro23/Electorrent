@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       clients:
-        description: 'JSON array of clients to test; empty runs the full matrix'
+        description: 'JSON array of explicitly requested clients; empty tests Deluge only'
         required: false
         default: ''
       spec:
@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        client: ${{ fromJSON(inputs.clients || '["aria2","mock","qbittorrent:4","qbittorrent:5","qbittorrent:latest","rtorrent","rtorrent:latest","transmission","deluge:1","deluge:2","utorrent"]') }}
+        client: ${{ fromJSON(inputs.clients || '["deluge:2"]') }}
 
     steps:
     - name: Checkout source code
@@ -68,7 +68,7 @@ jobs:
     - name: Lint
       run: npm run lint
     - name: Test GitHub updater
-      run: node --test test/unit/*.test.cjs
+      run: node --test test/unit/github-updater.test.cjs test/unit/torrent-state.test.cjs test/unit/server-origin.test.cjs test/unit/deluge-upload.test.cjs
     - name: Build web application
       run: npm run build
     - name: Run tests
