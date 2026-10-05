@@ -132,6 +132,41 @@ export abstract class Torrent implements TorrentProps {
         return link;
     };
 
+    trackerFaviconUrl(): string {
+        const torrent = this as Torrent & { tracker?: unknown; trackerHost?: unknown; trackers?: unknown; trackerFavicon?: unknown }
+        const candidates: unknown[] = [torrent.trackerFavicon, torrent.trackerHost, torrent.tracker]
+        if (Array.isArray(torrent.trackers)) {
+            candidates.push(...torrent.trackers.map((tracker: unknown) => {
+                if (typeof tracker === "string") return tracker
+                if (tracker && typeof tracker === "object") {
+                    const entry = tracker as Record<string, unknown>
+                    return entry.announce || entry.url || entry.host
+                }
+                return undefined
+            }))
+        }
+        if (typeof this.props?.trackers === "string") candidates.push(...this.props.trackers.split(/[\r\n]+/))
+
+        for (const candidate of candidates) {
+            const tracker = Array.isArray(candidate) ? candidate[0] : candidate
+            if (typeof tracker !== "string" || !tracker.trim()) continue
+
+            try {
+                const value = tracker.trim()
+                const url = new URL(/^[a-z][a-z\d+.-]*:\/\//i.test(value) ? value : `https://${value}`)
+                const hostname = url.hostname.toLowerCase()
+                const privateIpv4 = /^(?:10\.|127\.|169\.254\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/.test(hostname)
+                const privateSuffix = /\.(?:local|internal|lan|home|test|localhost)$/.test(hostname)
+                if (!hostname.includes(".") || hostname === "localhost" || privateIpv4 || privateSuffix) continue
+                return `https://${hostname}/favicon.ico`
+            } catch {
+                // Some clients expose a display label instead of a tracker URL.
+            }
+        }
+
+        return ""
+    }
+
 
     abstract isStatusError(): boolean;
     abstract isStatusPaused(): boolean;
@@ -237,7 +272,7 @@ export abstract class Torrent implements TorrentProps {
     static COL_NAME = new Column({
       name: 'Torrent',
       enabled: true,
-      template: '<span class="terminal-name-cell"><button type="button" class="terminal-row-check" ng-click="toggleTerminalSelection($event, torrent)" ng-attr-aria-pressed="{{torrent.selected}}" aria-label="Select torrent">{{torrent.selected ? "[✓]" : "[ ]"}}</button><span class="deck-row-state" ng-attr-title="{{torrent.manualStatusText()}}"><i class="icon" ng-class="{\'arrow down\': torrent.isStatusDownloading() && !torrent.isStatusChecking(), \'arrow up\': torrent.isStatusSeeding() && !torrent.isStatusChecking(), \'pause\': (torrent.isStatusPaused() || torrent.isStatusStopped()) && !torrent.isStatusChecking(), \'clock\': torrent.isStatusQueued() && !torrent.isStatusChecking(), \'refresh\': torrent.isStatusChecking(), \'exclamation triangle\': torrent.isStatusError()}"></i></span><span class="torrent-name-content">{{settings.ui.cleanNames ? torrent.decodedName : torrent.name}}</span></span>',
+      template: '<span class="terminal-name-cell"><button type="button" class="terminal-row-check" ng-click="toggleTerminalSelection($event, torrent)" ng-attr-aria-pressed="{{torrent.selected}}" aria-label="Select torrent">{{torrent.selected ? "[✓]" : "[ ]"}}</button><span class="deck-row-state" ng-attr-title="{{torrent.manualStatusText()}}"><i class="icon" ng-class="{\'arrow down\': torrent.isStatusDownloading() && !torrent.isStatusChecking(), \'arrow up\': torrent.isStatusSeeding() && !torrent.isStatusChecking(), \'pause\': (torrent.isStatusPaused() || torrent.isStatusStopped()) && !torrent.isStatusChecking(), \'clock\': torrent.isStatusQueued() && !torrent.isStatusChecking(), \'refresh\': torrent.isStatusChecking(), \'exclamation triangle\': torrent.isStatusError()}"></i></span><img class="tracker-favicon-small" ng-if="torrent.trackerFaviconUrl()" ng-src="{{torrent.trackerFaviconUrl()}}" alt="" aria-hidden="true" referrerpolicy="no-referrer" loading="lazy" hide-broken-image><span class="torrent-name-content">{{settings.ui.cleanNames ? torrent.decodedName : torrent.name}}</span></span>',
       attribute: 'decodedName',
       sort: Column.ALPHABETICAL
     })

@@ -1,5 +1,10 @@
 # Changes since the Electorrent fork
 
+## 2.19.2 — tracker favicons across themes
+
+- Restore tracker favicon icons in the shared torrent table so they appear consistently in every theme.
+- Derive safe HTTPS favicon URLs from tracker metadata and hide unavailable icons cleanly.
+
 ## 2.19.1 — renamed repository and desktop updates
 
 - Renamed the GitHub repository to `micro23/Torrent-Deck` and updated app metadata, release links, update feeds, workflow names, and documentation.
