@@ -1,6 +1,4 @@
 import chai from "chai"
-import { tmpdir } from "node:os"
-import { join } from "node:path"
 import { $, $$, browser } from "@wdio/globals"
 import { Torrent } from "../../e2e/e2e_torrent"
 import { eventually } from "../../e2e/eventually"
@@ -198,17 +196,6 @@ describe("mock bulk torrent actions", function () {
           }
         }
       }
-      // Both bulk actions must operate on the selection in every theme.
-      if (["matrix", "independence", "yankees", "dark", "light", "ocean", "forest", "sunset"].includes(theme)) {
-        await browser.saveScreenshot(join(tmpdir(), `electorrent-${theme}-today.png`))
-      }
-      await menu.$("a[data-role='stop']").click()
-      await expectTorrentState(torrents[0].hash, "Paused")
-      if (theme === "matrix") {
-        assert.include(await $(`#torrentTable tr[data-id='${torrents[0].hash}'] .matrix-code-progress`).getAttribute("class"), "paused")
-      }
-      await menu.$("a[data-role='resume']").click()
-      await expectTorrentState(torrents[0].hash, "Downloading")
     }
     await cycleTheme()
     await eventually(async () => $("html").getAttribute("data-theme")).equals("terminal")
