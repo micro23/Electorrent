@@ -72,6 +72,7 @@ The project uses Node.js (version specified in [`.nvmrc`](.nvmrc)), npm, TypeScr
 
 ```sh
 npm install
+npm run build
 npm run app
 ```
 
