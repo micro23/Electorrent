@@ -67,7 +67,9 @@ export class Aria2JsonRpcTransport {
     private readonly secret: string
 
     constructor(server: BittorrentServerConfig) {
-        this.endpoint = serverUrl(server)
+        const baseUrl = serverUrl(server)
+        const path = new URL(baseUrl).pathname.replace(/\/+$/, "")
+        this.endpoint = path.split("/").pop() === "jsonrpc" ? baseUrl : serverUrl(server, "jsonrpc")
         this.secret = server.password || ""
         this.http = axios.create({
             adapter: httpAdapter,
