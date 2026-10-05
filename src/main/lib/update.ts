@@ -70,12 +70,12 @@ export function manualQuitAndUpdate() {
     if (!downloadedUpdate) return
     const updatePath = downloadedUpdate
 
-    if (path.extname(updatePath).toLowerCase() === '.dmg') {
+    if (path.extname(updatePath).toLowerCase() === '.zip') {
         void shell.openPath(updatePath).then((error) => {
             if (!error) return
-            logger.error('Could not open downloaded macOS installer', error)
+            logger.error('Could not open downloaded macOS update', error)
             notifyConnectionError()
-            dialog.showErrorBox('Could not open installer', `Open the downloaded installer manually:\n${updatePath}`)
+            dialog.showErrorBox('Could not open update', `Open the downloaded ZIP manually:\n${updatePath}`)
         })
         return
     }
@@ -231,11 +231,11 @@ function manualMacUpdater() {
                 notifyUpToDate(newVersion)
                 return
             }
-            const suffix = process.arch === 'arm64' ? '-macOS-arm64.dmg' : '-macOS-universal.dmg'
+            const suffix = process.arch === 'arm64' ? '-macOS-arm64.zip' : '-macOS-universal.zip'
             const asset = release.assets.find((item: { name: string }) => item.name.endsWith(suffix))
-                || release.assets.find((item: { name: string }) => item.name.endsWith('-macOS-universal.dmg'))
+                || release.assets.find((item: { name: string }) => item.name.endsWith('-macOS-universal.zip'))
             if (!asset || !asset.browser_download_url.startsWith('https://github.com/micro23/Torrent-Deck/releases/download/')) {
-                throw new Error('Release has no compatible macOS installer')
+                throw new Error('Release has no compatible macOS ZIP')
             }
             update = { name: newVersion, notes: release.body, pub_date: release.published_at, url: release.html_url }
             pendingManualDownloadUrl = asset.browser_download_url

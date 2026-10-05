@@ -4,7 +4,7 @@ Install the new release and launch Torrent-Deck once. Renaming the source alone 
 
 ## macOS
 
-Drag **Torrent-Deck.app** from its DMG into `/Applications`, replacing the existing Torrent-Deck copy on future updates, then open it. It has its own bundle ID `com.github.micro23.torrentdeck` and registers the BitTorrent type and the extension's preferred UTI. The original Electorrent and other torrent clients retain their own identities and settings.
+Extract the macOS ZIP and move **Torrent-Deck.app** into `/Applications`, replacing the existing Torrent-Deck copy on future updates, then open it. It has its own bundle ID `com.github.micro23.torrentdeck` and registers the BitTorrent type and the extension's preferred UTI. The original Electorrent and other torrent clients retain their own identities and settings.
 
 Use Help → Make Torrent-Deck Default for Torrent Files if needed. If a particular file still opens elsewhere, Finder → Get Info → Open with → Torrent-Deck → Change All applies the Finder override. Quit an older running copy when manually replacing the app. Unsigned builds may need approval in System Settings.
 

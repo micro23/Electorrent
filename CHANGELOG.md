@@ -1,5 +1,11 @@
 # Changes since the Electorrent fork
 
+## 2.19.3 — streamlined downloads and update overlays
+
+- Ship one manual-update package format per platform: architecture-specific macOS ZIPs and the Windows NSIS installer with its required update metadata.
+- Download the matching macOS ZIP from the in-app updater and explain the manual replacement steps.
+- Keep the torrent drag-and-drop prompt above the page content and improve Darkhand lower-panel spacing.
+
 ## 2.19.2 — tracker favicons across themes
 
 - Restore tracker favicon icons in the shared torrent table so they appear consistently in every theme.

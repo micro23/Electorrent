@@ -7,6 +7,17 @@
             </h2>
         </div>
     </div>
+    <div ng-if="showDragAndDrop" class="popup animated">
+        <div class="content">
+            <h2 class="ui center aligned icon header">
+                <i class="add circle icon"></i>
+                Upload Torrent Files
+                <div class="sub header" ng-if="!settings.alwaysPromptUploadOptions && supportsUploadOptions()">
+                    Hold down <div class="ui label">{{ uploadAdvancedOptionsKey }}</div> key for advanced options
+                </div>
+            </h2>
+        </div>
+    </div>
     <torrent-sidebar
         settings="settings"
         features="$btclient.features"
@@ -195,17 +206,6 @@
             </div>
         </section>
         <div class="main-content" limit-bind="torrentLimit">
-            <div ng-if="showDragAndDrop" class="popup animated">
-                <div class="content">
-                    <h2 class="ui center aligned icon header">
-                        <i class="add circle icon"></i>
-                        Upload Torrent Files
-                        <div class="sub header" ng-if="!settings.alwaysPromptUploadOptions && supportsUploadOptions()">
-                            Hold down <div class="ui label">{{ uploadAdvancedOptionsKey }}</div> key for advanced options
-                        </div>
-                    </h2>
-                </div>
-            </div>
             <div infinite-scroll-parent="true" infinite-scroll="showMore()" infinite-scroll-distance="0.5">
                 <table
                     id="torrentTable"
