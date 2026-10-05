@@ -54,13 +54,13 @@
                 <div class="ui torrent sort label">{{ctl.numInStatus('seeding')}}</div>
             </li>
             <li class="nav-item" data-state="finished" title="Finished" ng-click="ctl.selectStatus('finished')" ng-class="ctl.activeOn('finished')">
-                <i class="check circle icon"></i>
-                <span class="sidebar-item-label">Finished</span>
+                <i class="ui large check circle icon"></i>
+                <span class="torrent-sidebar-item-label">Finished</span>
                 <div class="ui torrent sort label">{{ctl.numInStatus('finished')}}</div>
             </li>
             <li class="nav-item" data-state="stopped" title="Stopped" ng-click="ctl.selectStatus('stopped')" ng-class="ctl.activeOn('stopped')">
-                <i class="stop icon"></i>
-                <span class="sidebar-item-label">Stopped</span>
+                <i class="ui large stop icon"></i>
+                <span class="torrent-sidebar-item-label">Stopped</span>
                 <div class="ui torrent sort label">{{ctl.numInStatus('stopped')}}</div>
             </li>
             <li class="nav-item" data-state="paused" title="Paused" ng-click="ctl.selectStatus('paused')" ng-class="ctl.activeOn('paused')">
