@@ -485,7 +485,7 @@ export class App {
     }
 
     const headerSettingsButton = $('button[data-role="show-settings"]')
-    const settingsButton = await headerSettingsButton.isDisplayed()
+    const settingsButton = await headerSettingsButton.isDisplayed() && await headerSettingsButton.isClickable()
       ? headerSettingsButton : $(".terminal-preferences")
     await settingsButton.waitForDisplayed()
     await settingsButton.waitForClickable()
