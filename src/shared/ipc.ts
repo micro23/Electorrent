@@ -1,6 +1,7 @@
 export const IPC_CHANNELS = {
     app: {
         getMeta: 'app:get-meta',
+        claimTorrentFiles: 'app:claim-torrent-files',
         getDefaultProtocolStatus: 'app:get-default-protocol-status',
         setDefaultProtocolStatus: 'app:set-default-protocol-status',
         quit: 'app:quit',

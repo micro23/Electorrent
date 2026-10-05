@@ -190,9 +190,11 @@ export function deriveTitleMenu(state: TitleMenuState): TitleMenuItem[] {
     const helpItems: TitleMenuItem[] = [
         {
             label: "Learn More",
-            action: { type: "open-external", url: "https://github.com/tympanix/Electorrent" },
+            action: { type: "open-external", url: "https://github.com/micro23/Electorrent" },
         },
         { label: "Check For Updates", action: { type: "check-for-updates", verbose: true } },
+        { label: "Make Torrent-Deck Default for Torrent Files…", action: { type: "claim-torrent-files" } },
+        { label: "Original Electorrent & Credits", action: { type: "open-external", url: "https://github.com/micro23/Electorrent/blob/master/CREDITS.md" } },
     ]
 
     if (isDarwin) {

@@ -266,7 +266,7 @@
                 <details><summary>Custom</summary><form ng-submit="updateDeckChart()"><label>Minutes (up to 90 days)<input type="number" min="1" max="129600" step="1" ng-model="deckChartMinutes" required></label><button type="submit">Apply</button></form></details></header>
                 <div class="dh-chart-legend"><span>● Download <b>{{totalDownloadSpeed | speed}}</b></span><span>● Upload <b>{{totalUploadSpeed | speed}}</b></span></div>
                 <div class="dh-plot"><span>{{deckChartMax | speed}}</span><svg viewBox="0 0 700 125" preserveAspectRatio="none" role="img" aria-label="Transfer speeds; gaps indicate missing samples"><path d="M0 10H700M0 60H700M0 110H700" stroke="#262c37" stroke-dasharray="2 5" fill="none"></path><path ng-attr-d="{{deckHistoryPaths[0]}}" fill="none" stroke="#3ecf8e" stroke-width="1.8" vector-effect="non-scaling-stroke"></path><path ng-attr-d="{{deckHistoryPaths[1]}}" fill="none" stroke="#5b9dff" stroke-width="1.8" vector-effect="non-scaling-stroke"></path></svg><div class="dh-axis"><span>{{deckChartStart | date:'short'}}</span><span>{{deckChartNow | date:'short'}}</span></div></div>
-                <small class="dh-history-note">Recorded while Electorrent is open · saved per server{{connectionLost ? ' · connection interrupted' : ''}}</small>
+                <small class="dh-history-note">Recorded while Torrent-Deck is open · saved per server{{connectionLost ? ' · connection interrupted' : ''}}</small>
             </section>
         </div>
         <torrent-details-panel></torrent-details-panel>
@@ -334,7 +334,7 @@
         </div>
         <div class="content">
             <p>{{ getDeleteConfirmationMessage() }}</p>
-            <p ng-if="deleteConfirmation.mode === 'remove-options' &amp;&amp; !deleteConfirmation.deleteDataAction">This client does not offer file deletion through Electorrent.</p>
+            <p ng-if="deleteConfirmation.mode === 'remove-options' &amp;&amp; !deleteConfirmation.deleteDataAction">This client does not offer file deletion through Torrent-Deck.</p>
         </div>
         <div class="actions">
             <button type="button" class="ui black deny button">

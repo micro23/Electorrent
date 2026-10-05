@@ -98,14 +98,19 @@ export async function serializeTorrentFile(filePath: string, askUploadOptions: b
     const data = await fs.promises.readFile(filePath)
     const torrentData = new Uint8Array(data)
 
-    return {
+    const torrent: PendingTorrentUploadFile = {
         type: 'file',
         filename: path.basename(filePath),
         data: torrentData,
         sourcePath: filePath,
         askUploadOptions: !!askUploadOptions,
-        metadata: parse({ data: torrentData }),
     }
+    try {
+        torrent.metadata = parse({ data: torrentData })
+    } catch {
+        // Preview parsing must not prevent the server from accepting newer torrent formats.
+    }
+    return torrent
 }
 
 export async function readFiles(filepaths: string[], askUploadOptions: boolean) {

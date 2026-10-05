@@ -25,6 +25,7 @@ const electorrentBridge: ElectorrentBridge = {
         initialTheme,
         isTestEnvironment: nodeEnvironment === 'test',
         getMeta: () => invoke(IPC_CHANNELS.app.getMeta),
+        claimTorrentFiles: () => invoke(IPC_CHANNELS.app.claimTorrentFiles),
         getDefaultProtocolStatus: (protocol: string) => invoke(IPC_CHANNELS.app.getDefaultProtocolStatus, { protocol }),
         setDefaultProtocolStatus: (protocol: string, enabled: boolean) => invoke(IPC_CHANNELS.app.setDefaultProtocolStatus, { protocol, enabled }),
         quit: () => invoke(IPC_CHANNELS.app.quit),

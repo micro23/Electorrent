@@ -84,6 +84,9 @@ export function createMenuActionHandler({
             case "check-for-updates":
                 electorrent.updates.check(!!action.verbose);
                 break;
+            case "claim-torrent-files":
+                void electorrent.app.claimTorrentFiles();
+                break;
             case "connect-server":
                 {
                     const server = settingsService.getServer(action.serverId);

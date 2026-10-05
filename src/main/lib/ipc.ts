@@ -13,6 +13,7 @@ import * as settings from './settings'
 import themes, { getSystemTheme } from './themes'
 import * as torrents from './torrents'
 import * as updater from './update'
+import { reclaimTorrentFileAssociation } from './torrent-file-association'
 
 interface RegisterHandlersOptions {
     isDebug: boolean
@@ -101,6 +102,23 @@ function runEditCommand(window: BrowserWindow, command: EditCommand) {
 
 export function registerHandlers({ isDebug, forceTitleBarMenu, getWindow, consumePendingLaunchPayload, onSettingsSaved, onSystemThemeChanged, onBittorrentConnected }: RegisterHandlersOptions) {
     menu.configure({ isDebug })
+
+    ipcMain.handle(IPC_CHANNELS.app.claimTorrentFiles, async function() {
+        try {
+            const status = await reclaimTorrentFileAssociation(true)
+            await dialog.showMessageBox({
+                type: 'info', title: 'Torrent-Deck torrent files',
+                message: status === 'choose-in-settings'
+                    ? 'Choose Torrent-Deck for .torrent files in Windows Default Apps.'
+                    : status === 'newer-version'
+                        ? 'A newer installed Torrent-Deck version is already registered.'
+                        : 'Torrent-Deck is registered to open .torrent files.',
+            })
+        } catch (error) {
+            await dialog.showMessageBox({ type: 'error', title: 'Torrent file setup',
+                message: error instanceof Error ? error.message : String(error) })
+        }
+    })
 
     ipcMain.handle(IPC_CHANNELS.app.getMeta, async function() {
         return getAppMeta(isDebug, forceTitleBarMenu)

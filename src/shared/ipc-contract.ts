@@ -433,6 +433,7 @@ export type MenuAction =
     | { type: "paste-torrent-url"; askUploadOptions?: boolean }
     | { type: "open-external"; url: string }
     | { type: "check-for-updates"; verbose?: boolean }
+    | { type: "claim-torrent-files" }
     | { type: "connect-server"; serverId: string }
     | { type: "set-current-default-server" }
     | { type: "add-server" }
@@ -457,6 +458,7 @@ export interface ElectorrentBridge {
         initialTheme: ColorTheme
         isTestEnvironment: boolean
         getMeta(): Promise<AppMeta>
+        claimTorrentFiles(): Promise<void>
         getDefaultProtocolStatus(protocol: string): Promise<boolean>
         setDefaultProtocolStatus(protocol: string, enabled: boolean): Promise<void>
         quit(): Promise<void>

@@ -1,4 +1,4 @@
-name: Electorrent Release
+name: Torrent-Deck Release
 
 on:
   push:
@@ -68,7 +68,7 @@ jobs:
     - name: Lint
       run: npm run lint
     - name: Test GitHub updater
-      run: node --test test/unit/github-updater.test.cjs test/unit/torrent-state.test.cjs test/unit/server-origin.test.cjs test/unit/deluge-upload.test.cjs
+      run: node --test test/unit/github-updater.test.cjs test/unit/torrent-state.test.cjs test/unit/server-origin.test.cjs test/unit/deluge-upload.test.cjs test/unit/torrent-file-association.test.cjs test/unit/torrent-file-opening.test.cjs
     - name: Build web application
       run: npm run build
     - name: Run tests
@@ -122,6 +122,8 @@ jobs:
       run: npm run dist -- --config.mac.identity=null --config.extraMetadata.manualMacUpdates=true
       env:
         CSC_IDENTITY_AUTO_DISCOVERY: false
+    - name: Package identity assets
+      run: python3 scripts/package-brand-assets.py
     - name: Upload distribution
       uses: actions/upload-artifact@v7
       with:
@@ -160,6 +162,6 @@ jobs:
         if gh release view "$RELEASE_TAG" --json isDraft > release.json 2>/dev/null; then
           node -e 'if (!require("./release.json").isDraft) throw new Error("Refusing to overwrite a published release")'
         else
-          gh release create "$RELEASE_TAG" --verify-tag --draft --title "Electorrent ${RELEASE_TAG#v} — macOS" --generate-notes
+          gh release create "$RELEASE_TAG" --verify-tag --draft --title "Torrent-Deck ${RELEASE_TAG#v} — macOS" --generate-notes
         fi
         gh release upload "$RELEASE_TAG" release-assets/* --clobber

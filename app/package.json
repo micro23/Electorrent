@@ -1,8 +1,8 @@
 {
-  "name": "electorrent",
-  "productName": "Electorrent",
-  "version": "2.18.4",
-  "description": "A thin client for your torrenting needs",
+  "name": "torrent-deck",
+  "productName": "Torrent-Deck",
+  "version": "2.19.0",
+  "description": "A themed desktop remote client for managing torrents across your servers",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0"
@@ -12,7 +12,7 @@
     "url": "git+https://github.com/micro23/Electorrent.git"
   },
   "keywords": [
-    "Electorrent",
+    "Torrent-Deck",
     "Electron",
     "uTorrent",
     "Server",
@@ -24,9 +24,9 @@
   },
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/tympanix/Electorrent/issues"
+    "url": "https://github.com/micro23/Electorrent/issues"
   },
-  "homepage": "https://github.com/tympanix/Electorrent#readme",
+  "homepage": "https://github.com/micro23/Electorrent#readme",
   "dependencies": {
     "axios": "^0.24.0",
     "electron-is": "^3.0.0",

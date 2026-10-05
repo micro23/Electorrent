@@ -5,8 +5,12 @@ directories:
   buildResources: build
 toolsets:
   appimage: 1.0.3
-productName: Electorrent
-appId: com.github.micro23.electorrent
+productName: Torrent-Deck
+appId: com.github.micro23.torrentdeck
+executableName: torrent-deck
+extraResources:
+  - from: assets/torrent-deck.png
+    to: torrent-deck.png
 publish:
   - provider: github
     owner: micro23
@@ -18,7 +22,7 @@ mac:
   artifactName: "${productName}-${version}-macOS-${arch}.${ext}"
   category: public.app-category.utilities
   extendInfo:
-    NSLocalNetworkUsageDescription: Electorrent connects to torrent clients running on devices on your local network.
+    NSLocalNetworkUsageDescription: Torrent-Deck connects to torrent clients running on devices on your local network.
     CFBundleDocumentTypes:
       - CFBundleTypeName: BitTorrent document
         CFBundleTypeRole: Viewer
@@ -43,8 +47,10 @@ mac:
         - universal
         - arm64
 win:
+  artifactName: "${productName}-${version}-Windows-${arch}.${ext}"
   target: nsis
 linux:
+  artifactName: "${productName}-${version}-Linux-${arch}.${ext}"
   icon: build/png
   category: Network;FileTransfer;P2P;
   desktop:
@@ -61,7 +67,7 @@ extraFiles:
       - resources
 fileAssociations:
   - ext: torrent
-    name: Bittorrent Document
+    name: Torrent-Deck Torrent
     role: Viewer
     rank: Owner
     mimeType: application/x-bittorrent

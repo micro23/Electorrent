@@ -306,7 +306,7 @@ export class AppShellController {
                 $scope.statusText = "Loading Torrents";
                 settingsService.updateServer(server);
                 if (notifyOnConnect) {
-                    $notify.ok("Success!", "Hooray! Welcome to Electorrent");
+                    $notify.ok("Success!", "Hooray! Welcome to Torrent-Deck");
                 }
                 pageTorrents(true);
                 if (initialLaunchPayloadDelivered) {

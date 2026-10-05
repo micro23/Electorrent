@@ -206,7 +206,7 @@ function manualMacUpdater() {
     notifyCheckingUpdate()
     request({
         url: 'https://api.github.com/repos/micro23/Electorrent/releases/latest',
-        headers: { 'User-Agent': 'Electorrent', Accept: 'application/vnd.github+json' },
+        headers: { 'User-Agent': 'Torrent-Deck', Accept: 'application/vnd.github+json' },
         timeout: 15000,
     }, (error: Error | null, response: { statusCode: number }, body: string) => {
         if (error || !response || (response.statusCode !== 200 && response.statusCode !== 404)) {
@@ -264,11 +264,11 @@ function sendUpdateStatus(payload: unknown) {
 function notifyUpdateError() {
     sendUpdateStatus({
         type: 'error',
-        message: 'Could not update Electorrent. Please visit the website instead',
+        message: 'Could not update Torrent-Deck. Please visit the website instead',
     })
     notify({
         title: 'Update Error',
-        message: 'Could not update Electorrent. Please visit the website instead',
+        message: 'Could not update Torrent-Deck. Please visit the website instead',
         type: 'negative',
     })
 }
@@ -315,7 +315,7 @@ function notifyUpToDate(latestVersion = version) {
     })
     notify({
         title: 'Up to date!',
-        message: 'Your version of Electorrent is up to date',
+        message: 'Your version of Torrent-Deck is up to date',
         type: 'positive',
     })
 }

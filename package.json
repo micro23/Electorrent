@@ -1,7 +1,7 @@
 {
-  "name": "electorrent",
-  "version": "2.18.4",
-  "description": "A thin client for your torrenting needs",
+  "name": "torrent-deck",
+  "version": "2.19.0",
+  "description": "A themed desktop remote client for managing torrents across your servers",
   "type": "module",
   "main": "app/main.js",
   "license": "GPL-3.0",
@@ -133,5 +133,6 @@
   "overrides": {
     "form-data": "$form-data",
     "ip-address": "10.7.3"
-  }
+  },
+  "productName": "Torrent-Deck"
 }

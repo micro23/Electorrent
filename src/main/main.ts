@@ -15,6 +15,7 @@ import is from 'electron-is'
 import fs from 'fs'
 import path from 'path'
 import yargs from 'yargs'
+import semver from 'semver'
 
 import startup, { configureSystemStartup, shouldStartInBackground } from '@main/lib/startup'
 import { reclaimTorrentFileAssociation } from '@main/lib/torrent-file-association'
@@ -45,6 +46,7 @@ app.on('open-file', (event: ElectronEvent, filePath: string) => {
 })
 
 if (!startup) {
+    app.setName('Torrent-Deck')
     void bootstrap()
 }
 
@@ -57,8 +59,12 @@ async function bootstrap() {
         // The upstream app shares Electorrent's default userData folder. Electron
         // also uses that folder for its single-instance lock, so opening a torrent
         // could otherwise forward the file to the old app instead of this fork.
-        const previousUserData = app.getPath('userData')
-        const forkUserData = path.join(app.getPath('appData'), 'Electorrent-micro23')
+        const previousUserData = [
+            path.join(app.getPath('appData'), 'Electorrent-micro23'),
+            path.join(app.getPath('appData'), 'Electorrent'),
+            app.getPath('userData'),
+        ].find((directory) => fs.existsSync(path.join(directory, 'config.json'))) || app.getPath('userData')
+        const forkUserData = path.join(app.getPath('appData'), 'Torrent-Deck')
         fs.mkdirSync(forkUserData, { recursive: true })
         app.setPath('userData', forkUserData)
 
@@ -89,7 +95,7 @@ async function bootstrap() {
     const parser = yargs(process.argv.slice(1))
     parser.version(app.getVersion())
     parser.help('h').alias('h', 'help')
-    parser.usage(`Electorrent ${app.getVersion()}`)
+    parser.usage(`Torrent-Deck ${app.getVersion()}`)
     parser.boolean('v').alias('v', 'verbose').describe('v', 'Enable verbose logging')
     parser.boolean('d').alias('d', 'debug').describe('d', 'Start in debug mode')
     parser.boolean('force-title-bar-menu')
@@ -131,7 +137,7 @@ async function bootstrap() {
 
     registerContextMenuHandlers(() => torrentWindow)
 
-    logger.debug('Starting Electorrent in debug mode')
+    logger.debug('Starting Torrent-Deck in debug mode')
     logger.verbose('Verbose logging enabled')
 
     const program = parser.parse(process.argv.slice(1)) as { debug?: boolean; verbose?: boolean; forceTitleBarMenu?: boolean; updateUrl?: string }
@@ -372,7 +378,7 @@ async function bootstrap() {
         const isWindowVisible = !!torrentWindow && !torrentWindow.isDestroyed() && torrentWindow.isVisible()
         tray.setContextMenu(Menu.buildFromTemplate([
             {
-                label: isWindowVisible ? 'Hide Electorrent' : 'Show Electorrent',
+                label: isWindowVisible ? 'Hide Torrent-Deck' : 'Show Torrent-Deck',
                 click: () => {
                     if (isWindowVisible) {
                         hideTorrentWindow()
@@ -494,10 +500,17 @@ async function bootstrap() {
         },
     })
 
-    if (!app.requestSingleInstanceLock()) {
+    if (!app.requestSingleInstanceLock({ version: app.getVersion(), executable: process.execPath })) {
         app.quit()
     } else {
-        app.on('second-instance', function(_event: ElectronEvent, args: string[]) {
+        app.on('second-instance', function(_event: ElectronEvent, args: string[], _directory: string, launch: Record<string, unknown>) {
+            if (app.isPackaged && typeof launch?.version === 'string' && semver.valid(launch.version)
+                && semver.gt(launch.version, app.getVersion()) && typeof launch.executable === 'string'
+                && fs.existsSync(launch.executable)) {
+                app.relaunch({ execPath: launch.executable, args: args.slice(1) })
+                app.quit()
+                return
+            }
             queueAndFlushPendingLaunchArgs(args)
             if (!app.isReady()) {
                 return

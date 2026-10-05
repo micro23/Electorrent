@@ -21,7 +21,7 @@
         <p ng-if="data.status === 'available'">A new version is available. Download it when you’re ready.</p>
         <p ng-if="data.status === 'downloading'"><i class="spinner loading icon"></i> Downloading the update…</p>
         <p ng-if="data.status === 'error'">{{data.message}}</p>
-        <p ng-if="data.manual && data.status === 'downloaded'">Open the installer and drag Electorrent into Applications to replace the installed app.</p>
+        <p ng-if="data.manual && data.status === 'downloaded'">Open the installer and drag Torrent-Deck into Applications to replace the installed app.</p>
         <h4 ng-if="data.releaseNotes" class="ui horizontal divider header" style="margin-top: 14px">
             <i class="tag icon"></i>
             Release Notes
