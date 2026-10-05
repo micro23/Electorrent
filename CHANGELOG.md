@@ -1,5 +1,10 @@
 # Changes since the Electorrent fork
 
+## 2.19.6 — universal macOS and Windows release
+
+- Build and publish the Universal macOS ZIP alongside the Windows installer.
+- When signing credentials are unavailable, publish an unsigned macOS build and identify its Gatekeeper limitation.
+
 ## 2.19.5 — complete Deck theme refresh
 
 - Refresh theme materials from Deluge Deck 1.0.95 and show authentic stadium photography in every sports-team masthead.

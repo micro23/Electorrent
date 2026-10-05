@@ -1,7 +1,7 @@
 {
   "name": "torrent-deck",
   "productName": "Torrent-Deck",
-  "version": "2.19.5",
+  "version": "2.19.6",
   "description": "A themed desktop remote client for managing torrents across your servers",
   "main": "main.js",
   "scripts": {

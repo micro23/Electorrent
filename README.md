@@ -16,7 +16,7 @@ Torrent-Deck is a desktop remote-control application for managing torrents on cl
 
 Download published installers from [GitHub Releases](https://github.com/micro23/Torrent-Deck/releases). Releases provide macOS packages and a Windows installer. Linux support remains in the shared source and packaging configuration while its release builds are deferred.
 
-The currently published macOS packages are unsigned and may be blocked by Gatekeeper as damaged. Universal macOS releases require a Developer ID certificate and Apple notarization; when those credentials are unavailable, tagged releases publish Windows packages only. Signed macOS releases check GitHub for updates and download the compatible ZIP. Windows checks GitHub and installs approved updates through its NSIS installer. Windows may show a SmartScreen warning because the installer is unsigned.
+Universal macOS ZIPs are built for both Intel and Apple Silicon. When signing and notarization credentials are unavailable, the ZIP is unsigned and macOS may block it as damaged; signing is required for normal Gatekeeper-approved launching. Signed macOS releases check GitHub for updates and download the compatible ZIP. Windows checks GitHub and installs approved updates through its NSIS installer. Windows may show a SmartScreen warning because the installer is unsigned.
 
 Install Torrent-Deck and launch it once to register torrent files. Your existing fork profiles and certificates migrate into a separate Torrent-Deck profile. Updates are checked against the public [Torrent-Deck GitHub Releases](https://github.com/micro23/Torrent-Deck/releases). See [release and update details](docs/github-releases.md).
 
