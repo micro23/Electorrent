@@ -19,6 +19,7 @@ export default {
     key: "utorrent",
     clientId: "utorrent",
     features,
+    stopLabel: "Paused",
     fixture: "clients/utorrent",
     version: "latest",
     port: 58080,

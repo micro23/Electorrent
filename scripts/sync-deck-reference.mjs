@@ -13,6 +13,7 @@ const source = path.resolve(process.argv[2] || '.dream-loop/deck-latest');
 const target = 'src/renderer/styles/app/partials/deck-reference.less';
 const files = ['valentine','halloween','christmas','new-year','independence','core','signatures','matrix','independence-reference','sports-expansion','sports','darkhand','mets','sports-bespoke','yankees','sports-heritage'];
 if (fs.existsSync(path.join(source, 'src/themes/core-refined.css'))) files.push('core-refined');
+if (fs.existsSync(path.join(source, 'src/themes/forest.css'))) files.push('forest');
 if (files.includes('core-refined')) {
   const palettePath = 'src/renderer/styles/deck-palettes.less';
   const palettes = fs.readFileSync(palettePath, 'utf8').replace(/(:root\[data-theme="(?:dark|light|ocean|forest|sunset)"\]):not\(#dream-loop-skip\)/g, '$1');

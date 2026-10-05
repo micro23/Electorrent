@@ -55,7 +55,7 @@ A mock client is also included for development and testing; it is not a producti
 - Use native desktop notifications and configure certificate trust for self-signed HTTPS endpoints.
 - Choose from 38 bundled themes, including Darkhand, Terminal, Matrix, five redesigned core themes, and seasonal and sports styles. Theme assets and refreshed gallery previews are bundled locally.
 - Use the Darkhand dashboard’s live transfer statistics and history, and arrange statistics and torrent details to suit the window.
-- Receive release checks from this project’s GitHub Releases. macOS installs updates manually from a downloaded DMG; platform-specific update behavior is described in the [release guide](docs/github-releases.md).
+- Check this project’s GitHub Releases from Help or Settings to compare the installed and latest versions, then choose Download Update. macOS offers the downloaded DMG for manual installation; platform-specific update behavior is described in the [release guide](docs/github-releases.md).
 
 Feature availability can vary by client. Removing a torrent’s downloaded data is destructive, so check the confirmation and selected removal option before proceeding.
 

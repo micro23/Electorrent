@@ -56,7 +56,7 @@
             <label ng-if="showLabels">Port</label>
             <div class="ui left icon input">
                 <i class="sitemap icon"></i>
-                <input type="number" name="port" id="connection-port" ng-model="server.port" placeholder="Port" ng-disabled="hostLocks.port" />
+                <input type="number" name="port" id="connection-port" ng-model="server.port" placeholder="Port" min="1" max="65535" required ng-disabled="hostLocks.port" />
             </div>
         </div>
         <div class="ten wide field">

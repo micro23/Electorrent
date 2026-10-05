@@ -49,6 +49,7 @@ function electronCapability(client: (typeof selectedClients)[number]): Webdriver
     const testUserData = mkdtempSync(path.join(tmpdir(), 'electorrent-test-'))
     return {
         browserName: 'electron',
+        pageLoadStrategy: 'eager',
         'wdio:maxInstances': client.fixture ? concurrency : 1,
         'wdio:specs': client.specs ?? standardSpecs,
         'electorrent:client': client,
@@ -188,10 +189,10 @@ export const config: WebdriverIO.Config = {
     //
     // Default timeout in milliseconds for request
     // if browser driver or grid doesn't send response
-    connectionRetryTimeout: 120_000,
+    connectionRetryTimeout: 30_000,
     //
     // Default request retries count
-    connectionRetryCount: 3,
+    connectionRetryCount: 1,
     //
     // Test runner services
     // Services take over a specific job you don't want to take care of. They enhance
@@ -304,7 +305,8 @@ export const config: WebdriverIO.Config = {
      * @param {Array.<String>} specs        List of spec file paths that are to be run
      * @param {object}         browser      instance of created browser/device session
      */
-    before: function () {
+    before: async function () {
+        await browser.setTimeout({ pageLoad: 30_000 })
         const overwriteBrowserCommand = browser.overwriteCommand as (
             commandName: string,
             customCommand: (...args: unknown[]) => unknown,

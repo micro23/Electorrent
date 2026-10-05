@@ -358,6 +358,15 @@ export class Torrent {
   }
 
   async select() {
+    const targetId = await $(this.query).getAttribute("data-id")
+    for (const row of await $$("#torrentTable tr.active[data-id]")) {
+      if (await row.getAttribute("data-id") !== targetId) {
+        const selectedCheckbox = row.$(".terminal-row-check")
+        await selectedCheckbox.waitForClickable()
+        await selectedCheckbox.click()
+        await eventually(() => selectedCheckbox.getAttribute("aria-pressed")).equals("false")
+      }
+    }
     const checkbox = $(this.query).$(".terminal-row-check")
     await checkbox.waitForClickable()
     if (await checkbox.getAttribute("aria-pressed") !== "true") {

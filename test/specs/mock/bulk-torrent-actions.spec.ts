@@ -117,12 +117,19 @@ describe("mock bulk torrent actions", function () {
       await eventually(async () => $("html").getAttribute("data-theme")).equals(theme)
       await browser.pause(150)
       const core = DECK_CORE_THEMES[theme as keyof typeof DECK_CORE_THEMES]
-      if (core) {
+      if (core && theme !== "forest") {
         await eventually(async () => $(".core-masthead h1").getText()).equals(core)
         assert.equal(await $$(".deck-stat-icon .core-stat-icon").length, 4)
         const meter = $(`#torrentTable tr[data-id='${torrents[0].hash}'] .core-progress`)
         await meter.waitForDisplayed()
         assert.equal(await meter.$("clipPath rect").getAttribute("width"), "42%")
+      }
+      if (theme === "forest") {
+        await $(".forest-masthead").waitForDisplayed()
+        assert.equal(await $$(".deck-stat-icon .forest-stat-icon").length, 4)
+        const meter = $(`#torrentTable tr[data-id='${torrents[0].hash}'] .forest-progress`)
+        await meter.waitForDisplayed()
+        assert.equal(await meter.$("clipPath rect").getAttribute("width"), "84")
       }
       const club = DECK_SPORTS_CLUBS[theme as keyof typeof DECK_SPORTS_CLUBS]
       if (club) {

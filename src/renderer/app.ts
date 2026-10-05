@@ -130,6 +130,8 @@ import { SettingsPageDirective } from "@renderer/app/directives/settings-page/se
 torrentApp.directive("settingsPage", SettingsPageDirective.getInstance())
 import { SettingsGeneralDirective } from "@renderer/app/directives/settings-general/settings-general.directive"
 torrentApp.directive("settingsGeneral", SettingsGeneralDirective.getInstance())
+import { ForestArtworkDirective } from "@renderer/app/directives/forest-artwork/forest-artwork.directive"
+torrentApp.directive("forestArtwork", ForestArtworkDirective.getInstance())
 import { SettingsConnectionDirective } from "@renderer/app/directives/settings-connection/settings-connection.directive"
 torrentApp.directive("settingsConnection", SettingsConnectionDirective.getInstance())
 import { ConnectionFormDirective } from "@renderer/app/directives/connection-form/connection-form.directive"

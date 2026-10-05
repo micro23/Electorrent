@@ -4,6 +4,8 @@ Installed builds check public GitHub Releases on `micro23/Electorrent` using ele
 
 The electron-builder configuration retains Windows NSIS and Linux AppImage, DEB, RPM, and Snap targets for future releases; only macOS DMG and ZIP installers are built currently. Snap installations are managed by snapd. Users of upstream builds must install our fork once to switch update sources.
 
+Choose **Check for Updates** in Help or the Settings → General update card. The dialog displays the installed version and latest stable GitHub version, reports checking and error states, and offers **Download Update** when a newer version exists. After an unsigned macOS download finishes, choose **Open Downloaded Installer** and drag Electorrent into Applications. Other installer-supported platforms offer **Quit And Install** after download when their release builds resume.
+
 ## Publish a release
 
 1. Increase the version in both `package.json` and `app/package.json` (the existing `npm version` script synchronizes the app version).
@@ -17,6 +19,6 @@ The release repository must be publicly readable. No GitHub access token is embe
 
 ## Validation
 
-Run `npm run lint`, `npm run build`, `node --test test/unit/*.test.cjs`, and `npm test -- --client mock --headless --parallel`.
+Run `npm run lint`, `npm run build`, `node --test test/unit/*.test.cjs`, and `npm test -- --client mock --headless`.
 
 The CI matrix exercises the supported clients, and the macOS build job produces the unsigned installers. Local mocked tests cannot verify macOS Gatekeeper behavior or an older-to-newer manual DMG installation. Windows and Linux installer upgrades should be tested when release builds for those systems resume.

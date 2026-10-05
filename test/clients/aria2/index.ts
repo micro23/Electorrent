@@ -36,6 +36,7 @@ export default {
     clientId: "aria2",
     host: "127.0.0.1",
     features,
+    stopLabel: "Paused",
     fixture: "clients/aria2",
     version: "edge",
     port: 16800,

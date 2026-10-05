@@ -75,7 +75,11 @@ export class App {
     const portForm = $("#connection-port")
     await portForm.waitForDisplayed()
     if (!parsedHost.hasExplicitPort) {
-      await portForm.setValue(options.port);
+      await portForm.click()
+      await browser.keys([process.platform === "darwin" ? "Meta" : "Control", "a"])
+      await browser.keys("Backspace")
+      await portForm.addValue(String(options.port))
+      await eventually(() => portForm.getValue()).equals(String(options.port))
     }
 
     const submit = $("#connection-submit")

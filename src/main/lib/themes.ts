@@ -29,7 +29,7 @@ export function getSystemTheme(): ColorTheme {
 
 export function resolveTheme(theme?: ThemePreference): ColorTheme {
     if (theme === 'system' || !theme) return getSystemTheme()
-    return theme === 'light' || theme === 'dark' ? theme : theme === 'forest' || theme === 'valentine' || theme === 'st-patricks' ? 'light' : 'dark'
+    return theme === 'light' || theme === 'dark' ? theme : theme === 'valentine' || theme === 'st-patricks' ? 'light' : 'dark'
 }
 
 export default function themes(): ThemeInfo[] {

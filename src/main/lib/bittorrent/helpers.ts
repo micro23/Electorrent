@@ -29,11 +29,11 @@ export function urlPath(...pathValues: Array<string | undefined>) {
 
 export function serverOriginUrl(server: BittorrentServerConfig) {
     const sanitizedServer = sanitizeServerAddress(server)
-    const url = new URL("http://localhost")
-    url.protocol = `${sanitizedServer.proto.replace(/:$/, "")}:`
-    url.host = `${sanitizedServer.ip.includes(":") && !sanitizedServer.ip.startsWith("[") ? `[${sanitizedServer.ip}]` : sanitizedServer.ip}:${sanitizedServer.port}`
-
-    return url.origin
+    const host = sanitizedServer.ip.includes(":") && !sanitizedServer.ip.startsWith("[")
+        ? `[${sanitizedServer.ip}]` : sanitizedServer.ip
+    // Constructing the URL rejects invalid ports. Assigning URL.host silently
+    // kept the old localhost origin when a saved port was outside the TCP range.
+    return new URL(`${sanitizedServer.proto.replace(/:$/, "")}://${host}:${sanitizedServer.port}`).origin
 }
 
 export function serverUrl(server: BittorrentServerConfig, endpoint?: string) {
@@ -49,4 +49,3 @@ export function appendUrlPath(baseUrl: string, endpoint?: string) {
 
     return url.pathname === "/" ? url.origin : url.toString()
 }
-
