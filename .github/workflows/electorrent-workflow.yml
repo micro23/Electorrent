@@ -155,6 +155,6 @@ jobs:
         if gh release view "$RELEASE_TAG" --json isDraft > release.json 2>/dev/null; then
           node -e 'if (!require("./release.json").isDraft) throw new Error("Refusing to overwrite a published release")'
         else
-          gh release create "$RELEASE_TAG" --verify-tag --draft --title "$RELEASE_TAG" --generate-notes
+          gh release create "$RELEASE_TAG" --verify-tag --draft --title "Electorrent ${RELEASE_TAG#v} — macOS" --generate-notes
         fi
         gh release upload "$RELEASE_TAG" release-assets/* --clobber

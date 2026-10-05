@@ -88,11 +88,11 @@ test('release configuration points all platforms at the fork and provides update
 
 
 test('unsigned macOS downloads a compatible DMG and requires manual installation', () => {
-  const download = 'https://github.com/micro23/Electorrent/releases/download/v2.18.0/Electorrent-2.18.0-arm64.dmg'
+  const download = 'https://github.com/micro23/Electorrent/releases/download/v2.18.0/Electorrent-2.18.0-macOS-arm64.dmg'
   const f = fixture(true, {
     tag_name: 'v2.18.0', body: 'Release notes', published_at: '2026-10-04',
     html_url: 'https://github.com/micro23/Electorrent/releases/tag/v2.18.0',
-    assets: [{ name: 'Electorrent-2.18.0-arm64.dmg', browser_download_url: download }],
+    assets: [{ name: 'Electorrent-2.18.0-macOS-arm64.dmg', browser_download_url: download }],
   })
   f.api.initialise(f.window)
   f.api.checkForUpdates(true)

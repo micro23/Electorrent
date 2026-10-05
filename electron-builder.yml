@@ -15,6 +15,7 @@ publish:
 files:
   - '!**/*.map'
 mac:
+  artifactName: "${productName}-${version}-macOS-${arch}.${ext}"
   category: public.app-category.utilities
   extendInfo:
     NSLocalNetworkUsageDescription: Electorrent connects to torrent clients running on devices on your local network.

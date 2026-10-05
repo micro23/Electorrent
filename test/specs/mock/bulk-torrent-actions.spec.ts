@@ -15,6 +15,13 @@ const torrents = [
   { hash: "33".padStart(40, "0"), name: "Unselected torrent", state: "downloading" },
 ]
 
+async function cycleTheme() {
+  await browser.execute(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "t", bubbles: true }))
+  })
+}
+
 describe("mock bulk torrent actions", function () {
   configureSpec({ clearTorrents: false })
 
@@ -104,7 +111,11 @@ describe("mock bulk torrent actions", function () {
     const startIndex = DECK_THEME_ORDER.indexOf("terminal")
     for (let offset = 0; offset < DECK_THEME_ORDER.length; offset++) {
       const theme = DECK_THEME_ORDER[(startIndex + offset) % DECK_THEME_ORDER.length]
+      if (offset > 0) {
+        await cycleTheme()
+      }
       await eventually(async () => $("html").getAttribute("data-theme")).equals(theme)
+      await browser.pause(150)
       const core = DECK_CORE_THEMES[theme as keyof typeof DECK_CORE_THEMES]
       if (core) {
         await eventually(async () => $(".core-masthead h1").getText()).equals(core)
@@ -198,13 +209,13 @@ describe("mock bulk torrent actions", function () {
       }
       await menu.$("a[data-role='resume']").click()
       await expectTorrentState(torrents[0].hash, "Downloading")
-      await browser.keys("t")
     }
+    await cycleTheme()
     await eventually(async () => $("html").getAttribute("data-theme")).equals("terminal")
   })
 
   it("shows Matrix code progress in the details panel with independent SVG fills", async function () {
-    await browser.keys("t")
+    await cycleTheme()
     await eventually(async () => $("html").getAttribute("data-theme")).equals("matrix")
     await $(`#torrentTable tr[data-id='${torrents[0].hash}'] .torrent-name-content`).doubleClick()
     const drawer = $(".torrent-details-panel .matrix-code-progress")

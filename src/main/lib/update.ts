@@ -205,9 +205,9 @@ function manualMacUpdater() {
                 notifyUpToDate()
                 return
             }
-            const suffix = process.arch === 'arm64' ? '-arm64.dmg' : '-universal.dmg'
+            const suffix = process.arch === 'arm64' ? '-macOS-arm64.dmg' : '-macOS-universal.dmg'
             const asset = release.assets.find((item: { name: string }) => item.name.endsWith(suffix))
-                || release.assets.find((item: { name: string }) => item.name.endsWith('-universal.dmg'))
+                || release.assets.find((item: { name: string }) => item.name.endsWith('-macOS-universal.dmg'))
             if (!asset || !asset.browser_download_url.startsWith('https://github.com/micro23/Electorrent/releases/download/')) {
                 throw new Error('Release has no compatible macOS installer')
             }

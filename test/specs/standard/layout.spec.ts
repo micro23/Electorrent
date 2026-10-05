@@ -1,5 +1,5 @@
 import chai from "chai"
-import { $, $$ } from "@wdio/globals"
+import { $, $$, browser } from "@wdio/globals"
 import { eventually } from "../../e2e/eventually"
 import { configureSpec } from "../../framework/fixture"
 import { restartApplication } from "../../shared"
@@ -90,6 +90,8 @@ describe("layout", function () {
     }
     await this.app.setTorrentSidebarCollapsed(false)
     await $("torrent-sidebar .deck-sidebar-caption").waitForDisplayed()
+    await browser.keys("d")
+    await eventually(async () => $("html").getAttribute("data-theme")).equals("darkhand")
   })
 
   it("can change layout columns", async function () {
